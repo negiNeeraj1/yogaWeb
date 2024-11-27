@@ -157,7 +157,7 @@ const Hero = () => {
             <div className="relative">
               <img
                 src={
-                  "https://imgs.search.brave.com/DB8writMI5xwiZhBGlKXa-C3t3PPV3GfKoE6OjR5ofU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTM1/OTE0NTI3OS9waG90/by95b2dhLXRpbWUt/YXQtaG9tZS1mb3It/YmVhdXRpZnVsLWZl/bWFsZS1hdGhsZXRl/LmpwZz9zPTYxMng2/MTImdz0wJms9MjAm/Yz1hNGpuRmhwQUxY/MU1NTDlXMzhEUGNy/Rm9DR0xCTU9STE55/MnFETUxtdTVzPQ"
+                  "https://media.istockphoto.com/id/1292399474/photo/woman-meditating-at-park.jpg?s=612x612&w=0&k=20&c=iWXLpMMYCWq59Z11E6qKqHBeTgzXedktGRmsObGvi7g="
                 }
                 alt="Yoga practitioner"
                 className="image-hover w-full h-auto rounded-lg shadow-xl"
