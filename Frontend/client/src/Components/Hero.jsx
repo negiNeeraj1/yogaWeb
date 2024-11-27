@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const customers = [
   {
@@ -58,6 +59,7 @@ const CustomTooltip = ({ children, content }) => {
 };
 
 const Hero = () => {
+  const navigate = useNavigate();
   const userArray = Object.values(customers[0]);
 
   return (
@@ -114,7 +116,7 @@ const Hero = () => {
                 mind. Tailored to your lifestyle and goals.
               </p>
               <div className="space-x-4">
-                <button className="button-hover bg-indigo-600 text-white px-8 py-3 rounded-lg">
+                <button className="button-hover bg-indigo-600 text-white px-8 py-3 rounded-lg" onClick={()=>(navigate('/authPage'))}>
                   Start your journey
                 </button>
                 <button className="button-hover border border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg">

@@ -16,10 +16,16 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/classesPage" className="text-gray-600 hover:text-indigo-600">
+            <Link
+              to="/classesPage"
+              className="text-gray-600 hover:text-indigo-600"
+            >
               Classes
             </Link>
-            <Link to="/blog" className="text-gray-600 hover:text-indigo-600">
+            <Link
+              to="/blogPage"
+              className="text-gray-600 hover:text-indigo-600"
+            >
               Blog
             </Link>
             <Link
@@ -28,23 +34,23 @@ const Navbar = () => {
             >
               Teachers
             </Link>
-            <Link to="/ContactUs" className="text-gray-600 hover:text-indigo-600">
+            <Link
+              to="/contactUs"
+              className="text-gray-600 hover:text-indigo-600"
+            >
               Contact Us
             </Link>
             <Link
-              to="/TestimonialPage"
+              to="/testimonialPage"
               className="text-gray-600 hover:text-indigo-600"
             >
               Testimonials
             </Link>
-            <Link
-              to="/pricing"
-              className="text-gray-600 hover:text-indigo-600"
-            >
+            <Link to="/pricing" className="text-gray-600 hover:text-indigo-600">
               Pro Plan
             </Link>
             <Link
-              to="/try-free"
+              to="/authPage"
               className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
             >
               Try for free
