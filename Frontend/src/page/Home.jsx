@@ -4,6 +4,7 @@ import "aos/dist/aos.css";
 import Hero from "../Components/Hero";
 import Testimonials from "../Components/Testimonial";
 import YogaPoses from "../Components/YogaPoses";
+import Footer from "../Components/Footer";
 
 const Home = () => {
   useEffect(() => {
@@ -18,6 +19,8 @@ const Home = () => {
       <Hero />
       <YogaPoses />
       <Testimonials />
+      <Footer/>
+
     </main>
   );
 };

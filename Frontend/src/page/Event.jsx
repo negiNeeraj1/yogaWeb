@@ -1,4 +1,12 @@
+import React, { useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
 const EventsPage = () => {
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
   const events = [
     {
       date: { day: "15", month: "MAR" },
@@ -75,4 +83,4 @@ const EventsPage = () => {
   );
 };
 
-export default EventsPage
+export default EventsPage;
