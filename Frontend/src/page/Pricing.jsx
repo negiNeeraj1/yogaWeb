@@ -1,3 +1,7 @@
+import React, { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
+
 const PricingPage = () => {
   const plans = [
     {
@@ -37,6 +41,15 @@ const PricingPage = () => {
     },
   ];
 
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
+  const handleChoosePlan = (planName) => {
+    console.log(`Chosen Plan: ${planName}`);
+    // You can add functionality here, e.g., navigate to checkout or open a modal
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-16">
       <div className="container mx-auto px-4">
@@ -50,14 +63,14 @@ const PricingPage = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {plans.map((plan, index) => (
+          {plans.map((plan) => (
             <div
-              key={index}
+              key={plan.name}
               className={`bg-white rounded-lg shadow-md p-8 relative ${
                 plan.isPopular ? "border-2 border-indigo-600" : ""
               }`}
               data-aos="fade-up"
-              data-aos-delay={index * 100}
+              data-aos-delay={100}
             >
               {plan.isPopular && (
                 <span className="absolute top-0 right-0 bg-indigo-600 text-white px-3 py-1 text-sm rounded-bl">
@@ -91,6 +104,7 @@ const PricingPage = () => {
                 ))}
               </ul>
               <button
+                onClick={() => handleChoosePlan(plan.name)}
                 className={`w-full py-2 px-4 rounded transition ${
                   plan.isPopular
                     ? "bg-indigo-600 text-white hover:bg-indigo-700"
@@ -107,4 +121,4 @@ const PricingPage = () => {
   );
 };
 
-export default PricingPage
+export default PricingPage;

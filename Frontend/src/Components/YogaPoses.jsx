@@ -45,7 +45,6 @@ const poses = [
   },
 ];
 
-
 const YogaPoses = () => {
   const [showMore, setShowMore] = useState(false);
 
@@ -61,9 +60,11 @@ const YogaPoses = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {poses.slice(0, showMore ? poses.length : 4).map((pose, index) => (
-            <Link to={'/pose-detail'}>
+            <Link
+              key={index} // Key moved to the Link component
+              to="/pose-detail"
+            >
               <div
-                key={index}
                 className="flex flex-col md:flex-row gap-8 items-center"
                 data-aos="fade-up"
               >
@@ -102,4 +103,4 @@ const YogaPoses = () => {
   );
 };
 
-export default YogaPoses
+export default YogaPoses;
