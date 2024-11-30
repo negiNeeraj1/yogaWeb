@@ -11,6 +11,7 @@ import Bookings from './pages/Bookings';
 import Clients from './pages/Clients';
 import Blogs from './pages/Blogs';
 import Analytics from './pages/Analytics';
+import ManageCoursesPage from "./pages/ManageCoursesPage";
 
 const App = () => {
   return (
@@ -26,7 +27,8 @@ const App = () => {
               <Route path="/clients" element={<Clients />} />
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/analytics" element={<Analytics />} />
-            </Routes>
+              <Route path="/manage-courses" element={<ManageCoursesPage />} />
+              </Routes>
           </main>
           <Footer />
         </div>
