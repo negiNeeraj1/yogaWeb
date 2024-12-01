@@ -8,9 +8,9 @@ const Blogs = () => {
   ];
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Blogs</h2>
-      <div className="overflow-x-auto">
+    <div className="p-6" >
+      <h2 className="text-2xl font-bold mb-4 text-purple-600">Blogs</h2>
+      <div className="overflow-x-auto" style={{backgroundColor:"#f9fafb"}}>
         <table className="table-auto w-full border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
