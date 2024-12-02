@@ -33,24 +33,26 @@ const ContactUs = () => {
   };
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-3">
+    <section className="py-20 bg-gradient-to-r from-indigo-50 via-white to-indigo-50">
+      <div className="container mx-auto px-6 sm:px-10 lg:px-16">
+        {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800">Contact Us</h1>
+          <h1 className="text-5xl font-bold text-indigo-800">Contact Us</h1>
           <p className="text-lg text-gray-600 mt-4">
-            We'd love to hear from you! Please fill out the form below with your
-            details.
+            We'd love to hear from you! Fill out the form below and we'll get back to you as soon as possible.
           </p>
         </div>
+
+        {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-6"
+          className="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-lg shadow-2xl"
         >
           {/* Full Name */}
-          <div>
+          <div className="mb-6">
             <label
               htmlFor="fullName"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-semibold mb-2"
             >
               Full Name
             </label>
@@ -61,16 +63,16 @@ const ContactUs = () => {
               value={formData.fullName}
               onChange={handleChange}
               required
-              className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
-              placeholder="Enter your full name"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
+              placeholder="Your Full Name"
             />
           </div>
 
           {/* Email */}
-          <div>
+          <div className="mb-6">
             <label
               htmlFor="email"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-semibold mb-2"
             >
               Email Address
             </label>
@@ -81,16 +83,16 @@ const ContactUs = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
-              placeholder="Enter your email address"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
+              placeholder="Your Email Address"
             />
           </div>
 
-          {/* Phone Number */}
-          <div>
+          {/* Phone */}
+          <div className="mb-6">
             <label
               htmlFor="phone"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-semibold mb-2"
             >
               Phone Number
             </label>
@@ -101,36 +103,19 @@ const ContactUs = () => {
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
-              placeholder="Enter your phone number"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
+              placeholder="Your Phone Number"
             />
           </div>
 
-          {/* Address */}
-          <div>
-            <label
-              htmlFor="address"
-              className="block text-gray-700 font-medium mb-2"
-            >
-              Address
-            </label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
-              placeholder="Enter your address"
-            />
-          </div>
+         
 
           {/* City, State, ZIP */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" >
             <div>
               <label
                 htmlFor="city"
-                className="block text-gray-700 font-medium mb-2"
+                className="block text-gray-700 font-semibold mb-2"
               >
                 City
               </label>
@@ -140,14 +125,14 @@ const ContactUs = () => {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
                 placeholder="City"
               />
             </div>
             <div>
               <label
                 htmlFor="state"
-                className="block text-gray-700 font-medium mb-2"
+                className="block text-gray-700 font-semibold mb-2"
               >
                 State
               </label>
@@ -157,14 +142,14 @@ const ContactUs = () => {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
                 placeholder="State"
               />
             </div>
             <div>
               <label
                 htmlFor="zip"
-                className="block text-gray-700 font-medium mb-2"
+                className="block text-gray-700 font-semibold mb-2"
               >
                 ZIP Code
               </label>
@@ -174,17 +159,17 @@ const ContactUs = () => {
                 name="zip"
                 value={formData.zip}
                 onChange={handleChange}
-                className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
-                placeholder="ZIP"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
+                placeholder="ZIP Code"
               />
             </div>
           </div>
 
           {/* Message */}
-          <div>
+          <div className="mb-6">
             <label
               htmlFor="message"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-semibold mb-2"
             >
               Message
             </label>
@@ -195,8 +180,8 @@ const ContactUs = () => {
               onChange={handleChange}
               required
               rows="5"
-              className="w-full border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring focus:ring-indigo-200"
-              placeholder="Write your message here"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring focus:ring-indigo-300"
+              placeholder="Your Message"
             ></textarea>
           </div>
 
@@ -204,7 +189,7 @@ const ContactUs = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="bg-indigo-600 text-white py-2 px-6 rounded-lg font-medium shadow hover:bg-indigo-700 transition"
+              className=" btn-all btn-hover text-white py-3 px-8 rounded-lg shadow-md font-medium focus:outline-none focus:ring "
             >
               Submit
             </button>

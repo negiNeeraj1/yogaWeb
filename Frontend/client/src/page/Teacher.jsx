@@ -19,7 +19,7 @@ const Teachers = () => {
             Each teacher brings a wealth of knowledge, compassion, and
             personalized guidance to help you grow in your practice.
           </p>
-          <button className="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition">
+          <button className="mt-8 text-white px-8 py-3 rounded-lg btn-all button-hover btn-hover">
             Try 14 days for free
           </button>
         </div>
