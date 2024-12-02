@@ -1,97 +1,181 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import {
+  HomeIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  CogIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/outline";
+import { Link, useLocation } from "react-router-dom";
+import { BookAIcon } from "lucide-react";
 
-const Sidebar = () => {
-  // State to manage dark mode
-  const [isDarkMode, setIsDarkMode] = useState(false);
+const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
+  const location = useLocation();
 
-  // Effect to load the theme from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark");
-    }
-  }, []);
+  const menuItems = [
+    {
+      icon: HomeIcon,
+      text: "Dashboard",
+      path: "/",
+    },
+    {
+      icon: CalendarIcon,
+      text: "Bookings",
+      path: "/bookings",
+    },
+    {
+      icon: UserGroupIcon,
+      text: "Clients",
+      path: "/clients",
+    },
+    {
+      icon: DocumentTextIcon,
+      text: "Blogs",
+      path: "/blogs",
+    },
+    {
+      icon: ChartBarIcon,
+      text: "Analytics",
+      path: "/analytics",
+    },
+    {
+      icon: BookAIcon,
+      text: "Course",
+      path: "/manage-courses",
+    },
 
-  // Effect to apply the theme based on state
-  useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.body.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDarkMode]);
-
-  // Toggle function to switch between dark and light mode
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+    {
+      icon: CogIcon,
+      text: "Settings",
+      path: "/settings",
+    },
+  ];
 
   return (
-    <aside
-      className={`w-64 min-h-screen shadow-md transition-all duration-500 ease-in-out ${
-        isDarkMode ? "bg-gray-800 text-white" : "bg-[#edeff7] text-gray-800"
-      } relative`}
+    <div
+      className={`
+        bg-white 
+        border-r 
+        border-gray-200 
+        h-screen 
+        fixed 
+        left-0 
+        top-0 
+        transition-all 
+        duration-300 
+        ease-in-out 
+        ${isCollapsed ? "w-20" : "w-64"}
+        shadow-md 
+        flex 
+        flex-col
+      `}
     >
-      {/* Dark/Light Mode Toggle */}
-      <div className="absolute top-4 right-4 flex items-center space-x-3 z-10">
-        {/* Dark Mode Icon */}
-        <label
-          htmlFor="theme-toggle"
-          className="cursor-pointer flex items-center justify-center w-10 h-6 bg-gray-200 rounded-full relative transition-all duration-300 ease-in-out"
-        >
-          <input
-            type="checkbox"
-            id="theme-toggle"
-            className="hidden"
-            checked={isDarkMode}
-            onChange={toggleTheme}
-          />
-          <div
-            className={`w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ease-in-out ${
-              isDarkMode ? "translate-x-2 bg-grey-400" : ""
-            }`}
-          ></div>
-        </label>
+      {/* Collapse/Expand Button */}
+      <button
+        onClick={onToggleCollapse}
+        className="
+          absolute 
+          top-4 
+          -right-4 
+          bg-white 
+          border 
+          border-gray-200 
+          rounded-full 
+          w-8 
+          h-8 
+          flex 
+          items-center 
+          justify-center 
+          shadow-md 
+          z-10
+          hover:bg-gray-50 
+          transition-all
+        "
+      >
+        {isCollapsed ? (
+          <ChevronRightIcon className="h-5 w-5 text-gray-600" />
+        ) : (
+          <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
+        )}
+      </button>
+
+      {/* Logo */}
+      <div
+        className="
+          h-16 
+          flex 
+          items-center 
+          justify-center 
+          border-b 
+          border-gray-200 
+          relative
+        "
+      >
+        {!isCollapsed ? (
+          <h1 className="text-xl font-bold text-gray-800">Yoga Studio</h1>
+        ) : (
+          <h1 className="text-2xl font-bold text-gray-800">Y</h1>
+        )}
       </div>
 
-      {/* Sidebar Header */}
-      <div className="p-6 border-b border-gray-300">
-        <h1 className="text-xl font-bold">Yoga Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your sessions with ease</p>
-      </div>
-
-      {/* Navigation Links */}
-      <nav className="p-4 space-y-3">
-        {[
-          { href: "/overview", text: "Overview" },
-          { href: "/bookings", text: "Bookings" },
-          { href: "/clients", text: "Clients" },
-          { href: "/blogs", text: "Blogs" },
-          { href: "/analytics", text: "Analytics" },
-          { href: "/manage-courses", text: "Manage Fitness Programs" },
-        ].map((item, index) => (
-          <a
-            key={index}
-            href={item.href}
-            className={`block w-full px-4 py-2 text-left border border-gray-300 rounded-lg transition-all duration-300 transform hover:scale-105 ${
-              isDarkMode
-                ? "bg-gray-700 text-white hover:bg-gray-600 hover:border-gray-500"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:border-gray-400"
-            }`}
+      {/* Navigation Menu */}
+      <nav className="flex-grow py-4 overflow-y-auto">
+        {menuItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`
+              flex 
+              items-center 
+              px-6 
+              py-3 
+              transition-all 
+              duration-200 
+              ease-in-out 
+              ${
+                location.pathname === item.path ||
+                (item.path === "/" && location.pathname === "/")
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-600 hover:bg-gray-100"
+              }
+            `}
           >
-            {item.text}
-          </a>
+            <item.icon
+              className={`
+                h-6 
+                w-6 
+                ${
+                  location.pathname === item.path ||
+                  (item.path === "/" && location.pathname === "/")
+                    ? "text-blue-600"
+                    : "text-gray-400"
+                }
+                ${!isCollapsed ? "mr-4" : ""}
+              `}
+            />
+            {!isCollapsed && (
+              <span
+                className={`
+                  text-lg 
+                  font-medium 
+                  ${
+                    location.pathname === item.path ||
+                    (item.path === "/" && location.pathname === "/")
+                      ? "text-blue-600"
+                      : "text-gray-700"
+                  }
+                `}
+              >
+                {item.text}
+              </span>
+            )}
+          </Link>
         ))}
       </nav>
-
-      {/* Sidebar Footer */}
-      <div className="mt-6 p-4 border-t border-gray-300 text-center text-sm text-gray-500">
-        <p>© 2024 Yoga Dashboard</p>
-        <p>All rights reserved</p>
-      </div>
-    </aside>
+    </div>
   );
 };
 
