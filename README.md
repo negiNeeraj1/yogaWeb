@@ -23,3 +23,51 @@ A comprehensive full-stack application for yoga enthusiasts to book yoga session
 
 
 ## Tech Stack
+
+-Frontend:
+
+React.js (Hooks, Functional Components)
+Tailwind CSS
+AOS (for smooth animations)
+
+-Backend:
+ 
+Node.js
+Express.js
+
+-Database:
+MongoDB (using Mongoose)
+
+-Other Tools:
+Visual Studio Code
+Git & GitHub (Version control)
+## Project Structure
+
+📂 yoga-project
+├── 📂 client/                  
+│   ├── 📂 src/
+│   │   ├── 📂 components/    
+│   │   ├── 📂 pages/           
+│   │   ├── 📂 assets/          
+│   │   └── index.js            
+├── 📂 server/                  
+│   ├── 📂 controllers/         
+│   ├── 📂 models/              
+│   ├── 📂 routes/             
+│   └── server.js              
+├── .gitignore                 
+├── package.json                
+└── README.md                  
+
+This above is frontend for client page and same the dashboard for admin page.
+## Getting Started
+Follow these steps to run the project locally.
+
+## Prerequisites
+-Node.js (v16 or above)
+
+-MongoDB (local instance or cloud-based)
+
+-npm or yarn (package manager)
+
+
