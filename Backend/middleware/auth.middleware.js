@@ -84,3 +84,14 @@ export const isOwner = (req, res, next) => {
     }
     next();
 };
+
+
+export const updateLastActivity = async (req, res, next) => {
+    if (req.user) {
+        await User.findByIdAndUpdate(req.user._id, {
+            lastActivity: new Date()
+        });
+    }
+    next();
+};
+

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CalendarIcon,
   UserGroupIcon,
-  DocumentTextIcon,
-  TrendingUpIcon,
+  UserAddIcon,
   ChartBarIcon,
+  ClockIcon,
+  DatabaseIcon,
+  TrendingUpIcon,
+  UsersIcon,
 } from "@heroicons/react/outline";
 import {
   LineChart,
@@ -20,32 +23,35 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import axios from "axios";
+import LoadingSpinner from "../components/LoadingEffect";
 
-// Dummy data for charts
-const bookingData = [
-  { name: "Jan", bookings: 40 },
-  { name: "Feb", bookings: 30 },
-  { name: "Mar", bookings: 50 },
-  { name: "Apr", bookings: 75 },
-  { name: "May", bookings: 60 },
-  { name: "Jun", bookings: 85 },
-];
+const UserAnalyticsService = {
+  async getUserMetrics() {
+    try {
+      const response = await axios.get("http://localhost:4000/api/admin/dashboard-analytics", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch user metrics", error);
+      throw error;
+    }
+  },
+   extractRegistrationTrends(metrics) {
+    return metrics.registrationTrends || [];
+  },
 
-const revenueData = [
-  { name: "Jan", revenue: 4000 },
-  { name: "Feb", revenue: 3000 },
-  { name: "Mar", revenue: 5000 },
-  { name: "Apr", revenue: 7500 },
-  { name: "May", revenue: 6000 },
-  { name: "Jun", revenue: 8500 },
-];
+  extractActivityDistribution(metrics) {
+    return metrics.activityDistribution || [];
+  },
 
-const clientData = [
-  { name: "Yoga Basics", value: 400 },
-  { name: "Advanced Yoga", value: 300 },
-  { name: "Meditation", value: 200 },
-  { name: "Pilates", value: 150 },
-];
+  extractLoginActivity(metrics) {
+    return metrics.loginActivity || [];
+  },
+};
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -108,7 +114,64 @@ const StatsCard = ({
 };
 
 const Overview = () => {
-  const [timePeriod, setTimePeriod] = useState("monthly");
+  const [userMetrics, setUserMetrics] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    newUsersToday: 0,
+    loginsToday: 0,
+    uniqueVisitors: 0,
+    subscribers: 0,
+    averageSessionDuration: "0 mins",
+  });
+
+  const [registrationTrends, setRegistrationTrends] = useState([]);
+  const [activityDistribution, setActivityDistribution] = useState([]);
+  const [loginActivity, setLoginActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserMetrics = async () => {
+      try {
+        const metrics = await UserAnalyticsService.getUserMetrics();
+
+        console.log("Full Metrics:", metrics);
+        console.log("Registration Trends:", metrics.registrationTrends);
+
+        setUserMetrics({
+          totalUsers: metrics.totalUsers,
+          activeUsers: metrics.activeUsers,
+          newUsersToday: metrics.newUsersToday,
+          loginsToday: metrics.loginsToday,
+          uniqueVisitors: metrics.uniqueVisitors,
+          subscribers: metrics.subscribers,
+          averageSessionDuration: metrics.averageSessionDuration,
+        });
+
+        setRegistrationTrends(
+          UserAnalyticsService.extractRegistrationTrends(metrics)
+        );
+
+        setActivityDistribution(
+          UserAnalyticsService.extractActivityDistribution(metrics)
+        );
+
+        setLoginActivity(UserAnalyticsService.extractLoginActivity(metrics));
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch user metrics", error);
+        setLoading(false);
+      }
+    };
+
+    fetchUserMetrics();
+  }, []);
+
+  if (loading) {
+    return (
+      <LoadingSpinner/>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -116,84 +179,82 @@ const Overview = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-extrabold text-gray-900">
-            Dashboard Overview
+            User Analytics Dashboard
           </h2>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white rounded-lg p-1 flex items-center space-x-1">
-              <button
-                onClick={() => setTimePeriod("monthly")}
-                className={`
-                  px-3 py-1 rounded-md text-sm 
-                  ${
-                    timePeriod === "monthly"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-600"
-                  }
-                `}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setTimePeriod("yearly")}
-                className={`
-                  px-3 py-1 rounded-md text-sm 
-                  ${
-                    timePeriod === "yearly"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-600"
-                  }
-                `}
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* User Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatsCard
-            title="Total Bookings"
-            value="345"
-            icon={<CalendarIcon className="h-6 w-6 text-blue-500" />}
-            change="+12.5% from last month"
+            title="Total Users"
+            value={userMetrics.totalUsers}
+            icon={<UserGroupIcon className="h-6 w-6 text-blue-500" />}
+            change="+5.2% this month"
             backgroundColor="bg-white"
             iconBackground="bg-blue-100"
           />
           <StatsCard
-            title="Total Clients"
-            value="123"
-            icon={<UserGroupIcon className="h-6 w-6 text-green-500" />}
-            change="+8.2% from last month"
+            title="Active Users"
+            value={userMetrics.activeUsers}
+            icon={<UsersIcon className="h-6 w-6 text-green-500" />}
+            change="+3.8% from last week"
             backgroundColor="bg-white"
             iconBackground="bg-green-100"
           />
           <StatsCard
-            title="Blog Views"
-            value="12,345"
-            icon={<DocumentTextIcon className="h-6 w-6 text-purple-500" />}
-            change="+22.3% from last week"
+            title="New Users Today"
+            value={userMetrics.newUsersToday}
+            icon={<UserAddIcon className="h-6 w-6 text-purple-500" />}
+            change="+12.5% from yesterday"
             backgroundColor="bg-white"
             iconBackground="bg-purple-100"
           />
         </div>
 
+        {/* Secondary Metrics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatsCard
+            title="Logins Today"
+            value={userMetrics.loginsToday}
+            icon={<ClockIcon className="h-6 w-6 text-orange-500" />}
+            change="+7.2% from last week"
+            backgroundColor="bg-white"
+            iconBackground="bg-orange-100"
+          />
+          <StatsCard
+            title="Unique Visitors"
+            value={userMetrics.uniqueVisitors}
+            icon={<DatabaseIcon className="h-6 w-6 text-teal-500" />}
+            change="+6.5% this month"
+            backgroundColor="bg-white"
+            iconBackground="bg-teal-100"
+          />
+          <StatsCard
+            title="Subscribers"
+            value={userMetrics.subscribers}
+            icon={<TrendingUpIcon className="h-6 w-6 text-red-500" />}
+            change="+4.1% from last month"
+            backgroundColor="bg-white"
+            iconBackground="bg-red-100"
+          />
+        </div>
+
         {/* Charts Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Bookings Line Chart */}
+          {/* User Registration Trend */}
           <div className="bg-white shadow-md rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Bookings Trend
+              User Registration Trend
             </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={bookingData}>
+              <LineChart data={registrationTrends}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Line
                   type="monotone"
-                  dataKey="bookings"
+                  dataKey="registrations"
                   stroke="#8884d8"
                   strokeWidth={2}
                 />
@@ -201,31 +262,15 @@ const Overview = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Revenue Bar Chart */}
+          {/* User Activity Distribution */}
           <div className="bg-white shadow-md rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Revenue Analysis
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="revenue" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Client Distribution Pie Chart */}
-          <div className="bg-white shadow-md rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Client Distribution
+              User Activity Distribution
             </h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={clientData}
+                  data={activityDistribution}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -233,7 +278,7 @@ const Overview = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {clientData.map((entry, index) => (
+                  {activityDistribution.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -244,6 +289,22 @@ const Overview = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
+
+          {/* Login Activity */}
+          <div className="bg-white shadow-md rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Login Time Distribution
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={loginActivity}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="logins" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Additional Insights */}
@@ -251,18 +312,20 @@ const Overview = () => {
           <div className="bg-white shadow-md rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">
-                Quick Insights
+                User Engagement Metrics
               </h3>
-              <TrendingUpIcon className="h-6 w-6 text-green-500" />
+              <ChartBarIcon className="h-6 w-6 text-blue-500" />
             </div>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-gray-600">Total Revenue</span>
-                <span className="font-bold text-gray-800">$45,678</span>
+                <span className="text-gray-600">Avg. Session Duration</span>
+                <span className="font-bold text-gray-800">
+                  {userMetrics.averageSessionDuration}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Average Booking Value</span>
-                <span className="font-bold text-gray-800">$132</span>
+                <span className="text-gray-600">Most Active Time</span>
+                <span className="font-bold text-gray-800">Evening</span>
               </div>
             </div>
           </div>
@@ -270,18 +333,22 @@ const Overview = () => {
           <div className="bg-white shadow-md rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">
-                Recent Activity
+                Recent User Activities
               </h3>
-              <ChartBarIcon className="h-6 w-6 text-orange-500" />
+              <UsersIcon className="h-6 w-6 text-green-500" />
             </div>
             <ul className="space-y-3">
               <li className="flex justify-between">
-                <span className="text-gray-600">New Client Registration</span>
-                <span className="text-sm text-gray-500">2 mins ago</span>
+                <span className="text-gray-600">New User Registration</span>
+                <span className="text-sm text-gray-500">5 mins ago</span>
               </li>
               <li className="flex justify-between">
-                <span className="text-gray-600">Booking Confirmed</span>
+                <span className="text-gray-600">User Login</span>
                 <span className="text-sm text-gray-500">15 mins ago</span>
+              </li>
+              <li className="flex justify-between">
+                <span className="text-gray-600">Profile Updated</span>
+                <span className="text-sm text-gray-500">30 mins ago</span>
               </li>
             </ul>
           </div>

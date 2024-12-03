@@ -181,6 +181,74 @@ const userSchema = new mongoose.Schema({
     joinedDate: {
         type: Date,
         default: Date.now
+    },
+    loginHistory: [{
+        timestamp: {
+            type: Date,
+            default: Date.now
+        },
+        ipAddress: {
+            type: String
+        }
+    }],
+
+    lastLogin: {
+        type: Date
+    },
+
+    accountStatus: {
+        type: String,
+        enum: ['active', 'inactive', 'suspended'],
+        default: 'active'
+    },
+
+    loginCount: {
+        type: Number,
+        default: 0
+    },
+
+    isSubscriber: {
+        type: Boolean,
+        default: false
+    },
+
+    subscriptionDate: {
+        type: Date
+    },
+
+    sessionDurations: [{
+        loginTime: {
+            type: Date
+        },
+        logoutTime: {
+            type: Date
+        },
+        duration: {
+            type: Number // in minutes
+        }
+    }],
+
+    analyticsMetadata: {
+        registrationSource: {
+            type: String,
+            enum: ['website', 'mobile', 'referral', 'other']
+        },
+        referredBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        firstInteractionDate: {
+            type: Date
+        }
+    },
+    lastActivity: {
+        type: Date,
+        default: Date.now
+    },
+    subscriptionStatus: {
+        type: String,
+        enum: ['active', 'inactive', 'expired'],
+        default: 'inactive'
     }
 }, {
     timestamps: true

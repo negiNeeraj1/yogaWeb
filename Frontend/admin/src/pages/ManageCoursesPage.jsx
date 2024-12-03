@@ -12,6 +12,271 @@ import {
   Info,
 } from "lucide-react";
 
+// Course Modal Component
+const CourseModal = ({ course, onClose, onSave }) => {
+  const [formData, setFormData] = useState(
+    course || {
+      name: "",
+      level: "Beginner",
+      price: "",
+      description: "",
+      instructor: "",
+      venue: "",
+      date: "",
+      time: "",
+      duration: "",
+      maxParticipants: "",
+    }
+  );
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Basic validation
+    if (!formData.name || !formData.instructor) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    onSave({
+      ...formData,
+      price: Number(formData.price),
+      maxParticipants: Number(formData.maxParticipants)
+    });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative">
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          <X size={24} />
+        </button>
+        <h2 className="text-2xl font-bold mb-6 text-indigo-600">
+          {course ? "Edit Course" : "Add New Course"}
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Course Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Level</label>
+              <select
+                name="level"
+                value={formData.level}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Price (₹)</label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Instructor</label>
+              <input
+                type="text"
+                name="instructor"
+                value={formData.instructor}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Venue</label>
+              <input
+                type="text"
+                name="venue"
+                value={formData.venue}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Time</label>
+              <input
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Max Participants</label>
+              <input
+                type="number"
+                name="maxParticipants"
+                value={formData.maxParticipants}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+            <input
+              type="number"
+              name="duration"
+              value={formData.duration}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-4 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+            >
+              {course ? "Update Course" : "Add Course"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Course Details Modal Component
+const CourseDetailsModal = ({ course, onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative">
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          <X size={24} />
+        </button>
+        <h2 className="text-2xl font-bold mb-6 text-indigo-600">{course.name}</h2>
+        
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-600 font-medium">Description</p>
+            <p className="text-gray-800">{course.description}</p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Level</p>
+              <p className="text-gray-800">{course.level}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Price</p>
+              <p className="text-gray-800">₹{course.price.toLocaleString()}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Instructor</p>
+              <p className="text-gray-800">{course.instructor}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Venue</p>
+              <p className="text-gray-800">{course.venue}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Date</p>
+              <p className="text-gray-800">{course.date}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Time</p>
+              <p className="text-gray-800">{course.time}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 font-medium">Duration</p>
+              <p className="text-gray-800">{course.duration}</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-600 font-medium">Max Participants</p>
+            <p className="text-gray-800">{course.maxParticipants}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main Manage Courses Page Component
 const ManageCoursesPage = () => {
   const [courses, setCourses] = useState([
     {
@@ -62,8 +327,6 @@ const ManageCoursesPage = () => {
   const [filterLevel, setFilterLevel] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // ... [Previous CourseModal and CourseDetailsModal components remain the same]
-
   // Add a new course
   const addCourse = (newCourse) => {
     const courseToAdd = {
@@ -73,15 +336,17 @@ const ManageCoursesPage = () => {
     const updatedCourses = [...courses, courseToAdd];
     setCourses(updatedCourses);
     setFilteredCourses(updatedCourses);
+    setIsModalOpen(false);
   };
 
   // Edit an existing course
   const editCourse = (updatedCourse) => {
     const updatedCourses = courses.map((course) =>
-      course.id === updatedCourse.id ? updatedCourse : course
+      course.id === updatedCourse.id ? { ...updatedCourse } : course
     );
     setCourses(updatedCourses);
     setFilteredCourses(updatedCourses);
+    setIsModalOpen(false);
   };
 
   // Delete a course
@@ -143,6 +408,14 @@ const ManageCoursesPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none transition-all"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            )}
           </div>
 
           <div className="relative">

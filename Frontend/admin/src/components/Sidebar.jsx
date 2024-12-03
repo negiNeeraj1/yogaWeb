@@ -50,7 +50,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     {
       icon: CogIcon,
       text: "Settings",
-      path: "/settings",
+      path: "/setting",
     },
   ];
 
