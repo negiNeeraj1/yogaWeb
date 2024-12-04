@@ -60,7 +60,7 @@ const BlogPage = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bgcAll">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-5">
         {/* Header */}
         <div className="text-center mb-12">

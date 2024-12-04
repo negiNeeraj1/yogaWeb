@@ -12,6 +12,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { BookAIcon } from "lucide-react";
 
+
 const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
 
@@ -73,6 +74,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         flex-col
       `}
     >
+
       {/* Collapse/Expand Button */}
       <button
         onClick={onToggleCollapse}
@@ -120,6 +122,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           <h1 className="text-2xl font-bold text-gray-800">Y</h1>
         )}
       </div>
+
 
       {/* Navigation Menu */}
       <nav className="flex-grow py-4 overflow-y-auto">
@@ -174,6 +177,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
             )}
           </Link>
         ))}
+
       </nav>
     </div>
   );

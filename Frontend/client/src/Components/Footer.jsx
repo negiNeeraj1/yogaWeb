@@ -40,28 +40,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-50">
       {/* Newsletter Section */}
-      <div className="bg-purple-600">
-        <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-white">
-              <h3 className="text-2xl font-bold">Join Our Newsletter</h3>
-              <p className="mt-2 text-purple-100">Get updates on classes, events, and wellness tips</p>
-            </div>
-            <div className="w-full md:w-96">
-              <form className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                />
-                <button type='button' className="px-6 py-3 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-colors">
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+  
 
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">

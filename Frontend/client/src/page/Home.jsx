@@ -5,6 +5,8 @@ import Hero from "../Components/Hero";
 import Testimonials from "../Components/Testimonial";
 import YogaPoses from "../Components/YogaPoses";
 import Footer from "../Components/Footer";
+import RecommendedBatches from '../Components/RecommendedBatches';
+
 
 const Home = () => {
   useEffect(() => {
@@ -15,9 +17,10 @@ const Home = () => {
   }, []);
 
   return (
-    <main className="w-full">
+    <main className="w-full bgcAll">
       <Hero />
       <YogaPoses />
+      <RecommendedBatches />
       <Testimonials />
       <Footer/>
 

@@ -51,7 +51,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/authPage"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+              className=" btn-all text-white px-4 py-2 rounded-md button-hover"
             >
               Try for free
             </Link>

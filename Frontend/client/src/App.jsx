@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import './App.css'
+import './index.css'
 import Home from "./page/Home";
 import Teachers from "./page/Teacher";
 import Pricing from "./page/Pricing";
@@ -11,6 +12,9 @@ import ClassesPage from "./page/Classes";
 import BlogPage from "./page/Blog";
 import ContactUs  from "./page/Contact";
 import TestimonialPage from "./page/Testimonial";
+import CoursePage from './page/CoursePage';
+
+
 const App = () => {
   return (
     <Router>
@@ -23,6 +27,7 @@ const App = () => {
           <Route path="/authPage" element={<AuthPage />} />    
           <Route path="/eventsPage" element={<EventsPage />} />      
           <Route path="/classesPage" element={<ClassesPage />} />  
+          <Route path="/course/:id" element={<CoursePage />} />
           <Route path="/blogPage" element={<BlogPage />} />  
           <Route path="/contactUs" element={<ContactUs />} />  
           <Route path="/testimonialPage" element={<TestimonialPage />} />  

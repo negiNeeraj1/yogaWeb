@@ -28,7 +28,7 @@ const testimonials = [
     image:
       "https://images.unsplash.com/photo-1623582854588-d60de57fa33f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGF2YXRhcnxlbnwwfHwwfHx8MA%3D%3D",
     galleryImage:
-      "https://c4.wallpaperflare.com/wallpaper/804/257/228/girl-pose-gymnastics-yoga-wallpaper-preview.jpg",
+      "https://media.istockphoto.com/id/1219401141/photo/woman-practicing-yoga-in-lotus-position-at-park.jpg?s=612x612&w=0&k=20&c=Bk7HV73FLORtdNrnB9L0MI9tbMLB28W1c5N65bMiPvI=",
   },
   {
     text: "This program has been life-changing. I'm more focused at work and relaxed at home.",
