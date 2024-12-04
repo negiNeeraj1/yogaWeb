@@ -27,7 +27,7 @@ const customers2 = [
       image:
         "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YXZhdGFyfGVufDB8fDB8fHww",
     },
-    live:{
+    live: {
       name: "mohit",
       image:
         "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXZhdGFyfGVufDB8fDB8fHww",
@@ -139,10 +139,21 @@ const Hero = () => {
                 mind. Tailored to your lifestyle and goals.
               </p>
               <div className="space-x-4">
-                <button className="button-hover btn-all text-white px-8 py-3 rounded-lg btn-hover" onClick={()=>(navigate('/authPage'))} style={{fontWeight:"600"}}>
+                <button
+                  className="button-hover btn-all text-white px-8 py-3 rounded-lg btn-hover"
+                  onClick={() => navigate("/authPage")}
+                  style={{ fontWeight: "600" }}
+                >
                   Start your journey
                 </button>
-                <button className="button-hover  border px-8 py-3 rounded-lg" style={{border:"1px solid #e97963",color:"#e97963",fontWeight:"600"}}>
+                <button
+                  className="button-hover  border px-8 py-3 rounded-lg"
+                  style={{
+                    border: "1px solid #e97963",
+                    color: "#e97963",
+                    fontWeight: "600",
+                  }}
+                >
                   Learn More <ArrowRight className="inline ml-2" size={20} />
                 </button>
               </div>

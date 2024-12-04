@@ -51,7 +51,7 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-24">
+    <div className="min-h-screen bgcAll py-24">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16" data-aos="fade-up">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
