@@ -36,7 +36,9 @@ const adminUserSchema = new mongoose.Schema({
     role: {
         type: String,
         default: 'admin'
-    }
+    },
+    lastLogin: Date,
+    joinedDate: Date,
 }, {
     timestamps: true 
 });

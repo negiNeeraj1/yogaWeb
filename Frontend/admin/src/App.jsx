@@ -8,7 +8,6 @@ import {
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer";
-import Overview from "./pages/Overview";
 import Bookings from "./pages/Bookings";
 import Clients from "./pages/Clients";
 import Blogs from "./pages/Blogs";
@@ -19,6 +18,7 @@ import Setting from "./pages/Setting";
 import { useAuth } from "./components/AuthContext";
 import AdminLoginPage from "./pages/login";
 import AdminSignupPage from "./pages/Signup";
+import YogaDashboard from "./pages/Overview";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -59,7 +59,7 @@ const App = () => {
                 path="/"
                 element={
                   <PrivateRoute>
-                    <Overview />
+                    <YogaDashboard />
                   </PrivateRoute>
                 }
               />

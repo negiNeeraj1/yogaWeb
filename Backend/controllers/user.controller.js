@@ -217,6 +217,9 @@ export const getUserAnalytics = async (req, res) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
         const analytics = await User.aggregate([
             {
                 $facet: {
@@ -224,9 +227,7 @@ export const getUserAnalytics = async (req, res) => {
                     activeUsers: [
                         {
                             $match: {
-                                lastLogin: {
-                                    $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-                                }
+                                lastLogin: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
                             }
                         },
                         { $count: 'count' }
@@ -234,7 +235,10 @@ export const getUserAnalytics = async (req, res) => {
                     newUsersToday: [
                         {
                             $match: {
-                                createdAt: { $gte: today }
+                                createdAt: {
+                                    $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                                    $lt: new Date(new Date().setHours(23, 59, 59, 999))
+                                }
                             }
                         },
                         { $count: 'count' }
@@ -242,16 +246,31 @@ export const getUserAnalytics = async (req, res) => {
                     loginsToday: [
                         {
                             $match: {
-                                'loginHistory.timestamp': { $gte: today }
+                                lastLogin: {
+                                    $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                                    $lt: new Date(new Date().setHours(23, 59, 59, 999))
+                                }
                             }
                         },
                         { $count: 'count' }
                     ],
-                    userActivityDistribution: [
+                    registrationTrends: [
+                        {
+                            $match: { createdAt: { $gte: thirtyDaysAgo } }
+                        },
+                        {
+                            $group: {
+                                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                                registrations: { $sum: 1 }
+                            }
+                        },
+                        { $sort: { _id: 1 } }
+                    ],
+                    activityDistribution: [
                         {
                             $group: {
                                 _id: '$experienceLevel',
-                                count: { $sum: 1 }
+                                value: { $sum: 1 }
                             }
                         }
                     ],
@@ -270,29 +289,51 @@ export const getUserAnalytics = async (req, res) => {
                                 _id: {
                                     $switch: {
                                         branches: [
-                                            { case: { $lt: ['$loginHour', 6 ]}, then: 'Early Morning' },
-                                            { case: { $lt: ['$loginHour', 12 ]}, then: 'Morning' },
-                                            { case: { $lt: ['$loginHour', 17 ]}, then: 'Afternoon' },
-                                            { case: { $lt: ['$loginHour', 21 ]}, then: 'Evening' }
+                                            { case: { $lt: ['$loginHour', 6] }, then: 'Early Morning' },
+                                            { case: { $lt: ['$loginHour', 12] }, then: 'Morning' },
+                                            { case: { $lt: ['$loginHour', 17] }, then: 'Afternoon' },
+                                            { case: { $lt: ['$loginHour', 21] }, then: 'Evening' }
                                         ],
                                         default: 'Night'
                                     }
                                 },
-                                count: { $sum: 1 }
+                                logins: { $sum: 1 }
                             }
                         }
+                    ],
+                    subscribers: [
+                        {
+                            $match: {
+                                isSubscriber: true,
+                                subscriptionStatus: 'active'
+                            }
+                        },
+                        { $count: 'count' }
                     ]
                 }
             }
         ]);
 
+        const analyticsData = analytics[0];
+
         res.json({
-            totalUsers: analytics[0].totalUsers[0]?.count || 0,
-            activeUsers: analytics[0].activeUsers[0]?.count || 0,
-            newUsersToday: analytics[0].newUsersToday[0]?.count || 0,
-            loginsToday: analytics[0].loginsToday[0]?.count || 0,
-            userActivityDistribution: analytics[0].userActivityDistribution,
-            loginTimeDistribution: analytics[0].loginTimeDistribution
+            totalUsers: analyticsData.totalUsers[0]?.count || 0,
+            activeUsers: analyticsData.activeUsers[0]?.count || 0,
+            newUsersToday: analyticsData.newUsersToday[0]?.count || 0,
+            loginsToday: analyticsData.loginsToday[0]?.count || 0,
+            subscribers: analyticsData.subscribers[0]?.count || 0,
+            registrationTrends: analyticsData.registrationTrends.map(trend => ({
+                name: trend._id,
+                registrations: trend.registrations
+            })),
+            activityDistribution: analyticsData.activityDistribution.map(activity => ({
+                name: activity._id,
+                value: activity.value
+            })),
+            loginTimeDistribution: analyticsData.loginTimeDistribution.map(login => ({
+                name: login._id,
+                logins: login.logins
+            }))
         });
     } catch (error) {
         console.error('Analytics retrieval error:', error);
@@ -303,19 +344,61 @@ export const getUserAnalytics = async (req, res) => {
     }
 };
 
+export const trackUserSession = async (req, res) => {
+    try {
+        const { userId, loginTime, logoutTime, ipAddress } = req.body;
+
+        const duration = Math.round((new Date(logoutTime) - new Date(loginTime)) / 60000); // Duration in minutes
+
+        await User.findByIdAndUpdate(userId, {
+            $push: {
+                sessionDurations: {
+                    loginTime: new Date(loginTime),
+                    logoutTime: new Date(logoutTime),
+                    duration
+                },
+                loginHistory: { timestamp: new Date(loginTime), ipAddress }
+            },
+            $set: { lastLogin: new Date(logoutTime) },
+            $inc: { loginCount: 1 }
+        });
+
+        res.status(200).json({ message: 'Session tracked successfully', sessionDuration: `${duration} mins` });
+    } catch (error) {
+        console.error('Error tracking session:', error);
+        res.status(500).json({ message: 'Error tracking session', error: error.message });
+    }
+};
+
+
 // Modify existing login controller
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log("Login attempt for:", email);
+
+        // Find the user by email
         const existingUser = await User.findOne({ email });
 
+        // Check if user exists
         if (!existingUser) {
-            return res.status(404).json({ message: "User not found" });
+            console.log("User not found:", email);
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
         }
 
+        // Compare passwords
         const isMatch = await existingUser.comparePassword(password);
+
+        // Check if password is correct
         if (!isMatch) {
-            return res.status(401).json({ message: "Invalid credentials" });
+            console.log("Password mismatch for:", email);
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials"
+            });
         }
 
         // Update login tracking
@@ -324,7 +407,8 @@ export const login = async (req, res) => {
             ipAddress: req.ip // Capture IP address
         };
 
-        await User.findByIdAndUpdate(existingUser._id, {
+        // Update user login stats
+        const updatedUser = await User.findByIdAndUpdate(existingUser._id, {
             $set: {
                 lastLogin: new Date(),
                 lastActivity: new Date(),
@@ -336,21 +420,32 @@ export const login = async (req, res) => {
             $inc: {
                 loginCount: 1
             }
+        }, { new: true }); // Return the updated document
+
+        // Set session data
+        req.session.userId = existingUser._id;
+        req.session.userRole = existingUser.role;
+
+        // Prepare user response (exclude sensitive information)
+        const userResponse = {
+            id: existingUser._id,
+            firstName: existingUser.firstName,
+            lastName: existingUser.lastName,
+            email: existingUser.email,
+            role: existingUser.role
+        };
+
+        // Send successful response
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            user: userResponse
         });
 
-        res.json({
-            user: {
-                id: existingUser._id,
-                firstName: existingUser.firstName,
-                lastName: existingUser.lastName,
-                email: existingUser.email,
-                role: existingUser.role
-            },
-            message: "User logged in successfully"
-        });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({
+            success: false,
             error: error.message || "Internal server error"
         });
     }

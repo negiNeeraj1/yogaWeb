@@ -12,3 +12,14 @@ export const SignUpUser = async (userData) => {
     throw error.response ? error.response.data : new Error("Network Error");
   }
 };
+
+export const LoginUser = async (userData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/user/login`, userData, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};

@@ -217,15 +217,9 @@ const userSchema = new mongoose.Schema({
     },
 
     sessionDurations: [{
-        loginTime: {
-            type: Date
-        },
-        logoutTime: {
-            type: Date
-        },
-        duration: {
-            type: Number // in minutes
-        }
+        loginTime: { type: Date },
+        logoutTime: { type: Date },
+        duration: { type: Number }
     }],
 
     analyticsMetadata: {
@@ -256,13 +250,17 @@ const userSchema = new mongoose.Schema({
 
 // Password hashing middleware
 userSchema.pre('save', async function (next) {
+    // Only hash the password if it has been modified (or is new)
     if (!this.isModified('password')) return next();
 
     try {
+        console.log("Hashing password for:", this.email);
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
+        console.log("Password hashed successfully");
         next();
     } catch (error) {
+        console.error("Password hashing error:", error);
         next(error);
     }
 });

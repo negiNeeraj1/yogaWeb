@@ -1,39 +1,66 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./Components/Navbar";
-import './App.css'
-import './index.css'
+import "./App.css";
+import "./index.css";
 import Home from "./page/Home";
 import Teachers from "./page/Teacher";
 import Pricing from "./page/Pricing";
-import AuthPage from "./page/Login";
+import AuthPage from "./page/AuthPage";
 import EventsPage from "./page/Event";
-import ClassesPage from "./page/Classes";
+import ClassesPage from "./page/Dashboard/ClassPage";
 import BlogPage from "./page/Blog";
-import ContactUs  from "./page/Contact";
+import ContactUs from "./page/Contact";
 import TestimonialPage from "./page/Testimonial";
-import CoursePage from './page/CoursePage';
-
+import CoursePage from "./page/CoursePage";
+import LoginPage from "./page/LoginPage";
+import ProtectedRoute from "./routes/PrivateRoute";
+import DashboardLayout from "./Components/dashboard/DashboardLayout";
+import ProfilePage from "./page/Dashboard/ProfilePage";
+import ProgressPage from "./page/Dashboard/Progress";
+import MainDashboard from "./page/Dashboard/MainDashboard"; // Make sure to import this
 
 const App = () => {
   return (
-    <Router>
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/authPage" element={<AuthPage />} />    
-          <Route path="/eventsPage" element={<EventsPage />} />      
-          <Route path="/classesPage" element={<ClassesPage />} />  
-          <Route path="/course/:id" element={<CoursePage />} />
-          <Route path="/blogPage" element={<BlogPage />} />  
-          <Route path="/contactUs" element={<ContactUs />} />  
-          <Route path="/testimonialPage" element={<TestimonialPage />} />  
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-white">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/loginPage" element={<LoginPage />} />
+
+            {/* Nested Dashboard Routes */}
+            <Route
+              path="/yogadashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              {/* Default dashboard route */}
+              <Route index element={<MainDashboard />} />
+              <Route path="classes" element={<ClassesPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="progress" element={<ProgressPage />} />
+            </Route>
+
+            {/* Other Routes */}
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/authPage" element={<AuthPage />} />
+            <Route path="/eventsPage" element={<EventsPage />} />
+            <Route path="/classesPage" element={<ClassesPage />} />
+            <Route path="/course/:id" element={<CoursePage />} />
+            <Route path="/blogPage" element={<BlogPage />} />
+            <Route path="/contactUs" element={<ContactUs />} />
+            <Route path="/testimonialPage" element={<TestimonialPage />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 };
 

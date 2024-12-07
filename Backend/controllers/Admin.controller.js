@@ -115,155 +115,49 @@ export const getAdminDashboardAnalytics = async (req, res) => {
         const userAnalytics = await User.aggregate([
             {
                 $facet: {
-                    // Total Users Count
-                    totalUsers: [{ $count: 'count' }],
-
-                    // Active Users (last 7 days)
+                    totalUsers: [{ $count: "count" }],
                     activeUsers: [
                         {
                             $match: {
-                                lastLogin: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-                            }
+                                lastLogin: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+                            },
                         },
-                        { $count: 'count' }
+                        { $count: "count" },
                     ],
-
-                    // New Users Today
                     newUsersToday: [
                         {
                             $match: {
-                                createdAt: {
-                                    $gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                                    $lt: new Date(new Date().setHours(23, 59, 59, 999))
-                                }
-                            }
-                        },
-                        { $count: 'count' }
-                    ],
-
-                    // Logins Today
-                    loginsToday: [
-                        {
-                            $match: {
-                                lastLogin: {
-                                    $gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                                    $lt: new Date(new Date().setHours(23, 59, 59, 999))
-                                }
-                            }
-                        },
-                        { $count: 'count' }
-                    ],
-
-                    // Registration Trends (Last 30 Days)
-                    registrationTrends: [
-                        {
-                            $match: {
-                                createdAt: { $gte: thirtyDaysAgo }
-                            }
-                        },
-                        {
-                            $group: {
-                                _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-                                registrations: { $sum: 1 }
-                            }
-                        },
-                        { $sort: { _id: 1 } }
-                    ],
-
-                    // Activity Distribution
-                    activityDistribution: [
-                        {
-                            $group: {
-                                _id: '$experienceLevel',
-                                value: { $sum: 1 }
-                            }
-                        }
-                    ],
-
-                    // Login Activity Distribution
-                    loginActivity: [
-                        {
-                            $addFields: {
-                                loginHour: { $hour: { $ifNull: ['$lastLogin', '$createdAt'] } }
-                            }
-                        },
-                        {
-                            $group: {
-                                _id: {
-                                    $switch: {
-                                        branches: [
-                                            { case: { $lt: ['$loginHour', 6] }, then: 'Early Morning' },
-                                            { case: { $lt: ['$loginHour', 12] }, then: 'Morning' },
-                                            { case: { $lt: ['$loginHour', 17] }, then: 'Afternoon' },
-                                            { case: { $lt: ['$loginHour', 21] }, then: 'Evening' }
-                                        ],
-                                        default: 'Night'
-                                    }
+                                joinedDate: {
+                                    $gte: today,
+                                    $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
                                 },
-                                logins: { $sum: 1 }
-                            }
-                        }
-                    ],
-
-                    // Subscribers
-                    subscribers: [
-                        {
-                            $match: {
-                                isSubscriber: true,
-                                subscriptionStatus: 'active'
-                            }
+                            },
                         },
-                        { $count: 'count' }
+                        { $count: "count" },
                     ],
-
-                    // Average Session Duration
-                    averageSessionDuration: [
-                        { $unwind: '$sessionDurations' },
+                    registrationTrends: [
+                        { $match: { joinedDate: { $gte: thirtyDaysAgo } } },
                         {
                             $group: {
-                                _id: null,
-                                avgDuration: { $avg: '$sessionDurations.duration' }
-                            }
-                        }
-                    ]
-                }
-            }
+                                _id: { $dateToString: { format: "%Y-%m-%d", date: "$joinedDate" } },
+                                registrations: { $sum: 1 },
+                            },
+                        },
+                        { $sort: { _id: 1 } },
+                    ],
+                },
+            },
         ]);
 
         const analytics = userAnalytics[0];
 
         res.json({
-            // Basic Metrics
             totalUsers: analytics.totalUsers[0]?.count || 0,
             activeUsers: analytics.activeUsers[0]?.count || 0,
             newUsersToday: analytics.newUsersToday[0]?.count || 0,
-            loginsToday: analytics.loginsToday[0]?.count || 0,
-            uniqueVisitors: analytics.activeUsers[0]?.count || 0,
-            subscribers: analytics.subscribers[0]?.count || 0,
-            averageSessionDuration: `${Math.round(analytics.averageSessionDuration[0]?.avgDuration || 0)} mins`,
-
-            // Trends and Distributions for Charts
-            registrationTrends: analytics.registrationTrends.map(trend => ({
-                name: trend._id,
-                registrations: trend.registrations
-            })),
-
-            activityDistribution: analytics.activityDistribution.map(activity => ({
-                name: activity._id,
-                value: activity.value
-            })),
-
-            loginActivity: analytics.loginActivity.map(login => ({
-                name: login._id,
-                logins: login.logins
-            }))
+            registrationTrends: analytics.registrationTrends,
         });
-
     } catch (error) {
-        console.error('Analytics retrieval error:', error);
-        res.status(500).json({
-            message: 'Error retrieving dashboard analytics',
-            error: error.message
-        });
+        res.status(500).json({ message: "Error retrieving analytics", error: error.message });
     }
 };

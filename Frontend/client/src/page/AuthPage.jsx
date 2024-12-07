@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { SignUpUser } from "../api/api";
+import { Link } from "react-router-dom";
 
 
 const AuthPage = () => {
@@ -583,6 +584,20 @@ const AuthPage = () => {
                   </button>
                 )}
               </div>
+
+              {(
+                <div className="text-center mt-4">
+                  <span className="text-sm text-gray-600">
+                    Already have an account?{" "}
+                    <Link
+                      to={'/loginPage'}
+                      className="text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
+                    >
+                      Log in
+                    </Link>
+                  </span>
+                </div>
+              )}
             </form>
           </div>
         </div>

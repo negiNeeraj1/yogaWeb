@@ -1,14 +1,14 @@
 import User from "../models/user.Model";
 
-export const isAuthenticated = (req , res , next) =>{
-    if(!req.session.userId){
-        return res.status(401).json({
-            success: false,
-            message : "Authentication required , you must be logged in"
-        })
+export const isAuthenticated = (req, res, next) => {
+    if (req.session && req.session.userId) {
+        return next();
     }
-    next();
-}
+    res.status(401).json({
+        success: false,
+        message: 'Unauthorized: Please log in'
+    });
+};
 
 
 export const isAdmin = async(req , res , next) =>{
