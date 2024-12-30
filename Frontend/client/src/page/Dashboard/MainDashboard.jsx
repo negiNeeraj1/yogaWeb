@@ -22,7 +22,6 @@ import {
   Book,
   Lock,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 import {
   LineChart,
   Line,
@@ -32,6 +31,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useAuth } from "../../context/AuthContext";
+import DarkModeClasses from "../../Components/DarkMode";
+
 
 const MainDashboard = () => {
   const { user } = useAuth();
@@ -84,6 +86,7 @@ const MainDashboard = () => {
     { month: "Apr", progress: 90, xp: 500, color: "#FDCB6E" },
     { month: "May", progress: 95, xp: 550, color: "#6C5CE7" },
   ];
+
   const handleLearningPathInteraction = (path) => {
     if (path.status === "Locked") {
       // Show a modal or notification about unlocking the path
@@ -228,54 +231,44 @@ const MainDashboard = () => {
   }, [totalXP]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6 space-y-6 relative overflow-hidden">
-      {/* Playful Confetti Background (if triggered) */}
-      {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none z-50">
-          {[...Array(100)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 rounded-full animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                backgroundColor: [
-                  "#FF6B6B",
-                  "#4ECDC4",
-                  "#45B7D1",
-                  "#FDCB6E",
-                  "#6C5CE7",
-                ][Math.floor(Math.random() * 5)],
-                animationDelay: `${Math.random() * 3}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+    <div
+      className={`min-h-screen ${DarkModeClasses.backgroundGradient.primary} bg-gradient-to-br from-purple-50 to-blue-50 p-6 space-y-6 relative overflow-hidden`}
+    >
+      {/* Welcome Section */}
 
-      {/* Animated Welcome Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6 rounded-3xl shadow-2xl relative overflow-hidden">
+      <div
+        className={`${DarkModeClasses.card.gradient} bg-gradient-to-r from-purple-600 to-indigo-700  p-6 rounded-3xl relative overflow-hidden`}
+      >
         <div className="absolute top-0 right-0 opacity-20">
-          <Sparkles className="w-48 h-48 text-white" />
+          <Sparkles className={`w-48 h-48 ${DarkModeClasses.text.primary}`} />
         </div>
+
         <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-2 flex items-center">
+          <h2
+            className={`text-3xl font-bold mb-2 flex items-center ${DarkModeClasses.gradients.text}`}
+          >
             Welcome, {user?.name || "Wellness Warrior"}
             <Rocket className="ml-3 w-8 h-8 text-yellow-300 animate-bounce" />
           </h2>
-          <p className="italic font-light text-white/90 h-12">
+          <p
+            className={`italic font-light h-12 ${DarkModeClasses.text.secondary}`}
+          >
             "{animatedQuote}"
           </p>
           <div className="mt-4 flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-white/20 px-4 py-2 rounded-full">
-              <Activity className="w-6 h-6 text-yellow-300" />
-              <span className="font-bold">
+            <div
+              className={`flex items-center space-x-2 ${DarkModeClasses.glass.panel} px-4 py-2 rounded-full`}
+            >
+              <Activity className="w-6 h-6 dark:text-yellow-300 text-rose-500" />
+              <span
+                className={`font-bold ${DarkModeClasses.text.primary}`}
+              >
                 Current Streak: {dailyStreak} Days
               </span>
             </div>
             <button
               onClick={triggerConfetti}
-              className="bg-yellow-400 text-purple-800 px-4 py-2 rounded-full hover:bg-yellow-500 transition-all flex items-center"
+              className={`${DarkModeClasses.button.gradient} transition-all px-4 py-2 rounded-full flex items-center`}
             >
               Boost Motivation <Zap className="ml-2 w-5 h-5" />
             </button>
@@ -285,27 +278,48 @@ const MainDashboard = () => {
 
       {/* Interactive Class Preview Grid */}
       <div className="grid md:grid-cols-3 gap-6">
-        {upcomingClasses.map((cls) => (
+        {upcomingClasses.map((cls, index) => (
           <div
             key={cls.id}
-            className={`${cls.bgColor} text-white p-6 rounded-3xl shadow-lg transform transition-all hover:scale-105 hover:shadow-2xl`}
+            className={`${
+              index % 3 === 0
+                ? DarkModeClasses.card.glassBlue
+                : index % 3 === 1
+                ? DarkModeClasses.card.glassPurple
+                : DarkModeClasses.card.glassBlue
+            } p-6 rounded-3xl transform transition-all hover:scale-105 ${
+              DarkModeClasses.hover.card
+            }`}
           >
+            <div className="absolute inset-0 opacity-10">
+              <div
+                className={`${DarkModeClasses.gradients.glass} w-full h-full rounded-3xl`}
+              />
+            </div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">{cls.name}</h3>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm">
+              <h3
+                className={`text-xl font-bold ${DarkModeClasses.text.primary}`}
+              >
+                {cls.name}
+              </h3>
+              <span
+                className={`${DarkModeClasses.gradients.primary.text} px-3 py-1 rounded-full text-sm`}
+              >
                 {cls.difficulty}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p>{cls.instructor}</p>
-                <p className="text-sm opacity-80">
+                <p className={DarkModeClasses.text.secondary}>
+                  {cls.instructor}
+                </p>
+                <p className={DarkModeClasses.text.accent}>
                   {cls.time} | {cls.date}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedClass(cls)}
-                className="bg-white text-purple-600 p-2 rounded-full hover:bg-purple-100 transition-all"
+                className={`${DarkModeClasses.button.primary} p-2 rounded-full ${DarkModeClasses.hover.button}`}
               >
                 <ArrowRight className="w-6 h-6" />
               </button>
@@ -313,51 +327,76 @@ const MainDashboard = () => {
             <div className="mt-4 flex justify-between items-center">
               <div className="flex items-center">
                 <Zap className="w-5 h-5 mr-2 text-yellow-300" />
-                <span>XP: {cls.xpReward}</span>
+                <span className={DarkModeClasses.text.secondary}>
+                  XP: {cls.xpReward}
+                </span>
               </div>
-              <div className="text-sm opacity-80">{cls.duration}</div>
+              <div className={DarkModeClasses.text.muted}>{cls.duration}</div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Achievements Section with Leveling System */}
-      <div className="bg-white rounded-3xl p-6 shadow-lg">
-        <h3 className="text-2xl font-bold mb-6 flex items-center">
-          <Trophy className="mr-3 text-purple-600" /> Your Achievement Journey
+      {/* Achievements Section */}
+      <div className={`${DarkModeClasses.card.ocean} rounded-3xl p-6`}>
+        <h3
+          className={`text-2xl font-bold mb-6 flex items-center ${DarkModeClasses.gradients.text}`}
+        >
+          <Trophy className="mr-3 text-purple-600 dark:text-purple-400" />
+          Your Achievement Journey
         </h3>
         <div className="grid md:grid-cols-3 gap-6">
-          {achievements.map((achievement) => (
+          {achievements.map((achievement, index) => (
             <div
               key={achievement.id}
-              className={`${achievement.difficultyColor} p-6 rounded-3xl relative overflow-hidden transform transition-all hover:scale-105`}
+              className={`${
+                DarkModeClasses.gradients.card[
+                  index % 4 === 0
+                    ? "purple"
+                    : index % 4 === 1
+                    ? "blue"
+                    : index % 4 === 2
+                    ? "green"
+                    : "orange"
+                ]
+              } p-6 rounded-3xl relative overflow-hidden`}
             >
-              <div className="absolute top-2 right-2 bg-white/50 px-2 py-1 rounded-full text-xs font-bold">
+              <div
+                className={`absolute top-2 right-2 ${DarkModeClasses.gradients.primary.text} px-2 py-1 rounded-full text-xs font-bold`}
+              >
                 Level {achievement.level}
               </div>
               <div className="flex items-center mb-4">
                 {achievement.icon}
                 <div className="ml-4">
-                  <h4 className="font-bold">{achievement.title}</h4>
-                  <p className="text-sm opacity-70">
+                  <h4 className={`font-bold ${DarkModeClasses.text.primary}`}>
+                    {achievement.title}
+                  </h4>
+                  <p className={DarkModeClasses.text.accent}>
                     {achievement.description}
                   </p>
                 </div>
               </div>
-              <div className="w-full bg-white/50 rounded-full h-2.5 mt-2">
+              <div
+                className={`w-full ${DarkModeClasses.background.tertiary} rounded-full h-2.5 mt-2`}
+              >
                 <div
-                  className="bg-purple-600 h-2.5 rounded-full"
+                  className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full transition-all duration-300"
                   style={{ width: `${achievement.progress}%` }}
                 ></div>
               </div>
               <div className="mt-4 flex justify-between items-center">
                 <div className="flex items-center">
-                  <Rocket className="w-5 h-5 mr-2 text-purple-500" />
-                  <span>XP: {achievement.xpReward}</span>
+                  <Rocket
+                    className={`w-5 h-5 mr-2 ${DarkModeClasses.accent.primary}`}
+                  />
+                  <span className={DarkModeClasses.text.secondary}>
+                    XP: {achievement.xpReward}
+                  </span>
                 </div>
                 <button
                   onClick={() => setSelectedAchievement(achievement)}
-                  className="bg-white text-purple-600 p-2 rounded-full hover:bg-purple-100 transition-all"
+                  className={`${DarkModeClasses.button.outline} p-2 rounded-full ${DarkModeClasses.hover.button}`}
                 >
                   <ArrowRight className="w-5 h-5" />
                 </button>
@@ -367,55 +406,134 @@ const MainDashboard = () => {
         </div>
       </div>
 
-      {/* Achievement Details Modal */}
+      {/* Progress Chart Section */}
+      <div className={`${DarkModeClasses.card.gradient} p-6 rounded-xl`}>
+        <div className="absolute inset-0 opacity-10">
+          <div
+            className={`${DarkModeClasses.gradients.subtle} w-full h-full rounded-xl`}
+          />
+        </div>
+        <h3
+          className={`text-lg font-semibold mb-4 ${DarkModeClasses.text.primary}`}
+        >
+          Progress Tracking
+        </h3>
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={progressData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                className={`${DarkModeClasses.divider.default} opacity-20`}
+              />
+              <XAxis
+                dataKey="month"
+                tick={{
+                  fill: `white`,
+                }}
+                stroke={`${DarkModeClasses.text.primary}`}
+              />
+              <YAxis
+                tick={{
+                  fill: "white",
+                }}
+                stroke={`${DarkModeClasses.text.primary}`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--tooltip-bg)",
+                  border: "none",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="progress"
+                stroke="#8884d8"
+                strokeWidth={3}
+                dot={{ stroke: "#8884d8", strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Modal */}
       {selectedAchievement && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-8 rounded-3xl max-w-md w-full relative animate-scale-up">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            className={`${DarkModeClasses.gradients.frost} p-8 rounded-3xl max-w-md w-full relative animate-scale-up`}
+          >
             <button
               onClick={() => setSelectedAchievement(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className={`absolute top-4 right-4 ${DarkModeClasses.hover.icon}`}
             >
               <XCircle className="w-8 h-8" />
             </button>
 
             <div className="text-center">
               {selectedAchievement.icon}
-              <h2 className="text-2xl font-bold mt-4">
+              <h2
+                className={`text-2xl font-bold mt-4 ${DarkModeClasses.text.heading}`}
+              >
                 {selectedAchievement.title}
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className={`${DarkModeClasses.text.secondary} mb-6`}>
                 {selectedAchievement.description}
               </p>
 
-              <div className="bg-purple-50 p-4 rounded-2xl mb-6">
+              <div
+                className={`${DarkModeClasses.background.secondary} p-4 rounded-2xl mb-6`}
+              >
                 <div className="flex justify-between items-center mb-2">
-                  <span>Progress</span>
-                  <span>{selectedAchievement.progress}%</span>
+                  <span className={DarkModeClasses.text.primary}>Progress</span>
+                  <span className={DarkModeClasses.text.accent}>
+                    {selectedAchievement.progress}%
+                  </span>
                 </div>
-                <div className="w-full bg-purple-200 rounded-full h-2.5">
+                <div
+                  className={`w-full ${DarkModeClasses.background.tertiary} rounded-full h-2.5`}
+                >
                   <div
-                    className="bg-purple-600 h-2.5 rounded-full"
+                    className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full transition-all duration-300"
                     style={{ width: `${selectedAchievement.progress}%` }}
                   ></div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-green-50 p-4 rounded-2xl">
-                  <Target className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <h4 className="font-bold">Next Milestone</h4>
-                  <p>{selectedAchievement.nextMilestone}</p>
+                <div
+                  className={`${DarkModeClasses.card.glass} p-4 rounded-2xl`}
+                >
+                  <Target
+                    className={`w-8 h-8 ${DarkModeClasses.accent.success} mx-auto mb-2`}
+                  />
+                  <h4 className={`font-bold ${DarkModeClasses.text.primary}`}>
+                    Next Milestone
+                  </h4>
+                  <p className={DarkModeClasses.text.secondary}>
+                    {selectedAchievement.nextMilestone}
+                  </p>
                 </div>
-                <div className="bg-yellow-50 p-4 rounded-2xl">
-                  <Gift className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                  <h4 className="font-bold">Secret Reward</h4>
-                  <p>{selectedAchievement.secretReward}</p>
+                <div
+                  className={`${DarkModeClasses.card.glass} p-4 rounded-2xl`}
+                >
+                  <Gift
+                    className={`w-8 h-8 ${DarkModeClasses.accent.warning} mx-auto mb-2`}
+                  />
+                  <h4 className={`font-bold ${DarkModeClasses.text.primary}`}>
+                    Secret Reward
+                  </h4>
+                  <p className={DarkModeClasses.text.secondary}>
+                    {selectedAchievement.secretReward}
+                  </p>
                 </div>
               </div>
 
               <button
                 onClick={triggerConfetti}
-                className="mt-6 w-full bg-purple-600 text-white py-3 rounded-full hover:bg-purple-700 transition-all flex items-center justify-center"
+                className={`mt-6 w-full ${DarkModeClasses.button.gradient} py-3 rounded-full flex items-center justify-center ${DarkModeClasses.hover.button}`}
               >
                 <CircleCheck className="mr-2" /> Unlock Next Level
               </button>
@@ -424,86 +542,32 @@ const MainDashboard = () => {
         </div>
       )}
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Upcoming Classes */}
-        <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-md">
-          <h3 className="text-lg font-semibold mb-4">Upcoming Classes</h3>
-          {upcomingClasses.map((cls) => (
+      {/* Confetti Animation */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {[...Array(100)].map((_, i) => (
             <div
-              key={cls.id}
-              className="flex justify-between items-center mb-4 pb-4 border-b last:border-b-0"
-            >
-              <div>
-                <h4 className="font-medium">{cls.name}</h4>
-                <p className="text-sm text-gray-500">{cls.instructor}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-medium">{cls.time}</p>
-                <p className="text-sm text-gray-500">{cls.date}</p>
-              </div>
-              <button
-                onClick={() => setSelectedClass(cls)}
-                className="px-3 py-1 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
-              >
-                Details
-              </button>
-            </div>
+              key={i}
+              className={`absolute w-2 h-2 rounded-full animate-confetti ${
+                i % 5 === 0
+                  ? "bg-purple-200"
+                  : i % 5 === 1
+                  ? "bg-blue-500"
+                  : i % 5 === 2
+                  ? "bg-emerald-500"
+                  : i % 5 === 3
+                  ? "bg-amber-500"
+                  : "bg-rose-500"
+              }`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+              }}
+            />
           ))}
         </div>
-
-        {/* Achievements Section with More Details */}
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h3 className="text-lg font-semibold mb-4">Your Achievements</h3>
-          {achievements.map((achievement) => (
-            <div
-              key={achievement.id}
-              className="mb-4 pb-4 border-b last:border-b-0"
-            >
-              <div className="flex items-center mb-2">
-                {achievement.icon}
-                <div className="ml-4 flex-grow">
-                  <h4 className="font-medium">{achievement.title}</h4>
-                  <p className="text-sm text-gray-500">
-                    {achievement.description}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedAchievement(achievement)}
-                  className="text-purple-600 hover:text-purple-800 transition-colors"
-                >
-                  <Target className="w-5 h-5" />
-                </button>
-              </div>
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  className="bg-purple-600 h-2.5 rounded-full"
-                  style={{ width: `${achievement.progress}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Progress Chart */}
-        <div className="md:col-span-3 bg-white p-6 rounded-xl shadow-md">
-          <h3 className="text-lg font-semibold mb-4">Progress Tracking</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={progressData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="progress"
-                stroke="#8884d8"
-                strokeWidth={3}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

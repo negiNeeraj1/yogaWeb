@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import DarkModeClasses from "./DarkMode";
+
 const customers = [
   {
     user1: {
@@ -20,6 +22,7 @@ const customers = [
     },
   },
 ];
+
 const customers2 = [
   {
     class1: {
@@ -123,40 +126,39 @@ const Hero = () => {
           }
         `}
       </style>
-      <div className="relative bg-white pt-20">
+      <div className={`relative ${DarkModeClasses.container} pt-20 py-20 `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <h1 className="text-5xl font-bold leading-tight text-gray-900">
+            <div className="space-y-8 order-2 md:order-1">
+              <h1
+                className={`text-3xl md:text-5xl whitespace-nowrap font-bold leading-tight ${DarkModeClasses.text.primary}`}
+              >
                 Nourish your Mind,
                 <br />
                 Body, and Soul with
                 <br />
                 Yoga
               </h1>
-              <p className="text-xl text-gray-600">
+              <p className={`text-md ${DarkModeClasses.text.secondary}`}>
                 The smart 365-days-per-year yoga plan to transform your body and
                 mind. Tailored to your lifestyle and goals.
               </p>
-              <div className="space-x-4">
+
+              <div className="space-x-4 ">
                 <button
-                  className="button-hover btn-all text-white px-8 py-3 rounded-lg btn-hover"
+                  className={`button-hover px-8 py-3 mb-3 rounded-lg ${DarkModeClasses.button.primary}`}
                   onClick={() => navigate("/authPage")}
                   style={{ fontWeight: "600" }}
                 >
                   Start your journey
                 </button>
                 <button
-                  className="button-hover  border px-8 py-3 rounded-lg"
-                  style={{
-                    border: "1px solid #e97963",
-                    color: "#e97963",
-                    fontWeight: "600",
-                  }}
+                  className={`button-hover px-8 py-3 rounded-lg ${DarkModeClasses.button.outline}`}
                 >
                   Learn More <ArrowRight className="inline ml-2" size={20} />
                 </button>
               </div>
+
               <div className="flex items-center space-x-4">
                 <div className="flex -space-x-2">
                   {userArray.map((user, index) => (
@@ -181,20 +183,24 @@ const Hero = () => {
                     </CustomTooltip>
                   ))}
                 </div>
-                <p className="text-gray-600">
-                  Guided{" "}
-                  <span className="font-bold text-indigo-600">5000+</span>{" "}
+
+                <p className={DarkModeClasses.text.secondary}>
+                  Guided
+                  <span className={DarkModeClasses.accent.primary}>
+                    5000+
+                  </span>{" "}
                   clients last year!
                 </p>
               </div>
             </div>
-            <div className="relative">
+
+            <div className="relative order-1 md:order-2">
               <img
                 src={
                   "https://media.istockphoto.com/id/1292399474/photo/woman-meditating-at-park.jpg?s=612x612&w=0&k=20&c=iWXLpMMYCWq59Z11E6qKqHBeTgzXedktGRmsObGvi7g="
                 }
                 alt="Yoga practitioner"
-                className="image-hover w-full h-auto rounded-lg shadow-xl"
+                className={`image-hover w-full h-auto rounded-lg ${DarkModeClasses.hover.card}`}
               />
             </div>
           </div>

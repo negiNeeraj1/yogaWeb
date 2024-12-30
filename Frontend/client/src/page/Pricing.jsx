@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import DarkModeClasses from "../Components/DarkMode";
 
 const PricingPage = () => {
   const plans = [
@@ -47,27 +48,34 @@ const PricingPage = () => {
 
   const handleChoosePlan = (planName) => {
     console.log(`Chosen Plan: ${planName}`);
-    // You can add functionality here, e.g., navigate to checkout or open a modal
   };
 
   return (
-    <div className="min-h-screen bgcAll py-24">
+    <div className={`min-h-screen ${DarkModeClasses.background.primary} py-24`}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-16" data-aos="fade-up">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          <h1
+            className={`text-4xl md:text-5xl font-bold ${DarkModeClasses.text.primary} mb-4`}
+          >
             Membership Plans
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className={`text-xl ${DarkModeClasses.text.accent}`}>
             Choose the perfect plan for your practice
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div
+          className={`grid md:grid-cols-3 gap-8 ${DarkModeClasses.container}`}
+        >
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`bg-white rounded-lg shadow-md p-8 relative ${
-                plan.isPopular ? "border-2 border-indigo-600" : ""
+              className={`${
+                DarkModeClasses.card
+              } p-8 rounded-lg shadow-md relative transition-all duration-300 ${
+                plan.isPopular
+                  ? "border-2 border-indigo-600"
+                  : "border-2 border-gray-200 dark:border-[#2D3D53]"
               }`}
               data-aos="fade-up"
               data-aos-delay={100}
@@ -77,15 +85,22 @@ const PricingPage = () => {
                   Popular
                 </span>
               )}
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+              <h3
+                className={`text-2xl font-semibold text-gray-800 mb-4 ${DarkModeClasses.text.primary}`}
+              >
                 {plan.name}
               </h3>
-              <p className="text-3xl font-bold text-gray-800 mb-6">
+              <p
+                className={`text-3xl font-bold text-gray-800 mb-6 ${DarkModeClasses.text.secondary}`}
+              >
                 {plan.price}
               </p>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center text-gray-600">
+                  <li
+                    key={idx}
+                    className={`flex items-center text-gray-600 ${DarkModeClasses.text.accent}`}
+                  >
                     <svg
                       className="w-5 h-5 text-green-500 mr-2"
                       fill="none"
@@ -105,10 +120,10 @@ const PricingPage = () => {
               </ul>
               <button
                 onClick={() => handleChoosePlan(plan.name)}
-                className={`w-full py-2 px-4 rounded transition ${
+                className={`w-full py-2 px-4 rounded-md transition-all duration-300 ${
                   plan.isPopular
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    ? `${DarkModeClasses.hover.button} ${DarkModeClasses.button.primary} hover:bg-indigo-700 `
+                    : `${DarkModeClasses.button.secondary} dark:hover:bg-gray-600`
                 }`}
               >
                 Choose Plan

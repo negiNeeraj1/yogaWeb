@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import DarkModeClasses from "./DarkMode";
 
 const poses = [
   {
@@ -49,11 +50,16 @@ const YogaPoses = () => {
   const [showMore, setShowMore] = useState(false);
 
   return (
-    <section className="py-20 bg-gray-50" id="blog">
+    <section
+      className={`py-20 bg-gray-50 ${DarkModeClasses.background.secondary}`}
+      id="blog"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="text-indigo-600 font-semibold">Some Yoga Poses</span>
-          <h2 className="mt-2 text-3xl font-bold text-gray-900">
+          <h2
+            className={`mt-2 text-3xl  text-gray-900 font-bold leading-tight ${DarkModeClasses.text.primary}`}
+          >
             Your daily dose of health in 3 simple steps
           </h2>
         </div>
@@ -61,7 +67,7 @@ const YogaPoses = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {poses.slice(0, showMore ? poses.length : 4).map((pose, index) => (
             <Link
-              key={index} // Key moved to the Link component
+              key={index}
               to="/pose-detail"
             >
               <div
@@ -69,19 +75,27 @@ const YogaPoses = () => {
                 data-aos="fade-up"
               >
                 <div className="flex-1 space-y-4">
-                  <p className="text-2xl font-bold text-indigo-600">
+                  <p
+                    className={`text-2xl font-bold text-indigo-600 ${DarkModeClasses.text.secondary}`}
+                  >
                     {pose.number}
                   </p>
-                  <h3 className="text-xl font-bold text-gray-900">
+                  <h3
+                    className={`mt-2 text-xl  text-gray-900 font-bold leading-tight ${DarkModeClasses.text.primary}`}
+                  >
                     {pose.title}
                   </h3>
-                  <p className="text-gray-600">{pose.description}</p>
+                  <p
+                    className={`text-sm text-gray-600 ${DarkModeClasses.text.secondary}`}
+                  >
+                    {pose.description}
+                  </p>
                 </div>
                 <div className="flex-1">
                   <img
                     src={pose.image}
                     alt={pose.title}
-                    className="w-full h-64 object-cover rounded-lg shadow-md"
+                    className={`w-full h-64 object-cover rounded-lg shadow-md image-hover ${DarkModeClasses.hover.card}`}
                   />
                 </div>
               </div>
@@ -92,7 +106,7 @@ const YogaPoses = () => {
         <div className="text-center mt-12">
           <button
             onClick={() => setShowMore(!showMore)}
-            className="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700"
+            className={`inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700`}
           >
             {showMore ? "Show Less" : "See More"}
             <ArrowRight className="ml-2" size={20} />

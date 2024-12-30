@@ -1,13 +1,14 @@
 import React from "react";
+import Footer from "../Components/Footer";
 
 const BlogPage = () => {
+
   const blogPosts = [
     {
       title: "Sukhasana: The Easy Pose",
       description:
         "Sukhasana is a simple seated posture that helps with relaxation and mindfulness. It is perfect for meditation and calming your mind.",
-      image:
-        "https://media.gettyimages.com/id/1320177756/photo/young-adult-woman-is-practicing-yoga-in-a-modern-loft.jpg?s=2048x2048&w=gi&k=20&c=b752gReApIgGY6Rq7o1-jPmsrbCw02XOfKrxb3HoSgU=",
+      image: "/api/placeholder/400/320",
       link: "/sukhasana-details",
       author: "John Doe",
       date: "November 24, 2024",
@@ -16,9 +17,8 @@ const BlogPage = () => {
     {
       title: "Adho Mukha Svanasana: Downward Dog",
       description:
-        "A foundational pose that stretches the hamstrings and spine. It’s great for calming the mind and strengthening the body.",
-      image:
-        "https://media.hearstapps.com/loop/downward-dog-edited-1-1617286688.mp4/poster.jpg",
+        "A foundational pose that stretches the hamstrings and spine. It's great for calming the mind and strengthening the body.",
+      image: "/api/placeholder/400/320",
       link: "/downward-dog-details",
       author: "Jane Smith",
       date: "November 22, 2024",
@@ -28,8 +28,7 @@ const BlogPage = () => {
       title: "Virabhadrasana I: Warrior I",
       description:
         "A standing pose that strengthens the legs, opens the chest, and improves focus and balance. It energizes your whole body.",
-      image:
-        "https://yogajala.com/wp-content/uploads/2021/11/The-Yoga-Warrior-Pose-Explained_-The-5-Warrior-Poses.jpg",
+      image: "/api/placeholder/400/320",
       link: "/warrior-1-details",
       author: "Alice Green",
       date: "November 20, 2024",
@@ -39,8 +38,7 @@ const BlogPage = () => {
       title: "Vrksasana: Tree Pose",
       description:
         "A balancing posture that enhances stability and focus. Perfect for building core strength and improving your posture.",
-      image:
-        "https://t4.ftcdn.net/jpg/06/65/80/01/360_F_665800190_u59ww8djyzrHbyl0ptD55uHHgxo48qW7.jpg",
+      image: "/api/placeholder/400/320",
       link: "/tree-pose-details",
       author: "Chris Lee",
       date: "November 18, 2024",
@@ -49,9 +47,8 @@ const BlogPage = () => {
     {
       title: "Balasana: Child's Pose",
       description:
-        "A gentle resting pose to stretch the back, hips, and thighs. It’s often used to relax and center the mind during practice.",
-      image:
-        "https://t4.ftcdn.net/jpg/00/99/66/59/360_F_99665987_hAxRHpLXxxlDIvAZ7U7OItxoUgEsUPv2.jpg",
+        "A gentle resting pose to stretch the back, hips, and thighs. It's often used to relax and center the mind during practice.",
+      image: "/api/placeholder/400/320",
       link: "/child-pose-details",
       author: "Emma Brown",
       date: "November 15, 2024",
@@ -60,22 +57,24 @@ const BlogPage = () => {
   ];
 
   return (
-    <section className="py-16 bgcAll">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-        {/* Header */}
+    <section className="py-16 bg-white dark:bg-[#0F172A] transition-colors duration-300">
+      
+      <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 pt-5">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800">Yoga Blogs</h1>
-          <p className="text-lg text-gray-600 mt-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 transition-colors duration-300">
+            Yoga Blogs
+          </h1>
+          <p className="text-lg text-gray-700 dark:text-gray-300 transition-colors duration-300 mt-4">
             Explore the world of yoga with detailed guides to various poses.
           </p>
         </div>
 
-        {/* Blog Posts */}
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogPosts.map((post, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
+              className="bg-white dark:bg-[#1E293B] rounded-lg shadow-md dark:shadow-[#0F172A]/20 overflow-hidden border border-gray-100 dark:border-[#2D3D53] hover:shadow-lg dark:hover:shadow-[#0F172A]/50 transition-all duration-300"
             >
               <img
                 src={post.image}
@@ -83,22 +82,27 @@ const BlogPage = () => {
                 className="w-full h-56 object-cover"
               />
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 transition-colors duration-300 mb-2">
                   {post.title}
                 </h3>
-                <p className="text-gray-600 mb-4">{post.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 transition-colors duration-300 mb-4">
+                  {post.description}
+                </p>
                 <a
                   href={post.link}
-                  className="text-indigo-600 hover:text-indigo-800 font-semibold"
+                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold transition-colors duration-300"
                 >
                   See More →
                 </a>
-                {/* Author and Date */}
-                <div className="mt-4 border-t pt-4 text-sm text-gray-500">
-                  <p>
-                    Posted by <span className="font-medium">{post.author}</span>
+                
+                <div className="mt-4 border-t border-gray-200 dark:border-[#2D3D53] pt-4 text-sm transition-colors duration-300">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Posted by{" "}
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      {post.author}
+                    </span>
                   </p>
-                  <p>
+                  <p className="text-gray-500 dark:text-gray-400">
                     On {post.date} at {post.time}
                   </p>
                 </div>
@@ -107,6 +111,8 @@ const BlogPage = () => {
           ))}
         </div>
       </div>
+
+      <Footer/>
     </section>
   );
 };

@@ -4,8 +4,7 @@ import { ArrowLeft, Clock, Users, BarChart3 } from "lucide-react";
 
 const CoursePage = ({}) => {
   const { id } = useParams();
-  // In a real application, you would fetch this data from an API
-  // Using the provided data structure and expanding it with more details
+  
   const courseData = {
     1: {
       title: "Foundational Poses (Asanas)",
@@ -184,7 +183,6 @@ const CoursePage = ({}) => {
 
   const handleEnrollNow = () => {
     console.log(`Enrolling in course ${id}`);
-    // Add your enrollment logic here
   };
 
   useEffect(() => {
@@ -200,7 +198,9 @@ const CoursePage = ({}) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-[70px]">
+    <div
+      className={`min-h-screen ${DarkModeClasses.background.primary} pt-[70px]`}
+    >
       {/* Banner Image */}
       <div className="relative h-96">
         <img
@@ -220,24 +220,28 @@ const CoursePage = ({}) => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-md p-8 mb-8">
-              <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            <div className={`rounded-xl p-8 mb-8 ${DarkModeClasses.card}`}>
+              <h1
+                className={`text-3xl font-bold mb-4 ${DarkModeClasses.text.primary}`}
+              >
                 {course.title}
               </h1>
               <div className="flex items-center gap-6 mb-6">
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                <span
+                  className={`px-3 py-1 rounded-full ${DarkModeClasses.button.secondary}`}
+                >
                   {course.level}
                 </span>
-                <div className="flex items-center text-gray-600">
+                <div
+                  className={`flex items-center ${DarkModeClasses.text.secondary}`}
+                >
                   <Clock className="w-4 h-4 mr-2" />
                   {course.duration}
                 </div>
-                <div className="flex items-center text-gray-600">
-                  <Users className="w-4 h-4 mr-2" />
-                  {course.studentsEnrolled.toLocaleString()} students
-                </div>
               </div>
-              <p className="text-gray-600 mb-8">{course.fullDescription}</p>
+              <p className={`mb-8 ${DarkModeClasses.text.secondary}`}>
+                {course.fullDescription}
+              </p>
 
               {/* Course Highlights */}
               <div className="mb-8">
@@ -292,7 +296,9 @@ const CoursePage = ({}) => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-md p-6 sticky top-8">
+            <div
+              className={`rounded-xl p-6 sticky top-8 ${DarkModeClasses.card}`}
+            >
               <div className="mb-6">
                 <div className="flex items-center mb-2">
                   <span className="text-3xl font-bold text-gray-800">

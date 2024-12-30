@@ -2,6 +2,7 @@
 import React from "react";
 import { Home, Calendar, Activity, User, BookOpen } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import DarkModeClasses from "../DarkMode";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -30,10 +31,14 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-white shadow-lg h-full flex flex-col">
-      <div className="p-6 border-b">
-        <h1 className="text-2xl font-bold text-purple-600 flex items-center">
-          <BookOpen className="mr-2" /> YogaFlow
+    <div
+      className={`w-64 bg-white shadow-lg h-full flex flex-col ${DarkModeClasses.background.primary}`}
+    >
+      <div className={`p-4 border-b ${DarkModeClasses.card.gradient}`}>
+        <h1
+          className={`text-2xl font-bold text-purple-600 flex items-center ${DarkModeClasses.text.primary}`}
+        >
+          <BookOpen className="mr-2" /> Yoga
         </h1>
       </div>
       <nav className="p-4 flex-grow">
@@ -45,12 +50,23 @@ const Sidebar = () => {
               w-full flex items-center p-3 rounded-lg mb-2 transition-all
               ${
                 location.pathname === item.path
-                  ? "bg-purple-100 text-purple-700"
-                  : "hover:bg-gray-100 text-gray-700"
+                  ? `bg-rose-100 text-rose-700 ${DarkModeClasses.text.primary} ${DarkModeClasses.background.tertiary}`
+                  : `hover:bg-rose-100  ${DarkModeClasses.text.muted}`
               }
             `}
           >
-            {item.icon}
+            <span
+              className={`mr-2 transition-all duration-300 
+              ${
+                location.pathname === item.path
+                  ? `dark:text-rose-600`
+                  : `dark:text-rose-300 hover:text-rose-600`
+              }
+            `}
+            >
+              {item.icon}
+            </span>
+
             <span className="ml-3">{item.name}</span>
           </Link>
         ))}

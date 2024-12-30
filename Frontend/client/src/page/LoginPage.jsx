@@ -136,7 +136,6 @@ const LoginPage = () => {
                 />
               </div>
 
-              {/* Password Input */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="w-5 h-5 text-gray-400" />
@@ -183,7 +182,6 @@ const LoginPage = () => {
                 </a>
               </div>
 
-              {/* Login Button */}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -203,12 +201,12 @@ const LoginPage = () => {
               <div className="text-center mt-4">
                 <span className="text-sm text-gray-600">
                   Don't have an account?{" "}
-                  <a
-                    href="#"
+                  <Link
+                    to={"/authPage"}
                     className="text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
                   >
                     Sign Up
-                  </a>
+                  </Link>
                 </span>
               </div>
             </form>

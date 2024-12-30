@@ -5,25 +5,26 @@ import Hero from "../Components/Hero";
 import Testimonials from "../Components/Testimonial";
 import YogaPoses from "../Components/YogaPoses";
 import Footer from "../Components/Footer";
-import RecommendedBatches from '../Components/RecommendedBatches';
-
+import RecommendedBatches from "../Components/RecommendedBatches";
+import DarkModeClasses from "../Components/DarkMode";
 
 const Home = () => {
   useEffect(() => {
     AOS.init({
-      offset: 200,
+      offset: 150,
       duration: 1000,
     });
   }, []);
 
   return (
-    <main className="w-full bgcAll">
+    <main
+      className={`w-full bgcAll m-0 p-0 ${DarkModeClasses.container} overflow-x-hidden`}
+    >
       <Hero />
       <YogaPoses />
       <RecommendedBatches />
       <Testimonials />
-      <Footer/>
-
+      <Footer />
     </main>
   );
 };
