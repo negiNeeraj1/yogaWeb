@@ -3,27 +3,61 @@
 @tailwind utilities;
 @import "~slick-carousel/slick/slick.css";
 @import "~slick-carousel/slick/slick-theme.css";
-body{
+
+body {
     font-family: "Poppins";
-  
+
 }
-.btn-all{
+
+.btn-all {
     background-color: #e97963;
 }
-.btn-hover:hover{
+
+.btn-hover:hover {
     background-color: #d2604a;
 }
-.filter-button{
-    border:1px solid #e97963;
-    color:#e97963;
-    font-weight:600;
+
+.filter-button {
+    border: 1px solid #e97963;
+    color: #e97963;
+    font-weight: 600;
 }
-.filter-button:hover{
+
+.filter-button:hover {
     background-color: #d2604a;
 }
-.bgcAll{
+
+.bgcAll {
     background-color: #f8fbfa;
 }
-.contact-right{
+
+.contact-right {
     margin-top: 2rem;
 }
+
+::selection {
+    background-color: #eb294a;
+    color: white;
+}
+
+
+*:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #f43f5e;
+}
+
+
+button:hover,
+a:hover {
+    background-color: #f43f5e;
+    color: white;
+}
+
+
+button:focus,
+a:focus,
+input:focus,
+textarea:focus {
+    outline: 2px solid #f43f5e;
+}
+

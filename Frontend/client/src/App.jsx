@@ -18,10 +18,13 @@ import LoginPage from "./page/LoginPage";
 import ProtectedRoute from "./routes/PrivateRoute";
 import DashboardLayout from "./Components/dashboard/DashboardLayout";
 import ProfilePage from "./page/Dashboard/ProfilePage";
-import ProgressPage from "./page/Dashboard/Progress";
+
 import MainDashboard from "./page/Dashboard/MainDashboard"; 
 import { ThemeProvider } from "./context/ThemeProvider";
 import YogaClassPage from "./page/Dashboard/YogaClassPage";
+import SupportPage from "./page/Dashboard/Support";
+import SubscriptionPage from "./page/Dashboard/Subscription";
+import OurCenter from "./page/Dashboard/OurCenter";
 
 const App = () => {
   return (
@@ -46,7 +49,9 @@ const App = () => {
                 <Route index element={<MainDashboard />} />
                 <Route path="classes" element={<ClassesPage />} />
                 <Route path="profile" element={<ProfilePage />} />
-                <Route path="progress" element={<ProgressPage />} />
+                <Route path="contact" element={<SupportPage />} />
+                <Route path="subscription" element={<SubscriptionPage />} />
+                <Route path="centers" element={<OurCenter />} />
                 <Route path="yoga-class/:classId" element={<YogaClassPage />} />
               </Route>
 

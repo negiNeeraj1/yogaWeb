@@ -1,6 +1,15 @@
 // src/components/dashboard/Sidebar.jsx
 import React from "react";
-import { Home, Calendar, Activity, User, BookOpen } from "lucide-react";
+import {
+  Home,
+  Calendar,
+  BarChart2,
+  HeartHandshake,
+  CreditCard,
+  MapPin,
+  User,
+  BookOpen,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import DarkModeClasses from "../DarkMode";
 
@@ -19,9 +28,19 @@ const Sidebar = () => {
       path: "/yogadashboard/classes",
     },
     {
-      icon: <Activity className="w-5 h-5" />,
-      name: "Progress",
-      path: "/yogadashboard/progress",
+      icon: <HeartHandshake className="w-5 h-5" />,
+      name: "Support",
+      path: "/yogadashboard/contact",
+    },
+    {
+      icon: <CreditCard className="w-5 h-5" />,
+      name: "Subscription",
+      path: "/yogadashboard/subscription",
+    },
+    {
+      icon: <MapPin className="w-5 h-5" />,
+      name: "Our Centers",
+      path: "/yogadashboard/centers",
     },
     {
       icon: <User className="w-5 h-5" />,

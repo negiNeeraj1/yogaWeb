@@ -33,7 +33,7 @@ import {
 } from "recharts";
 import { useAuth } from "../../context/AuthContext";
 import DarkModeClasses from "../../Components/DarkMode";
-
+import { BlurText } from "../../Components/Themes/BlurText";
 
 const MainDashboard = () => {
   const { user } = useAuth();
@@ -253,16 +253,19 @@ const MainDashboard = () => {
           <p
             className={`italic font-light h-12 ${DarkModeClasses.text.secondary}`}
           >
-            "{animatedQuote}"
+            <BlurText
+              text={animatedQuote}
+              className="text-gray-600 dark:text-gray-300"
+              delay={100}
+            />
+            
           </p>
           <div className="mt-4 flex items-center space-x-4">
             <div
               className={`flex items-center space-x-2 ${DarkModeClasses.glass.panel} px-4 py-2 rounded-full`}
             >
               <Activity className="w-6 h-6 dark:text-yellow-300 text-rose-500" />
-              <span
-                className={`font-bold ${DarkModeClasses.text.primary}`}
-              >
+              <span className={`font-bold ${DarkModeClasses.text.primary}`}>
                 Current Streak: {dailyStreak} Days
               </span>
             </div>
