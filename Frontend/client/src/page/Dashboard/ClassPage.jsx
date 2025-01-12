@@ -15,6 +15,7 @@ import {
   MapPin,
   Heart,
   BookOpen,
+  Info,
 } from "lucide-react";
 import DarkModeClasses from "../../Components/DarkMode";
 import PaymentButton from "../../Components/PaymentGateway/PaymentButton";
@@ -24,51 +25,150 @@ import {
   getClassAttendanceStats,
 } from "../../api/api";
 
-const Card = ({
-  children,
-  classId,
-  setAttendanceStats,
-  className = "",
-  onClick,
-}) => {
-  useEffect(() => {
-    const fetchAttendanceStats = async () => {
-      try {
-        const user = localStorage.getItem("user");
-        const parsedUserData = user ? JSON.parse(user) : null;
-        const attendanceData = { classId, userId: parsedUserData?.id };
-        const statsResponse = await getClassAttendanceStats(attendanceData);
-        if (statsResponse.data && Array.isArray(statsResponse.data)) {
-          const stats = statsResponse.data.reduce((acc, stat) => {
-            acc[stat._id] = stat.count;
-            return acc;
-          }, {});
-          setAttendanceStats((prevStats) => ({
-            ...prevStats,
-            [classId]: {
-              attended: stats.attended || 0,
-              totalSessions: stats.totalSessions || 0,
-              attendancePercentage: stats["attendancePercentage"] || 0,
-              progress: stats["progress"] || 0,
-            },
-          }));
-        }
-      } catch (error) {
-        console.error(`Error fetching stats for classId ${classId}:`, error);
-      }
-    };
+const FormattedDays = ({ days }) => {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {days.map((day, index) => (
+        <span
+          key={index}
+          className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium
+            bg-purple-50 text-purple-700 border border-purple-100
+            dark:bg-purple-900/20 dark:text-purple-200 dark:border-purple-800/50
+            transition-colors duration-200"
+        >
+          {day}
+        </span>
+      ))}
+    </div>
+  );
+};
 
-    if (classId && setAttendanceStats) {
-      fetchAttendanceStats();
-    }
-  }, [classId, setAttendanceStats]);
+const ClassCard = ({
+  class_,
+  parsedUser,
+  handlePaymentSuccess,
+  handlePaymentFailure,
+  PaymentButton,
+  getFormattedDays,
+}) => {
+  const daysArray = getFormattedDays(class_.schedule.daysOfWeek).split(", ");
 
   return (
-    <div
-      onClick={onClick}
-      className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-all duration-300 ${className}`}
-    >
-      {children}
+    <div className="group relative overflow-hidden rounded-2xl border-black">
+      <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl hover:translate-x-1 transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div className="p-6 space-y-6">
+          {/* Header section */}
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-200 to-pink-300 dark:from-purple-100 dark:to-pink-200 bg-clip-text text-transparent">
+                  {class_.className}
+                </h3>
+              </div>
+              <span
+                className="inline-flex px-3 py-1 rounded-full text-sm font-medium 
+                bg-purple-50 text-purple-700 border border-purple-100
+                dark:bg-purple-900/20 dark:text-purple-200 dark:border-purple-800/50"
+              >
+                {class_.category}
+              </span>
+            </div>
+            <div
+              className="p-3 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100
+              dark:from-purple-900/20 dark:to-pink-900/20 dark:border-purple-800/50"
+            >
+              <Layout className="w-6 h-6 text-purple-600 dark:text-purple-300" />
+            </div>
+          </div>
+
+          {/* Info cards grid with enhanced days display */}
+          <div className="grid grid-cols-2 gap-3">
+            <div
+              className="col-span-2 flex items-start p-3 
+              bg-white dark:bg-gray-800/50 rounded-xl 
+              group-hover:shadow-sm transition-all 
+              border border-gray-100 dark:border-gray-700"
+            >
+              <Calendar className="w-5 h-5 text-purple-500 dark:text-purple-300 mt-1" />
+              <div className="ml-3">
+                <FormattedDays days={daysArray} />
+              </div>
+            </div>
+
+            <div
+              className="flex items-center p-3 
+              bg-white dark:bg-gray-800/50 rounded-xl 
+              group-hover:shadow-sm transition-all 
+              border border-gray-100 dark:border-gray-700"
+            >
+              <Clock className="w-5 h-5 text-purple-500 dark:text-purple-300" />
+              <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
+                {class_.schedule.startTime} - {class_.schedule.endTime}
+              </span>
+            </div>
+
+            <div
+              className="flex items-center p-3 
+              bg-white dark:bg-gray-800/50 rounded-xl 
+              group-hover:shadow-sm transition-all 
+              border border-gray-100 dark:border-gray-700"
+            >
+              <Users className="w-5 h-5 text-purple-500 dark:text-purple-300" />
+              <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
+                {class_.capacity - class_.remainingClasses} / {class_.capacity}
+              </span>
+            </div>
+
+            <div
+              className="flex items-center p-3 
+              bg-white dark:bg-gray-800/50 rounded-xl 
+              group-hover:shadow-sm transition-all 
+              border border-gray-100 dark:border-gray-700"
+            >
+              <Star className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
+              <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
+                {class_.difficulty}
+              </span>
+            </div>
+          </div>
+
+          {/* Total classes info */}
+          <div
+            className="flex items-center p-3 
+            bg-white dark:bg-gray-800/50 rounded-xl 
+            border border-gray-100 dark:border-gray-700"
+          >
+            <Info className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <span className="ml-3 text-gray-600 dark:text-gray-300">
+              {class_.totalClasses} total classes
+            </span>
+          </div>
+
+          {/* Price and CTA section */}
+          <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <span className="text-md text-gray-500 dark:text-gray-400">
+                Course Price
+              </span>
+              <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 dark:from-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
+                ₹{class_.price}
+              </span>
+            </div>
+
+            {parsedUser && (
+              <PaymentButton
+                amount={class_.price}
+                onSuccess={handlePaymentSuccess}
+                onFailure={handlePaymentFailure}
+                text="Enroll Now"
+                userId={parsedUser.id}
+                classId={class_._id}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white px-6 py-3 rounded-xl font-medium transform transition-all hover:scale-[1.02] focus:scale-[0.98] shadow-lg hover:shadow-xl"
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -110,19 +210,32 @@ const ClassesPage = () => {
     try {
       const user = localStorage.getItem("user");
       const parsedUserData = user ? JSON.parse(user) : null;
-
       if (parsedUserData) {
         setParsedUser(parsedUserData);
-        const userId = parsedUserData.id;
-        const response = await EnrolledClasses(userId);
-        const enrolledClassesData = response.data;
-        setEnrolledClasses(enrolledClassesData);
+        const response = await EnrolledClasses(parsedUserData.id);
+        setEnrolledClasses(response.data || []);
       }
     } catch (error) {
       console.error("Error fetching enrolled classes:", error);
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    retrieveClasses();
+    retrieveEnrolledClasses();
+  }, []);
+
+  const getFormattedDays = (daysArray) => {
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return daysArray.map((day) => days[day - 1]).join(", ");
   };
 
   const handleClassClick = (id) => {
@@ -141,12 +254,14 @@ const ClassesPage = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen p-6 ${DarkModeClasses.background.primary}`}>
+    <div className={`min-h-screen p-6 `}>
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header section remains the same */}
-        <div className={`${DarkModeClasses.card.gradient} p-8 rounded-2xl`}>
+        <div
+          className={` bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700`}
+        >
           <h1
-            className={`text-4xl font-bold mb-3 ${DarkModeClasses.text.heading}`}
+            className={`text-4xl font-bold mb-3 ${DarkModeClasses.text.heading} `}
           >
             Your Yoga Journey
           </h1>
@@ -162,15 +277,15 @@ const ClassesPage = () => {
           </h2>
           {enrolledClasses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {enrolledClasses.map((class_) => (
-                <div key={class_._id} className="group relative">
+              {enrolledClasses.map((enrollment) => (
+                <div key={enrollment._id} className="group relative">
                   {/* Decorative elements */}
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-100 rounded-full animate-pulse dark:bg-pink-900/30" />
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-200 rounded-full animate-pulse dark:bg-pink-900/30" />
                   <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-100 rounded-full animate-pulse dark:bg-purple-900/30" />
 
                   <div className="relative bg-gradient-to-r from-pink-50 to-purple-50 dark:from-gray-800/50 dark:to-gray-700/50 p-1 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                     <div
-                      onClick={() => handleClassClick(class_._id)}
+                      onClick={() => handleClassClick(enrollment._id)}
                       className="bg-white dark:bg-gray-800 rounded-xl p-6 cursor-pointer"
                     >
                       {/* Header Section */}
@@ -182,22 +297,24 @@ const ClassesPage = () => {
                               fill="currentColor"
                             />
                             <h3 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-                              {class_.yogaClass.title}
+                              {enrollment.yogaClass.description}
                             </h3>
                           </div>
                           <div className="flex items-center gap-2">
                             <Award className="w-4 h-4 text-purple-400" />
                             <p className="text-sm text-gray-600 dark:text-gray-300">
-                              with {class_.yogaClass.instructor.firstName}{" "}
-                              {class_.yogaClass.instructor.lastName}
+                              with {enrollment.yogaClass.instructor.firstName}{" "}
+                              {enrollment.yogaClass.instructor.lastName}
                             </p>
                           </div>
                         </div>
                         <button
-                          onClick={(e) => handlePlayClick(e, class_._id)}
+                          onClick={(e) =>
+                            handlePlayClick(e, enrollment.yogaClass._id)
+                          }
                           className="p-3 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white shadow-lg transform hover:scale-105 transition-all duration-300"
                         >
-                          {activeClass === class_._id && isPlaying ? (
+                          {activeClass === enrollment._id && isPlaying ? (
                             <Pause className="w-5 h-5" />
                           ) : (
                             <Play className="w-5 h-5" />
@@ -211,7 +328,7 @@ const ClassesPage = () => {
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 text-pink-500" />
                             <span className="text-sm text-gray-700 dark:text-gray-200">
-                              {class_.yogaClass.duration} mins
+                              Price: ${enrollment.yogaClass.price}
                             </span>
                           </div>
                         </div>
@@ -219,7 +336,7 @@ const ClassesPage = () => {
                           <div className="flex items-center gap-2">
                             <MapPin className="w-4 h-4 text-purple-500" />
                             <span className="text-sm text-gray-700 dark:text-gray-200">
-                              {class_.yogaClass.classType}
+                              Status: {enrollment.status}
                             </span>
                           </div>
                         </div>
@@ -230,38 +347,29 @@ const ClassesPage = () => {
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-pink-400" />
                           <span className="text-sm text-gray-600 dark:text-gray-300">
+                            Enrolled:{" "}
                             {new Date(
-                              class_.yogaClass.startTime
-                            ).toLocaleDateString()}{" "}
-                            -{" "}
-                            {new Date(
-                              class_.yogaClass.endTime
+                              enrollment.createdAt
                             ).toLocaleDateString()}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Star className="w-4 h-4 text-purple-400" />
                           <span className="text-sm text-gray-600 dark:text-gray-300">
-                            {class_.yogaClass.style} •{" "}
-                            {class_.yogaClass.difficulty}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-pink-400" />
-                          <span className="text-sm text-gray-600 dark:text-gray-300">
-                            {class_.yogaClass.location}
+                            Attendance: {enrollment.attendancePercentage}%
                           </span>
                         </div>
                       </div>
 
                       {/* Expanded Content */}
-                      {activeClass === class_._id && (
+                      {activeClass === enrollment._id && (
                         <div className="mt-6 space-y-4 border-t border-gray-100 dark:border-gray-700 pt-4">
                           <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                            {class_.yogaClass.description}
+                            Instructor Bio:{" "}
+                            {enrollment.yogaClass.instructor.bio}
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {class_.yogaClass.instructor.certifications?.map(
+                            {enrollment.yogaClass.instructor.certifications?.map(
                               (certification, index) => (
                                 <span
                                   key={index}
@@ -271,19 +379,6 @@ const ClassesPage = () => {
                                 </span>
                               )
                             )}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                            <Users className="w-4 h-4 text-purple-400" />
-                            <span>
-                              {class_.yogaClass.currentParticipants}/
-                              {class_.yogaClass.maxParticipants} participants
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                            <Award className="w-4 h-4 text-pink-400" />
-                            <span>
-                              Attendance: {class_.attendancePercentage}%
-                            </span>
                           </div>
                         </div>
                       )}
@@ -307,70 +402,22 @@ const ClassesPage = () => {
           </h2>
 
           {isLoading ? (
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading classes...
-            </p>
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 font-extrabold border-t-2 border-b-2 border-blue-500"></div>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {availableClasses.length > 0 ? (
-                availableClasses.map((class_) => (
-                  <Card
-                    key={class_._id}
-                    className="group p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                  >
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-white">
-                        {class_.title}
-                      </h3>
-                      <div
-                        className={`p-2 rounded-lg bg-gradient-to-r ${class_.color}`}
-                      >
-                        <Layout className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-
-                    <div className="mt-4 space-y-3">
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        <Clock className="w-4 h-4 mr-2" />
-                        <span>{class_.duration} minutes</span>{" "}
-                      </div>
-
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span>
-                          {new Date(class_.startTime).toLocaleString()}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        <Users className="w-4 h-4 mr-2" />
-                        <span>
-                          {class_.currentParticipants} /{" "}
-                          {class_.maxParticipants} students
-                        </span>{" "}
-                      </div>
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                        <span>{class_.difficulty} difficulty</span>{" "}
-                      </div>
-                    </div>
-
-                    <PaymentButton
-                      amount={class_.price}
-                      onSuccess={handlePaymentSuccess}
-                      onFailure={handlePaymentFailure}
-                      text={"Pay & Join Class"}
-                      userId={parsedUser.id}
-                      classId={class_._id}
-                      updateEnrolledClassess={setEnrolledClasses}
-                    />
-                  </Card>
-                ))
-              ) : (
-                <p className="text-gray-600 dark:text-gray-400">
-                  No available classes found. Please try again later.
-                </p>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {availableClasses.map((class_) => (
+                <ClassCard
+                  key={class_._id}
+                  class_={class_}
+                  parsedUser={parsedUser}
+                  handlePaymentSuccess={handlePaymentSuccess}
+                  handlePaymentFailure={handlePaymentFailure}
+                  PaymentButton={PaymentButton}
+                  getFormattedDays={getFormattedDays}
+                />
+              ))}
             </div>
           )}
         </div>

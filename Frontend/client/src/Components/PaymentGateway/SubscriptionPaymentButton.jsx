@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { CreatePayment, VerifyPayment , EnrolledClasses } from "../../api/api";
+import { subscriptionPayment, verifySubscriptionPayment } from "../../api/api"; // Your subscription payment API methods
 import { CreditCard, ChevronRight, Lock } from "lucide-react";
 import DarkModeClasses from "../DarkMode";
 
+// Load Razorpay SDK dynamically
 const loadScript = (src) => {
   return new Promise((resolve) => {
     const script = document.createElement("script");
@@ -23,16 +24,18 @@ const PaymentButton = ({
   onFailure,
   text = "Pay Now",
   userId,
-  classId,
+  planId,
   className,
-  updateEnrolledClasses, 
+  updateSubscriptionStatus,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
+
     try {
       setIsLoading(true);
 
+      // Load Razorpay SDK dynamically
       const isScriptLoaded = await loadScript(
         "https://checkout.razorpay.com/v1/checkout.js"
       );
@@ -42,39 +45,47 @@ const PaymentButton = ({
         );
       }
 
+      // Create subscription payment data
       const paymentData = {
         userId,
-        classId,
+        planId,
         amount: Number(amount),
       };
 
-      const result = await CreatePayment(paymentData);
+      // Call the subscription payment API
+      const result = await subscriptionPayment(paymentData);
       if (!result.success) {
-        throw new Error(result.message || "Failed to create payment order");
+        throw new Error(
+          result.message || "Failed to create subscription payment order"
+        );
       }
 
       const options = {
-        key: "rzp_test_zR3Hw3haQMWYC9",
-        amount: amount * 100,
+        key: "rzp_test_zR3Hw3haQMWYC9", // Your Razorpay Key
+        amount: amount * 100, // Razorpay requires amount in paise (cents)
         currency: "INR",
-        name: "Yoga Class Enrollment",
-        description: `Enrollment for Yoga Class`,
-        order_id: result.orderId,
+        name: "Subscription Payment",
+        description: `Subscription for Yoga Plan`,
+        order_id: result.orderId, // The orderId returned from your API
         handler: async function (response) {
           try {
-           
+            // Payment verification
             const verifyData = {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
             };
 
-            const verificationResult = await VerifyPayment(verifyData);
+            // Call the verify subscription payment API
+            const verificationResult = await verifySubscriptionPayment(
+              verifyData
+            );
 
             if (verificationResult.success) {
-             
-              const enrolledClassesResult = await EnrolledClasses(userId);
-              updateEnrolledClasses(enrolledClassesResult.data);
+              // Update subscription status
+              updateSubscriptionStatus(verificationResult.data);
+
+              // Trigger success callback
               onSuccess(verificationResult.data);
             } else {
               throw new Error(
@@ -95,19 +106,19 @@ const PaymentButton = ({
         },
         notes: {
           userId: userId,
-          classId: classId,
+          planId: planId, // Passing the planId here as well
         },
         theme: {
-          color: "#4F46E5",
+          color: "#4F46E5", // Customize the color
         },
         modal: {
           ondismiss: function () {
-            setIsLoading(false);
+            setIsLoading(false); // Reset loading state if modal is dismissed
           },
         },
       };
 
-     
+      // Initialize and open Razorpay payment window
       const paymentObject = new window.Razorpay(options);
       paymentObject.on("payment.failed", function (response) {
         onFailure({
@@ -117,7 +128,7 @@ const PaymentButton = ({
         setIsLoading(false);
       });
 
-      paymentObject.open();
+      paymentObject.open(); // Open the Razorpay payment modal
     } catch (error) {
       onFailure({
         success: false,

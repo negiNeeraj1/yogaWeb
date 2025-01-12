@@ -89,8 +89,8 @@ export const loginAdmin = async (req, res) => {
         res.json({
             user: {
                 id: existingUser._id,
-                firstName: existingUser.firstName,
-                lastName: existingUser.lastName,
+                firstName: existingUser.Fname,
+                lastName: existingUser.Lname,
                 email: existingUser.email,
                 role: existingUser.role
             },
@@ -159,5 +159,32 @@ export const getAdminDashboardAnalytics = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Error retrieving analytics", error: error.message });
+    }
+};
+
+export const getAdminProfile = async (req, res) => {
+    try {
+
+        const userId = req.params.id;
+        const user = await Admin.findById(userId).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching profile",
+            error: error.message
+        });
     }
 };

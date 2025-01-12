@@ -32,41 +32,40 @@ export const registerForClass = async (req, res) => {
 
 export const markAttendance = async (req, res) => {
     try {
-        const { _id } = req.body; 
+        const { classId, userId } = req.body;
 
-        // Validate `_id` as a MongoDB ObjectId
-        if (!mongoose.Types.ObjectId.isValid(_id)) {
-            return res.status(400).json({ success: false, message: 'Invalid attendance ID' });
+        if (!classId || !userId) {
+            return res.status(400).json({ success: false, message: 'classId and userId are required.' });
         }
 
-        const attendance = await ClassAttendance.findById(_id);
+        const attendance = await ClassAttendance.findOneAndUpdate(
+            { yogaClass: classId, user: userId },
+            { status: 'Present', checkinTime: new Date() },
+            { new: true, upsert: true }
+        );
 
-        if (!attendance) {
-            return res.status(404).json({ success: false, message: 'Attendance record not found' });
+        if (attendance.completedSessions === undefined) {
+            attendance.completedSessions = 0;
         }
 
-        if (!attendance.totalSessions) attendance.totalSessions = 10;
-        if (!attendance.completedSessions) attendance.completedSessions = 0;
-        if (!attendance.achievements) attendance.achievements = [];
-
-        attendance.status = 'attended';
-        attendance.checkinTime = new Date();
         attendance.completedSessions += 1;
         attendance.progress = (attendance.completedSessions / attendance.totalSessions) * 100;
 
         if (attendance.progress >= 50 && !attendance.achievements.includes('Halfway There')) {
             attendance.achievements.push('Halfway There');
         }
+        if (attendance.progress >= 100 && !attendance.achievements.includes('Completed All Sessions')) {
+            attendance.achievements.push('Completed All Sessions');
+        }
 
         await attendance.save();
 
-        // Send the response
         res.status(200).json({ success: true, data: attendance });
     } catch (error) {
-        console.error('Error in markAttendance:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 export const getClassAttendanceStats = async (req, res) => {
     try {

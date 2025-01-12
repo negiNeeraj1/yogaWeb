@@ -1,388 +1,383 @@
 import React, { useState, useEffect } from "react";
-import {
-  Users,
-  Search,
-  Filter,
-  Edit2,
-  UserCheck,
-  UserX,
-  MoreVertical,
-  PlusCircle,
-} from "lucide-react";
+import { Users, Search, Edit, Trash2, UserPlus, X } from "lucide-react";
+import { getAdminProfile } from "../api/api";
 
-const Clients = () => {
-  const clients = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      sessions: 5,
-      active: true,
-      course: "Yoga 101",
-      level: "Beginner",
-      photo: "https://images.unsplash.com/photo-1603791440634-d4f15b48b1f0",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      sessions: 8,
-      active: true,
-      course: "Advanced Yoga",
-      level: "Advanced",
-      photo: "https://images.unsplash.com/photo-1601474539439-d2047faff5f1",
-    },
-    {
-      id: 3,
-      name: "Sam Wilson",
-      email: "sam@example.com",
-      sessions: 3,
-      active: false,
-      course: "Yoga for Beginners",
-      level: "Intermediate",
-      photo: "https://images.unsplash.com/photo-1596495577884-bfef0330c41d",
-    },
-    {
-      id: 4,
-      name: "Emma Brown",
-      email: "emma@example.com",
-      sessions: 0,
-      active: false,
-      course: "Basic Yoga",
-      level: "Beginner",
-      photo: "https://images.unsplash.com/photo-1512950675312-e6899880ab87",
-    },
-    {
-      id: 5,
-      name: "Chris Lee",
-      email: "chris@example.com",
-      sessions: 10,
-      active: true,
-      course: "Advanced Yoga",
-      level: "Advanced",
-      photo: "https://images.unsplash.com/photo-1560807707-8cc7777c7f7f",
-    },
-    {
-      id: 6,
-      name: "Anna Taylor",
-      email: "anna@example.com",
-      sessions: 0,
-      active: false,
-      course: "Yoga Basics",
-      level: "Beginner",
-      photo: "https://images.unsplash.com/photo-1541479788290-df498e9cd9fc",
-    },
-  ];
-
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [filter, setFilter] = useState("all");
+const UserManagement = () => {
+  // State Management
+  const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedClient, setEditedClient] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Filter clients by search query and other filters (active/inactive)
-  const filteredClients = clients.filter((client) => {
-    const isMatchingSearchQuery = client.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const isActiveFilter =
-      filter === "active"
-        ? client.active
-        : filter === "inactive"
-        ? !client.active
-        : true;
-
-    return isMatchingSearchQuery && isActiveFilter;
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    membershipType: "Basic",
+    status: "active",
+    preferredClass: "Morning Yoga",
+    healthConditions: "",
+    emergencyContact: "",
   });
 
-  // Handle click outside to close modal
-  const handleClickOutside = (event) => {
-    if (event.target.id === "modal-overlay") {
-      setSelectedClient(null);
+  const [editForm, setEditForm] = useState({
+    Fname: "",
+    Lname: "",
+    email: "",
+    phone_Number: "",
+  });
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "N/A";
+      return date.toLocaleDateString();
+    } catch (error) {
+      return "N/A";
+    }
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "N/A";
+      return date.toLocaleString();
+    } catch (error) {
+      return "N/A";
     }
   };
 
   useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    fetchUserProfile();
   }, []);
 
-  // Handle edit form input change
+  const fetchUserProfile = async () => {
+    try {
+      setError(null);
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (storedUser && storedUser.id) {
+        const response = await getAdminProfile(storedUser.id);
+
+        if (response.success && response.user) {
+          const transformedUser = {
+            id: response.user._id,
+            name: `${response.user.Fname || ""} ${
+              response.user.Lname || ""
+            }`.trim(),
+            Fname: response.user.Fname || "",
+            Lname: response.user.Lname || "",
+            email: response.user.email,
+            phone: response.user.phone_Number || "N/A",
+            membershipType: response.user.membershipType || "N/A",
+            joinDate: formatDate(response.user.createdAt),
+            totalClasses: response.user.sessionDurations?.length || 0,
+            status: response.user.accountStatus || "inactive",
+            paymentStatus: response.user.subscriptionStatus || "N/A",
+            preferredClass: response.user.preferredStyle || "N/A",
+            healthConditions:
+              response.user.medicalConditions?.join(", ") || "None",
+            emergencyContact: response.user.phone_Number || "N/A",
+            experienceLevel: response.user.experienceLevel || "N/A",
+            fitnessGoals: response.user.fitnessGoals?.join(", ") || "None",
+            lastLogin: formatDateTime(response.user.lastLogin),
+          };
+          setUsers([transformedUser]);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setError("Failed to load user profile. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setEditForm({
+      Fname: user.Fname,
+      Lname: user.Lname,
+      email: user.email,
+      phone_Number: user.phone,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // const response = await updateUser(editingUser.id, editForm);
+
+      // For now, just update the local state
+      const updatedUsers = users.map((user) =>
+        user.id === editingUser.id
+          ? {
+              ...user,
+              name: `${editForm.Fname} ${editForm.Lname}`,
+              Fname: editForm.Fname,
+              Lname: editForm.Lname,
+              email: editForm.email,
+              phone: editForm.phone_Number,
+              emergencyContact: editForm.phone_Number,
+            }
+          : user
+      );
+
+      setUsers(updatedUsers);
+      setIsEditModalOpen(false);
+      // Add a success message here
+    } catch (error) {
+      console.error("Error updating user:", error);
+      // Add error handling here
+    }
+  };
+
+  // Filter users
+  const filteredUsers = users.filter((user) => {
+
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" ? true : user.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   const handleInputChange = (e) => {
-    setEditedClient({
-      ...editedClient,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  // Handle submit form for saving changes
-  const handleSaveChanges = () => {
-    const updatedClients = clients.map((client) =>
-      client.id === editedClient.id ? editedClient : client
-    );
-    setEditedClient(null);
-    setIsEditing(false);
-    setSelectedClient(
-      updatedClients.find((client) => client.id === editedClient.id)
-    );
-  };
-
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50">
-      {/* Header Section */}
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-extrabold text-gray-800 flex items-center">
-            <Users className="mr-3 text-indigo-600" size={32} />
-            Clients Management
-          </h2>
-          <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-            <PlusCircle className="mr-2" size={20} />
-            Add New Client
-          </button>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8 text-gray-700 dark:text-white">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold flex items-center">
+            <Users className="mr-2" />
+            User Profile
+          </h1>
         </div>
 
-        {/* Search and Filter Section */}
-        <div className="flex space-x-4 mb-6">
-          <div className="relative flex-grow">
-            <input
-              type="text"
-              placeholder="Search clients by name"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
-            <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-          </div>
+        {/* Loading and Error States */}
+        {loading && <div className="text-center py-8">Loading profile...</div>}
 
-          <div className="flex space-x-2">
-            <button
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                filter === "all"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setFilter("all")}
-            >
-              <Users className="mr-2" size={16} />
-              All ({clients.length})
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                filter === "active"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setFilter("active")}
-            >
-              <UserCheck className="mr-2" size={16} />
-              Active ({clients.filter((client) => client.active).length})
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                filter === "inactive"
-                  ? "bg-red-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setFilter("inactive")}
-            >
-              <UserX className="mr-2" size={16} />
-              Inactive ({clients.filter((client) => !client.active).length})
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Clients Table */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-100 border-b">
-            <tr>
-              {[
-                "Client",
-                "Email",
-                "Course",
-                "Sessions",
-                "Status",
-                "Actions",
-              ].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {filteredClients.map((client) => (
-              <tr
-                key={client.id}
-                className="hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => setSelectedClient(client)}
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <img
-                      src={client.photo}
-                      alt={client.name}
-                      className="w-10 h-10 rounded-full mr-4 object-cover"
-                    />
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {client.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {client.level}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {client.email}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {client.course}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {client.sessions}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      client.active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {client.active ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <button className="text-gray-500 hover:text-indigo-600 transition-colors">
-                    <MoreVertical size={20} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Empty State */}
-        {filteredClients.length === 0 && (
-          <div className="text-center py-10 bg-gray-50">
-            <p className="text-gray-500 mb-4">No clients found</p>
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-              Add Your First Client
-            </button>
+        {error && (
+          <div className="text-center py-8 text-red-600 dark:text-red-400">
+            {error}
           </div>
         )}
-      </div>
 
-      {/* Modal Section */}
-      {selectedClient && (
-        <div
-          id="modal-overlay"
-          className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
-        >
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 relative">
-            <button
-              onClick={() => setSelectedClient(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <MoreVertical size={24} />
-            </button>
-
-            <div className="flex items-center mb-6">
-              <img
-                src={selectedClient.photo}
-                alt="Client"
-                className="w-24 h-24 rounded-full object-cover mr-6 border-4 border-indigo-100"
-              />
-              <div>
-                <h3 className="text-2xl font-bold text-gray-800 flex items-center">
-                  {selectedClient.name}
-                  <button
-                    className="ml-3 text-indigo-600 hover:text-indigo-800"
-                    onClick={() => {
-                      setIsEditing(true);
-                      setEditedClient({ ...selectedClient });
-                    }}
+        {/* Users Table */}
+        {!loading && !error && (
+          <div className="rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800">
+            <table className="w-full">
+              <thead className="bg-gray-200 dark:bg-gray-700">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    User
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Contact
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Membership
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Health & Goals
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredUsers.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <Edit2 size={20} />
-                  </button>
-                </h3>
-                <p className="text-gray-600">{selectedClient.email}</p>
-                <p className="text-gray-500">
-                  {selectedClient.sessions} sessions attended
-                </p>
-              </div>
-            </div>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                            {user.Fname}
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium">{user.name}</div>
+                          <div className="text-sm text-gray-500">
+                            {user.email}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Joined: {user.joinDate}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Last login: {user.lastLogin}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">{user.phone}</div>
+                      <div className="text-sm text-gray-500">
+                        Experience: {user.experienceLevel}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">{user.membershipType}</div>
+                      <div className="text-sm text-gray-500">
+                        Preferred: {user.preferredClass}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Classes: {user.totalClasses}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        Health: {user.healthConditions}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Goals: {user.fitnessGoals}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          user.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {user.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handleEdit(user)}
+                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200"
+                      >
+                        <Edit className="h-5 w-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-            <div className="mb-6">
-              <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                Course Details
-              </h4>
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <p className="text-gray-600">
-                  <strong>Course:</strong> {selectedClient.course}
-                </p>
-                <p className="text-gray-600">
-                  <strong>Level:</strong> {selectedClient.level}
-                </p>
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mt-2 ${
-                    selectedClient.active
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {selectedClient.active ? "Active" : "Inactive"}
-                </span>
-              </div>
-            </div>
+            {isEditModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                      Edit User Profile
+                    </h2>
+                    <button
+                      onClick={() => setIsEditModalOpen(false)}
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
 
-            {/* Edit Form */}
-            {isEditing && (
-              <div className="mt-4">
-                <input
-                  type="text"
-                  name="name"
-                  value={editedClient.name}
-                  onChange={handleInputChange}
-                  className="p-2 border border-gray-300 rounded-lg w-full mb-4"
-                  placeholder="Name"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  value={editedClient.email}
-                  onChange={handleInputChange}
-                  className="p-2 border border-gray-300 rounded-lg w-full mb-4"
-                  placeholder="Email"
-                />
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveChanges}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                  >
-                    Save Changes
-                  </button>
+                  <form onSubmit={handleEditSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.Fname}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, Fname: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.Lname}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, Lname: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        value={editForm.email}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, email: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={editForm.phone_Number}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            phone_Number: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+
+                    <div className="flex justify-end space-x-2 mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditModalOpen(false)}
+                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
+            
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
 
-export default Clients;
+export default UserManagement;

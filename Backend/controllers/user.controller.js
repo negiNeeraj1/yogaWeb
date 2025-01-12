@@ -6,24 +6,25 @@ export const register = async (req, res, next) => {
             firstName,
             lastName,
             email,
+            phone,
             password,
             dateOfBirth,
             gender,
-        
+
             height,
             weight,
             medicalConditions,
             injuries,
-        
+
             experienceLevel,
             preferredStyle,
             flexibility,
-        
+
             fitnessGoals,
             focusAreas,
             preferredTime,
             sessionDuration,
-        
+
             occupation,
             stressLevel,
             sleepQuality,
@@ -31,7 +32,7 @@ export const register = async (req, res, next) => {
             activityLevel
         } = req.body;
 
-        
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -39,21 +40,22 @@ export const register = async (req, res, next) => {
             });
         }
 
-        
+
         const user = new User({
-        
+
             firstName,
             lastName,
             email,
             password,
+            phone,
             dateOfBirth,
             gender,
-            
+
             height,
             weight,
             medicalConditions,
             injuries,
-            
+
             experienceLevel,
             preferredStyle,
             flexibility,
@@ -62,19 +64,19 @@ export const register = async (req, res, next) => {
             focusAreas,
             preferredTime,
             sessionDuration,
-            
+
             occupation,
             stressLevel,
             sleepQuality,
             dietaryPreferences,
             activityLevel
         });
-        
+
         await user.save();
 
         req.session.userId = user._id;
 
-        
+
         res.status(201).json({
             user: {
                 id: user._id,
@@ -93,7 +95,6 @@ export const register = async (req, res, next) => {
     }
 };
 
-
 export const logout = async (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -106,8 +107,9 @@ export const logout = async (req, res) => {
 
 export const getProfile = async (req, res) => {
     try {
-        
-        const user = await User.findById(req.user._id).select('-password');
+
+        const userId = req.params.id;
+        const user = await User.findById(userId).select('-password');
 
         if (!user) {
             return res.status(404).json({
@@ -130,24 +132,25 @@ export const getProfile = async (req, res) => {
     }
 };
 
+
 export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
         const updateData = req.body;
 
-        
+
         const protectedFields = ['_id', 'email', 'password', 'role', 'joinedDate'];
         protectedFields.forEach(field => {
             delete updateData[field];
         });
 
-        
+
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             updateData,
             {
-                new: true,  
-                runValidators: true  
+                new: true,
+                runValidators: true
             }
         ).select('-password');
 
@@ -185,7 +188,7 @@ export const changePassword = async (req, res) => {
             });
         }
 
-        
+
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
             return res.status(401).json({
@@ -194,7 +197,7 @@ export const changePassword = async (req, res) => {
             });
         }
 
-        
+
         user.password = newPassword;
         await user.save();
 
@@ -375,68 +378,84 @@ export const trackUserSession = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log("Login attempt for:", email);
 
-        // Find the user by email
-        const existingUser = await User.findOne({ email });
+        // Input validation
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            });
+        }
+
+        // Find user and select necessary fields
+        const existingUser = await User.findOne({ email }).select('+password');
 
         // Check if user exists
         if (!existingUser) {
             console.log("User not found:", email);
             return res.status(404).json({
                 success: false,
-                message: "User not found"
+                message: "Invalid email or password"
             });
         }
 
         // Compare passwords
         const isMatch = await existingUser.comparePassword(password);
 
-        // Check if password is correct
+        // Check if password matches
         if (!isMatch) {
             console.log("Password mismatch for:", email);
             return res.status(401).json({
                 success: false,
-                message: "Invalid credentials"
+                message: "Invalid email or password"
             });
         }
 
-        // Update login tracking
+        // Create login entry
         const loginEntry = {
             timestamp: new Date(),
-            ipAddress: req.ip // Capture IP address
+            ipAddress: req.ip || req.connection.remoteAddress
         };
 
         // Update user login stats
-        const updatedUser = await User.findByIdAndUpdate(existingUser._id, {
-            $set: {
-                lastLogin: new Date(),
-                lastActivity: new Date(),
-                accountStatus: 'active'
+        const updatedUser = await User.findByIdAndUpdate(
+            existingUser._id,
+            {
+                $set: {
+                    lastLogin: new Date(),
+                    lastActivity: new Date(),
+                    accountStatus: 'active'
+                },
+                $push: {
+                    loginHistory: {
+                        $each: [loginEntry],
+                        $slice: -10  // Keep only last 10 login entries
+                    }
+                },
+                $inc: { loginCount: 1 }
             },
-            $push: {
-                loginHistory: loginEntry
-            },
-            $inc: {
-                loginCount: 1
+            {
+                new: true,
+                runValidators: true
             }
-        }, { new: true }); // Return the updated document
+        );
 
         // Set session data
         req.session.userId = existingUser._id;
         req.session.userRole = existingUser.role;
 
-        // Prepare user response (exclude sensitive information)
+        // Prepare user response (excluding sensitive data)
         const userResponse = {
             id: existingUser._id,
             firstName: existingUser.firstName,
             lastName: existingUser.lastName,
             email: existingUser.email,
-            role: existingUser.role
+            role: existingUser.role,
+            accountStatus: updatedUser.accountStatus
         };
 
         // Send successful response
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: "Login successful",
             user: userResponse
@@ -444,9 +463,10 @@ export const login = async (req, res) => {
 
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            error: error.message || "Internal server error"
+            message: "Internal server error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 };

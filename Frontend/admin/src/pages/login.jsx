@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate, } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
+import { useRole } from "../context/RoleContext";
 import { LoginAdmin } from "../api/api";
 import axios from "axios";
 
@@ -28,6 +29,7 @@ const AdminLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
+  const { setAdminRole } = useRole();
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -44,47 +46,43 @@ const AdminLoginPage = () => {
     setIsLoading(true);
 
     try {
-      console.log("Submitting form data:", formData);
-
       const response = await LoginAdmin(formData);
 
-      // Log the entire response to see its structure
-      console.log("Full API response:", response);
+      console.log(response);
 
-      // Check if the response contains a user object
       if (response && response.user) {
-        console.log("User found in response");
-
-        // Assuming you want to store the user ID or email as a token
-        login(response.user.id || response.user.email);
+        
+        const { role } = response.user;
+        login(response.user);
+        setAdminRole(role);
         navigate("/");
       } else {
-        console.log("No user found in response");
         setError("Login failed: Unexpected response format");
       }
     } catch (err) {
-      console.error("Full error details:", err);
+ 
+       console.error("Full error details:", err);
+       if (err.response) {
+         // The request was made and the server responded with a status code
+         console.log("Error response data:", err.response.data);
+         console.log("Error response status:", err.response.status);
 
-      // More detailed error handling
-      if (err.response) {
-        // The request was made and the server responded with a status code
-        console.log("Error response data:", err.response.data);
-        console.log("Error response status:", err.response.status);
+         setError(err.response.data.message || "Login failed");
+       } else if (err.request) {
+         // The request was made but no response was received
+         console.log("No response received:", err.request);
+         setError("No response from server");
+       } else {
+         // Something happened in setting up the request
+         console.log("Error message:", err.message);
+         setError(err.message);
+       }
 
-        setError(err.response.data.message || "Login failed");
-      } else if (err.request) {
-        // The request was made but no response was received
-        console.log("No response received:", err.request);
-        setError("No response from server");
-      } else {
-        // Something happened in setting up the request
-        console.log("Error message:", err.message);
-        setError(err.message);
-      }
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const [draggedItems, setDraggedItems] = useState([]);
   const [activeCharacter, setActiveCharacter] = useState(null);

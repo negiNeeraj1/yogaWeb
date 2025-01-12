@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        required: true,
         trim: true
     },
 
@@ -83,7 +84,8 @@ const userSchema = new mongoose.Schema({
         enum: ['limited', 'moderate', 'good', 'excellent']
     },
     strengthLevel: {
-        type: String
+        type: String,
+        enum: ['weak', 'average', 'strong', 'very strong']
     },
 
     // Goals and Preferences
@@ -149,7 +151,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['excellent', 'good', 'fair', 'poor', 'insomnia']
     },
-    dietaryPreferences: {
+    dietaryPreferences: [{
         type: String,
         enum: [
             'vegetarian',
@@ -157,10 +159,10 @@ const userSchema = new mongoose.Schema({
             'gluten-free',
             'dairy-free',
             'pescatarian',
-            'no restrictions',
+            'omnivore',
             'other'
         ]
-    },
+    }],
     activityLevel: {
         type: String,
         enum: [
@@ -243,6 +245,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['active', 'inactive', 'expired'],
         default: 'inactive'
+    },
+    membershipType: {
+        type: String,
+        enum: ['basic', 'premium', 'vip'],
+        default: 'basic'
+    },
+    nextPaymentDue: {
+        type: Date
     }
 }, {
     timestamps: true

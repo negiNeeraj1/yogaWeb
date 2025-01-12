@@ -88,7 +88,7 @@ export const verifyPayment = async (req, res) => {
                 const attendance = new ClassAttendance({
                     yogaClass: classId,
                     user: userId,
-                    status: 'registered'
+                    status: 'Registered'
                 });
                 await attendance.save();
             }

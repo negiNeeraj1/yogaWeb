@@ -7,66 +7,74 @@ import {
   Heart,
   Share2,
   ChevronRight,
+  Sun,
+  Moon,
+  Clock,
+  MessageSquare,
+  Bookmark,
+  ThumbsUp,
+  PlusCircle,
+  Edit,
+  Trash2,
+  X,
 } from "lucide-react";
 
 const Blogs = () => {
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const categories = ["All", "Yoga", "Wellness", "Fitness", "Meditation"];
+  const categories = [
+    "All",
+    "Yoga",
+    "Wellness",
+    "Fitness",
+    "Meditation",
+    "Mindfulness",
+    "Nutrition",
+    "Lifestyle",
+  ];
 
   const blogs = [
     {
       id: 1,
-      title: "The Benefits of Yoga",
-      views: 1234,
+      title: "The Complete Guide to Morning Yoga Practice",
+      views: 12345,
       date: "2024-11-01",
       category: "Yoga",
       author: "Emma Johnson",
+      authorRole: "Senior Yoga Instructor",
+      authorImage: "/api/placeholder/100/100",
       excerpt:
-        "Discover how regular yoga practice can transform your physical and mental well-being.",
-      readTime: "5 min read",
-      likes: 345,
-      image: "/api/placeholder/800/400",
+        "Discover how a morning yoga routine can transform your entire day. Learn essential poses, breathing techniques, and meditation practices.",
+      readTime: "8 min read",
+      likes: 1345,
+      comments: 89,
+      bookmarks: 234,
+      image:
+        "https://img.freepik.com/free-psd/yoga-woman-banner-template_23-2148478401.jpg?semt=ais_hybrid",
+      tags: ["Morning Routine", "Beginners", "Wellness"],
+      featured: true,
     },
     {
       id: 2,
-      title: "How to Start Yoga at Home",
-      views: 987,
+      title: "Mindful Meditation: A Scientific Approach",
+      views: 9876,
       date: "2024-11-10",
-      category: "Wellness",
-      author: "Alex Rodriguez",
-      excerpt:
-        "Practical tips for beginners to create a peaceful yoga space and start their journey.",
-      readTime: "4 min read",
-      likes: 278,
-      image: "/api/placeholder/800/400",
-    },
-    {
-      id: 3,
-      title: "Advanced Yoga Techniques",
-      views: 456,
-      date: "2024-11-20",
-      category: "Fitness",
-      author: "Sarah Kim",
-      excerpt:
-        "Explore challenging yoga poses and how to safely advance your practice.",
-      readTime: "6 min read",
-      likes: 412,
-      image: "/api/placeholder/800/400",
-    },
-    {
-      id: 4,
-      title: "Meditation for Stress Relief",
-      views: 789,
-      date: "2024-11-25",
       category: "Meditation",
-      author: "Michael Chen",
+      author: "Dr. Alex Rodriguez",
+      authorRole: "Meditation Researcher",
+      authorImage: "/api/placeholder/100/100",
       excerpt:
-        "Learn powerful meditation techniques to reduce stress and improve mental clarity.",
-      readTime: "5 min read",
-      likes: 356,
-      image: "/api/placeholder/800/400",
+        "Explore the scientific benefits of meditation, backed by recent research and practical techniques for daily practice.",
+      readTime: "10 min read",
+      likes: 978,
+      comments: 56,
+      bookmarks: 189,
+      image:
+        "https://img.freepik.com/free-psd/banner-template-with-yoga_23-2148470622.jpg?semt=ais_hybrid",
+      tags: ["Science", "Mental Health", "Research"],
+      featured: true,
     },
+    // More blog data...
   ];
 
   const filteredBlogs =
@@ -75,106 +83,136 @@ const Blogs = () => {
       : blogs.filter((blog) => blog.category === activeCategory);
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-xl">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-extrabold text-indigo-600">
-          Yoga & Wellness Blogs
-        </h2>
-        <div className="flex space-x-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-3 py-1 rounded-full text-sm transition-colors duration-300 ${
-                activeCategory === category
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-indigo-100"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 px-3 py-3">
+      <div className="max-w-7xl mx-auto ">
+        <button className="fixed bottom-8 right-8 p-4 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors">
+          <PlusCircle className="w-6 h-6" />
+        </button>
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold py-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Yoga & Wellness Blog
+          </h1>
+
+          {/* Categories */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 
+                  ${
+                    activeCategory === category
+                      ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30"
+                      : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-700"
+                  }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Blogs Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {filteredBlogs.map((blog) => (
-          <div
-            key={blog.id}
-            className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group"
-          >
-            {/* Blog Image */}
-            <div className="relative">
-              <img
-                src={blog.image}
-                alt={blog.title}
-                className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute top-3 right-3 bg-white/80 px-2 py-1 rounded-full flex items-center space-x-1">
-                <Tag size={16} className="text-indigo-600" />
-                <span className="text-sm font-medium text-gray-700">
-                  {blog.category}
-                </span>
-              </div>
-            </div>
-
-            {/* Blog Content */}
-            <div className="p-5">
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {blog.title}
-              </h3>
-              <p className="text-gray-600 mb-4">{blog.excerpt}</p>
-
-              {/* Blog Metadata */}
-              <div className="flex justify-between items-center text-sm text-gray-500">
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1">
-                    <BookOpen size={16} className="text-indigo-500" />
-                    <span>{blog.readTime}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Eye size={16} className="text-indigo-500" />
-                    <span>{blog.views} Views</span>
+        {/* Featured Posts */}
+        {activeCategory === "All" && (
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {blogs
+              .filter((blog) => blog.featured)
+              .map((blog) => (
+                <div
+                  key={blog.id}
+                  className="relative group bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="relative h-64">
+                    <img
+                      src={blog.image}
+                      alt={blog.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Tag size={16} />
+                        <span className="text-sm font-medium">
+                          {blog.category}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">{blog.title}</h3>
+                      <p className="text-sm text-gray-200 line-clamp-2">
+                        {blog.excerpt}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-1">
-                    <Heart size={16} className="text-red-500" />
-                    <span>{blog.likes}</span>
-                  </div>
-                </div>
-              </div>
+              ))}
+          </div>
+        )}
 
-              {/* Author and Read More */}
-              <div className="mt-4 flex justify-between items-center border-t pt-3">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <span className="text-indigo-600 font-bold">
-                      {blog.author.charAt(0)}
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">
-                    {blog.author}
+        {/* Regular Posts Grid */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {filteredBlogs.map((blog) => (
+            <div
+              key={blog.id}
+              className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group"
+            >
+              <div className="relative">
+                <img
+                  src={blog.image}
+                  alt={blog.title}
+                  className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 px-3 py-1 rounded-full flex items-center space-x-1">
+                  <Tag
+                    size={14}
+                    className="text-purple-600 dark:text-purple-400"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {blog.category}
                   </span>
                 </div>
-                <button className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors">
-                  Read More
-                  <ChevronRight size={18} className="ml-1" />
-                </button>
+
+                <div className="absolute top-4 right-4 flex space-x-2">
+                  <button className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg">
+                    <Edit className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </button>
+                  <button className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg">
+                    <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-5">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                  {blog.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                  {blog.excerpt}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {blog.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* No Blogs Found */}
-      {filteredBlogs.length === 0 && (
-        <div className="text-center py-10 text-gray-500">
-          No blogs found in this category.
+          ))}
         </div>
-      )}
+
+        {/* No Results */}
+        {filteredBlogs.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              No blogs found in this category.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

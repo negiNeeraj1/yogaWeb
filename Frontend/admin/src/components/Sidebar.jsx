@@ -10,8 +10,15 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/outline";
 import { Link, useLocation } from "react-router-dom";
-import { BookAIcon } from "lucide-react";
-
+import {
+  Home,
+  Calendar,
+  Users,
+  FileText,
+  DollarSign,
+  HelpCircle,
+  Settings,
+} from "lucide-react";
 
 const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
@@ -24,18 +31,23 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     },
     {
       icon: CalendarIcon,
-      text: "Bookings",
-      path: "/bookings",
+      text: "Class Management",
+      path: "/class-management",
     },
     {
       icon: UserGroupIcon,
-      text: "Clients",
-      path: "/clients",
+      text: "User Management",
+      path: "/user-management",
     },
+    // {
+    //   icon: Users,
+    //   text: "Instructor Management",
+    //   path: "/instructor-management",
+    // },
     {
-      icon: DocumentTextIcon,
-      text: "Blogs",
-      path: "/blogs",
+      icon: FileText,
+      text: "Blog Management",
+      path: "/blog-management",
     },
     {
       icon: ChartBarIcon,
@@ -43,15 +55,24 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       path: "/analytics",
     },
     {
-      icon: BookAIcon,
-      text: "Course",
-      path: "/manage-courses",
+      icon: DollarSign,
+      text: "Subscription Management",
+      path: "/subscription-management",
     },
-
     {
-      icon: CogIcon,
+      icon: DollarSign,
+      text: "Payment Management",
+      path: "/payment-management",
+    },
+    {
+      icon: HelpCircle,
+      text: "Support & Feedback",
+      path: "/support-feedback",
+    },
+    {
+      icon: Settings,
       text: "Settings",
-      path: "/setting",
+      path: "/settings",
     },
   ];
 
@@ -59,8 +80,10 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     <div
       className={`
         bg-white 
+        dark:bg-gray-800
         border-r 
         border-gray-200 
+        dark:border-gray-700
         h-screen 
         fixed 
         left-0 
@@ -70,11 +93,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
         ease-in-out 
         ${isCollapsed ? "w-20" : "w-64"}
         shadow-md 
+        dark:shadow-gray-900/30
         flex 
         flex-col
       `}
     >
-
       {/* Collapse/Expand Button */}
       <button
         onClick={onToggleCollapse}
@@ -83,8 +106,10 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           top-4 
           -right-4 
           bg-white 
+          dark:bg-gray-800
           border 
           border-gray-200 
+          dark:border-gray-700
           rounded-full 
           w-8 
           h-8 
@@ -92,15 +117,17 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           items-center 
           justify-center 
           shadow-md 
+          dark:shadow-gray-900/30
           z-10
           hover:bg-gray-50 
+          dark:hover:bg-gray-700
           transition-all
         "
       >
         {isCollapsed ? (
-          <ChevronRightIcon className="h-5 w-5 text-gray-600" />
+          <ChevronRightIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         ) : (
-          <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
+          <ChevronLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         )}
       </button>
 
@@ -113,16 +140,20 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
           justify-center 
           border-b 
           border-gray-200 
+          dark:border-gray-700
           relative
         "
       >
         {!isCollapsed ? (
-          <h1 className="text-xl font-bold text-gray-800">Yoga Studio</h1>
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+            Yoga Studio
+          </h1>
         ) : (
-          <h1 className="text-2xl font-bold text-gray-800">Y</h1>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+            Y
+          </h1>
         )}
       </div>
-
 
       {/* Navigation Menu */}
       <nav className="flex-grow py-4 overflow-y-auto">
@@ -139,10 +170,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
               duration-200 
               ease-in-out 
               ${
-                location.pathname === item.path ||
-                (item.path === "/" && location.pathname === "/")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-100"
+                location.pathname === item.path
+                  ? "bg-blue-50 dark:bg-rose-500/20 text-blue-600 dark:text-rose-400"
+                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-rose-500/10"
               }
             `}
           >
@@ -151,10 +181,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
                 h-6 
                 w-6 
                 ${
-                  location.pathname === item.path ||
-                  (item.path === "/" && location.pathname === "/")
-                    ? "text-blue-600"
-                    : "text-gray-400"
+                  location.pathname === item.path
+                    ? "text-blue-600 dark:text-rose-400"
+                    : "text-gray-400 dark:text-gray-500"
                 }
                 ${!isCollapsed ? "mr-4" : ""}
               `}
@@ -165,10 +194,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
                   text-lg 
                   font-medium 
                   ${
-                    location.pathname === item.path ||
-                    (item.path === "/" && location.pathname === "/")
-                      ? "text-blue-600"
-                      : "text-gray-700"
+                    location.pathname === item.path
+                      ? "text-violet-600 dark:text-rose-400"
+                      : "text-gray-700 dark:text-gray-300"
                   }
                 `}
               >
@@ -177,7 +205,6 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
             )}
           </Link>
         ))}
-
       </nav>
     </div>
   );

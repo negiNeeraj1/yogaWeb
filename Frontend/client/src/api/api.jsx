@@ -35,6 +35,17 @@ export const GetClasses = async () => {
   }
 };
 
+export const GetClassById = async (id) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/classes/get/${id}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
 export const EnrolledClasses = async (userId) => {
   try {
     const response = await axios.get(
@@ -90,20 +101,18 @@ export const VerifyPayment = async (paymentData) => {
   }
 };
 
-export const markAttendance = async (classId) => {
+export const markAttendance = async (data) => {
   try {
-
-    console.log("Sending attendance mark for ID:", classId);
-
+    console.log("Sending attendance mark:", data);
     const response = await axios.post(
       `${BASE_URL}/attendance/mark`,
-      { _id: classId },
+      data,
       { withCredentials: true }
     );
 
-
     return response.data;
   } catch (error) {
+    console.error("Attendance mark error:", error);
     throw error.response ? error.response.data : new Error("Network Error");
   }
 };
@@ -118,3 +127,50 @@ export const getClassAttendanceStats = async (data) => {
     throw error.response ? error.response.data : new Error("Network Error");
   }
 };
+
+export const subscriptionPayment = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/subscriptions/pay`, data, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+export const verifySubscriptionPayment = async (data) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/subscriptions/verify-payment`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+export const getPlans = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/plans/get`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+export const sendForm = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/contact/send`, data, {
+      withCredentials : true
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+} 

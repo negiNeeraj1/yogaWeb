@@ -35,29 +35,4 @@ body {
     margin-top: 2rem;
 }
 
-::selection {
-    background-color: #eb294a;
-    color: white;
-}
-
-
-*:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px #f43f5e;
-}
-
-
-button:hover,
-a:hover {
-    background-color: #f43f5e;
-    color: white;
-}
-
-
-button:focus,
-a:focus,
-input:focus,
-textarea:focus {
-    outline: 2px solid #f43f5e;
-}
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Mail,
   Phone,
@@ -11,9 +11,7 @@ import {
   Send,
   AlertCircle,
   HelpCircle,
-  Sparkles,
   Heart,
-  Star,
   Flame,
   Dumbbell,
   Timer,
@@ -24,6 +22,7 @@ import {
   Flower2,
   MountainSnow,
 } from "lucide-react";
+import { sendForm } from "../../api/api";
 
 const FloatingElement = ({ children, className }) => (
   <div className={`absolute animate-bounce ${className}`}>{children}</div>
@@ -69,7 +68,6 @@ const FAQItem = ({ question, answer }) => {
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {/* Parallax floating elements */}
     {[...Array(150)].map((_, i) => (
       <div
         key={i}
@@ -89,12 +87,23 @@ const AnimatedBackground = () => (
 );
 
 const SupportPage = () => {
+
+  const user = localStorage.getItem("user");
+  const parsedUserData = user ? JSON.parse(user) : null;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
+    id: parsedUserData?.id,
   });
+
+    const [submitStatus, setSubmitStatus] = useState({
+      loading: false,
+      success: false,
+      error: null,
+    });
 
 
   const faqs = [
@@ -115,10 +124,51 @@ const SupportPage = () => {
     },
   ];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
+
+   const handleSubmit = async (e) => {
+     e.preventDefault();
+
+     if (!parsedUserData?.id) {
+       setSubmitStatus({
+         loading: false,
+         success: false,
+         error: "Please log in to send a message",
+       });
+       return;
+     }
+
+     setSubmitStatus({ loading: true, success: false, error: null });
+
+     try {
+       const response = await sendForm(formData);
+
+       if (response.success) {
+         setSubmitStatus({ loading: false, success: true, error: null });
+         setFormData({
+           name: "",
+           email: "",
+           subject: "",
+           message: "",
+           id: parsedUserData.id,
+         });
+       } else {
+         throw new Error(response.message || "Failed to send message");
+       }
+     } catch (error) {
+       setSubmitStatus({
+         loading: false,
+         success: false,
+         error: error.message || "An error occurred while sending the message",
+       });
+     }
+   };
 
   return (
     <div className={`min-h-screen  dark:bg-gray-900 bg-slate-300`}>
@@ -223,11 +273,9 @@ const SupportPage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-8 relative">
-        <AnimatedBackground />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Form */}
           <div className="bg-slate-200 dark:bg-gray-800 p-8 rounded-2xl shadow-sm dark:shadow-none border border-gray-100 dark:border-gray-700 transform hover:scale-[1.02] transition-all duration-300">
-            <AnimatedBackground/>
             <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
               Send us a Message
             </h2>
@@ -236,58 +284,86 @@ const SupportPage = () => {
                 <div>
                   <input
                     type="text"
+                    name="name"
                     placeholder="Your Name"
-                    className="w-full p-4 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all duration-300"
+                    className="w-full p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-all duration-300"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={handleChange}
+                    required
+                    disabled={submitStatus.loading}
                   />
                 </div>
                 <div>
                   <input
                     type="email"
+                    name="email"
                     placeholder="Email Address"
-                    className="w-full p-4 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all duration-300"
+                    className="w-full p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-all duration-300"
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
+                    onChange={handleChange}
+                    required
+                    disabled={submitStatus.loading}
                   />
                 </div>
               </div>
+
+              {/* Rest of the form inputs */}
               <div>
                 <input
                   type="text"
+                  name="subject"
                   placeholder="Subject"
-                  className="w-full p-4 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all duration-300"
+                  className="w-full p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-all duration-300"
                   value={formData.subject}
-                  onChange={(e) =>
-                    setFormData({ ...formData, subject: e.target.value })
-                  }
+                  onChange={handleChange}
+                  required
+                  disabled={submitStatus.loading}
                 />
               </div>
               <div>
                 <textarea
+                  name="message"
                   placeholder="Your Message"
                   rows="6"
-                  className="w-full p-4 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all duration-300"
+                  className="w-full p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-all duration-300 resize-y"
                   value={formData.message}
-                  onChange={(e) =>
-                    setFormData({ ...formData, message: e.target.value })
-                  }
+                  onChange={handleChange}
+                  required
+                  disabled={submitStatus.loading}
                 />
               </div>
+
               <button
                 type="submit"
-                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 dark:from-indigo-500 dark:to-violet-500 dark:hover:from-indigo-600 dark:hover:to-violet-600 text-white font-medium flex items-center justify-center gap-2 group shadow-sm hover:shadow-md transition-all duration-300"
+                disabled={submitStatus.loading}
+                className={`w-full py-4 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 dark:from-indigo-500 dark:to-violet-500 dark:hover:from-indigo-600 dark:hover:to-violet-600 text-white font-medium flex items-center justify-center gap-2 group shadow-sm hover:shadow-md transition-all duration-300 ${
+                  submitStatus.loading ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               >
-                <span>Send Message</span>
+                <span>
+                  {submitStatus.loading ? "Sending..." : "Send Message"}
+                </span>
                 <Send
                   size={20}
-                  className="group-hover:translate-x-1 animate-bounce transition-transform duration-300"
+                  className={`${
+                    submitStatus.loading
+                      ? "animate-pulse"
+                      : "group-hover:translate-x-1"
+                  } transition-all duration-300`}
                 />
               </button>
+
+              {/* Status messages */}
+              {submitStatus.success && (
+                <div className="text-green-600 dark:text-green-400 text-sm mt-2 animate-fadeIn">
+                  Message sent successfully!
+                </div>
+              )}
+              {submitStatus.error && (
+                <div className="text-red-600 dark:text-red-400 text-sm mt-2 animate-fadeIn">
+                  Error: {submitStatus.error}
+                </div>
+              )}
             </form>
           </div>
 

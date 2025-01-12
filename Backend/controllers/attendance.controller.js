@@ -34,6 +34,7 @@ export const registerForClass = async (req, res) => {
 export const markAttendance = async (req, res) => {
     try {
         const { classId, userId } = req.body;
+       
         const attendance = await ClassAttendance.findOneAndUpdate(
             { yogaClass: classId, user: userId },
             { status: 'attended', checkinTime: new Date() },
