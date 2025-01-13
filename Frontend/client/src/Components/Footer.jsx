@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   Facebook,
   Instagram,
@@ -11,7 +12,6 @@ import {
   ArrowRight,
   Heart,
 } from "lucide-react";
-import DarkModeClasses from "./DarkMode";
 
 const Footer = () => {
   const quickLinks = [
@@ -38,82 +38,114 @@ const Footer = () => {
     { day: "Sunday", hours: "8:00 AM - 6:00 PM" },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
-    <footer className={`${DarkModeClasses.background.primary}`}>
+    <motion.footer
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white dark:bg-gray-900"
+    >
       <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div
-          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 ${DarkModeClasses.divider}`}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 border-b dark:border-gray-800"
         >
-          <div>
-            <h3
-              className={`text-xl font-bold mb-4 ${DarkModeClasses.text.primary}`}
-            >
+          <motion.div variants={itemVariants}>
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
               Yoga Life
             </h3>
-            <p className={`mb-6 ${DarkModeClasses.text.secondary}`}>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">
               Transform your mind, body, and soul with our expert-led yoga
               classes. Join our community and begin your journey to wellness
               today.
             </p>
-            <div className="flex gap-4">
+            <motion.div variants={containerVariants} className="flex gap-4">
               {[Facebook, Instagram, Twitter, Youtube].map((Icon, index) => (
-                <a
+                <motion.a
                   key={index}
                   href="#"
-                  className={`${DarkModeClasses.text.muted} hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors duration-300`}
+                  whileHover={{ scale: 1.2, rotate: 5 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400"
                 >
                   <Icon className="h-6 w-6" />
-                </a>
+                </motion.a>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div>
-            <h3
-              className={`text-xl font-bold mb-4 ${DarkModeClasses.text.primary}`}
-            >
+          <motion.div variants={itemVariants}>
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
               Quick Links
             </h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
-                <li key={link.name}>
+                <motion.li
+                  key={link.name}
+                  whileHover={{ x: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <a
                     href={link.href}
-                    className={`${DarkModeClasses.text.secondary} hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center gap-2 group`}
+                    className="text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 flex items-center gap-2 group"
                   >
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                     {link.name}
                   </a>
-                </li>
+                </motion.li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          <div>
-            <h3
-              className={`text-xl font-bold mb-4 ${DarkModeClasses.text.primary}`}
-            >
+          <motion.div variants={itemVariants}>
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
               Our Classes
             </h3>
             <ul className="space-y-3">
               {yogaClasses.map((yogaClass) => (
-                <li key={yogaClass.name}>
+                <motion.li
+                  key={yogaClass.name}
+                  whileHover={{ x: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <a
                     href={yogaClass.href}
-                    className={`${DarkModeClasses.text.secondary} hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center gap-2 group`}
+                    className="text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400 flex items-center gap-2 group"
                   >
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                     {yogaClass.name}
                   </a>
-                </li>
+                </motion.li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          <div>
-            <h3
-              className={`text-xl font-bold mb-4 ${DarkModeClasses.text.primary}`}
-            >
+          <motion.div variants={itemVariants}>
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
               Contact Us
             </h3>
             <div className="space-y-4">
@@ -125,65 +157,90 @@ const Footer = () => {
                 { Icon: Phone, text: "+1 (555) 123-4567" },
                 { Icon: Mail, text: "info@yogalife.com" },
               ].map((item, index) => (
-                <div key={index} className="flex items-start gap-3">
+                <motion.div
+                  key={index}
+                  className="flex items-start gap-3"
+                  whileHover={{ x: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <item.Icon className="h-6 w-6 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                  <p className={DarkModeClasses.text.secondary}>{item.text}</p>
-                </div>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {item.text}
+                  </p>
+                </motion.div>
               ))}
 
-              <div>
-                <h4
-                  className={`font-semibold mb-2 flex items-center gap-2 ${DarkModeClasses.text.primary}`}
-                >
+              <motion.div variants={itemVariants}>
+                <h4 className="font-semibold mb-2 flex items-center gap-2 text-gray-900 dark:text-white">
                   <Clock className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
                   Business Hours
                 </h4>
                 <ul className="space-y-2">
                   {businessHours.map((schedule) => (
-                    <li
+                    <motion.li
                       key={schedule.day}
-                      className={`${DarkModeClasses.text.secondary} text-sm`}
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="text-gray-600 dark:text-gray-300 text-sm"
                     >
                       <span className="font-medium">{schedule.day}:</span>
                       <br />
                       {schedule.hours}
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className={`mt-12 pt-8 border-t ${DarkModeClasses.divider}`}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="mt-12 pt-8 border-t dark:border-gray-800"
+        >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className={`text-sm ${DarkModeClasses.text.secondary}`}>
+            <motion.p
+              whileHover={{ scale: 1.02 }}
+              className="text-sm text-gray-600 dark:text-gray-300"
+            >
               © {new Date().getFullYear()} Yoga Life. All rights reserved.
-            </p>
+            </motion.p>
             <div className="flex items-center gap-6">
-              <a
-                href="/privacy"
-                className={`text-sm ${DarkModeClasses.text.secondary} hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors duration-300`}
+              {["Privacy Policy", "Terms of Service"].map((text, index) => (
+                <motion.a
+                  key={index}
+                  href={text === "Privacy Policy" ? "/privacy" : "/terms"}
+                  whileHover={{ scale: 1.05 }}
+                  className="text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400"
+                >
+                  {text}
+                </motion.a>
+              ))}
+              <motion.p
+                whileHover={{ scale: 1.05 }}
+                className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1"
               >
-                Privacy Policy
-              </a>
-              <a
-                href="/terms"
-                className={`text-sm ${DarkModeClasses.text.secondary} hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors duration-300`}
-              >
-                Terms of Service
-              </a>
-              <p
-                className={`text-sm ${DarkModeClasses.text.secondary} flex items-center gap-1`}
-              >
-                Made with <Heart className="h-4 w-4 text-red-500" /> by Yoga
-                Life
-              </p>
+                Made with{" "}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                  }}
+                >
+                  <Heart className="h-4 w-4 text-red-500" />
+                </motion.div>{" "}
+                by Yoga Life
+              </motion.p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

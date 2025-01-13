@@ -76,6 +76,7 @@ const ProgressBar = ({ progress }) => (
     />
   </div>
 );
+
 const ProgressCard = ({ attendanceStats, progress }) => {
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
@@ -153,7 +154,7 @@ const YogaClassPage = () => {
     const user = localStorage.getItem("user");
     const parsedUserData = user ? JSON.parse(user) : null;
     if (parsedUserData) {
-      setParsedUser(parsedUserData); 
+      setParsedUser(parsedUserData);
     }
   }, []);
 
@@ -257,6 +258,7 @@ const YogaClassPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate("/yogadashboard/classes")}

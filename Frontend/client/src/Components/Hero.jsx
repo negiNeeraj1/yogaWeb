@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DarkModeClasses from "./DarkMode";
+import { motion } from "framer-motion";
 
 const customers = [
   {
@@ -48,6 +49,53 @@ const customers2 = [
   },
 ];
 
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
+};
+
+const buttonVariants = {
+  initial: { scale: 1 },
+  hover: {
+    scale: 1.05,
+    y: -4,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+    },
+  },
+  tap: { scale: 0.95 },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
+
 const CustomTooltip = ({ children, content }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -59,7 +107,7 @@ const CustomTooltip = ({ children, content }) => {
     >
       {children}
       {isVisible && (
-        <div
+        <motion.div
           className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg whitespace-nowrap"
           style={{
             animation: "fadeIn 0.2s ease-in-out",
@@ -78,7 +126,7 @@ const CustomTooltip = ({ children, content }) => {
               height: 0,
             }}
           />
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -126,11 +174,22 @@ const Hero = () => {
           }
         `}
       </style>
+
       <div className={`relative ${DarkModeClasses.container} pt-20 py-20 `}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        
+        <motion.div
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8 order-2 md:order-1">
-              <h1
+            <motion.div
+              variants={containerVariants}
+              className="space-y-8 order-2 md:order-1"
+            >
+              <motion.h1
+                variants={itemVariants}
                 className={`text-3xl md:text-5xl whitespace-nowrap font-bold leading-tight ${DarkModeClasses.text.primary}`}
               >
                 Nourish your Mind,
@@ -138,41 +197,60 @@ const Hero = () => {
                 Body, and Soul with
                 <br />
                 Yoga
-              </h1>
-              <p className={`text-md ${DarkModeClasses.text.secondary}`}>
+              </motion.h1>
+
+              <motion.p
+                variants={itemVariants}
+                className={`text-md ${DarkModeClasses.text.secondary}`}
+              >
                 The smart 365-days-per-year yoga plan to transform your body and
                 mind. Tailored to your lifestyle and goals.
-              </p>
+              </motion.p>
 
-              <div className="space-x-4 ">
-                <button
-                  className={`button-hover px-8 py-3 mb-3 rounded-lg ${DarkModeClasses.button.primary}`}
+              <motion.div variants={itemVariants} className="space-x-4">
+                <motion.button
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className={`px-8 py-3 mb-3 rounded-lg ${DarkModeClasses.button.primary}`}
                   onClick={() => navigate("/authPage")}
                   style={{ fontWeight: "600" }}
                 >
                   Start your journey
-                </button>
-                <button
-                  className={`button-hover px-8 py-3 rounded-lg ${DarkModeClasses.button.outline}`}
+                </motion.button>
+
+                <motion.button
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                  className={`px-8 py-3 rounded-lg ${DarkModeClasses.button.outline}`}
                 >
                   Learn More <ArrowRight className="inline ml-2" size={20} />
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
 
-              <div className="flex items-center space-x-4">
+              <motion.div
+                variants={itemVariants}
+                className="flex items-center space-x-4"
+              >
                 <div className="flex -space-x-2">
                   {userArray.map((user, index) => (
                     <CustomTooltip
                       key={index}
                       content={
-                        <div className="text-center">
+                        <motion.div
+                          key={index}
+                          whileHover={{ scale: 1.1, zIndex: 20 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                          className="text-center"
+                        >
                           <p className="font-semibold capitalize">
                             {user.name}
                           </p>
                           <p className="text-xs text-gray-300">
                             Yoga Enthusiast
                           </p>
-                        </div>
+                        </motion.div>
                       }
                     >
                       <img
@@ -191,20 +269,26 @@ const Hero = () => {
                   </span>{" "}
                   clients last year!
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            <div className="relative order-1 md:order-2">
-              <img
+            <motion.div
+              variants={imageVariants}
+              className="relative order-1 md:order-2"
+            >
+              <motion.img
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
                 src={
                   "https://media.istockphoto.com/id/1292399474/photo/woman-meditating-at-park.jpg?s=612x612&w=0&k=20&c=iWXLpMMYCWq59Z11E6qKqHBeTgzXedktGRmsObGvi7g="
                 }
                 alt="Yoga practitioner"
                 className={`image-hover w-full h-auto rounded-lg ${DarkModeClasses.hover.card}`}
               />
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
+        
       </div>
     </>
   );

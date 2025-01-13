@@ -1,266 +1,540 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Heart,
+  Clock,
+  Users,
+  Star,
+  Award,
+  BookOpen,
+  Sparkles,
+  Filter,
+  Search,
+  ChevronDown,
+} from "lucide-react";
+import Foundation from "../assets/Pose1.png";
+import DarkModeClasses from "../Components/DarkMode";
+import YogaHeader from "../Components/YogaHeader";
 
-const ClassesPage = ({ onExplore, onBuyNow }) => {
+const YogaClasses = () => {
   const navigate = useNavigate();
   const [selectedLevel, setSelectedLevel] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("popularity");
+  const [favorites, setFavorites] = useState(new Set());
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+    },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut",
+      },
+    },
+    hover: {
+      scale: 1.02,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+  };
+
+  const buttonVariants = {
+    hover: {
+      scale: 1.05,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    tap: {
+      scale: 0.95,
+    },
+  };
 
   const classes = [
     {
       id: 1,
       title: "Foundational Poses (Asanas)",
-      description: "Perfect for those just starting their yoga journey.",
-      fullDescription: "Dive deep into the fundamental poses that form the building blocks of yoga practice. This comprehensive course is designed for beginners who want to establish a strong foundation in yoga.",
-      originalPrice: 2000,
-      discountedPrice: 1499,
+      description:
+        "Begin your yoga journey with essential poses and breathing techniques.",
+      fullDescription:
+        "Perfect for beginners looking to build a strong foundation in yoga practice.",
       level: "beginner",
       duration: "8 weeks",
+      nextBatch: "Starts June 1, 2024",
       studentsEnrolled: 1500,
-      image: {
-        src: "https://media.istockphoto.com/id/1219401141/photo/woman-practicing-yoga-in-lotus-position-at-park.jpg?s=612x612&w=0&k=20&c=Bk7HV73FLORtdNrnB9L0MI9tbMLB28W1c5N65bMiPvI=",
-        alt: "Instructor demonstrating Sun Salutation pose",
+      rating: 4.8,
+      totalReviews: 450,
+      price: {
+        original: 2000,
+        discounted: 1499,
       },
-      highlights: [
-        "Basic yoga philosophy and principles",
-        "20+ fundamental yoga poses with proper alignment",
-        "Breathing techniques (Pranayama)",
-        "Meditation basics",
-        "Safe practice guidelines"
-      ],
+      image: Foundation,
       instructor: {
         name: "Sarah Johnson",
-        bio: "Certified yoga instructor with 10+ years of teaching experience",
-        image: "/api/placeholder/100/100"
-      }
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "RYT-500",
+      },
+      features: [
+        "Live online sessions",
+        "Personalized feedback",
+        "Community support",
+        "Practice videos",
+      ],
     },
     {
       id: 2,
-      title: "Gentle Hatha Yoga",
-      description: "A calm and relaxing approach to basic yoga postures.",
-      fullDescription: "Experience the therapeutic benefits of gentle Hatha yoga. This course focuses on slow-paced, mindful movement combined with breath awareness.",
-      originalPrice: 2500,
-      discountedPrice: 1799,
-      level: "beginner",
+      title: "Vinyasa Flow Mastery",
+      description: "Dynamic sequences synchronizing breath with movement.",
+      fullDescription:
+        "Advance your practice with fluid movements and challenging sequences.",
+      level: "intermediate",
       duration: "10 weeks",
+      nextBatch: "Starts May 15, 2024",
       studentsEnrolled: 1200,
-      image: {
-        src: "https://media.istockphoto.com/id/1919389111/photo/old-friends-meditating-on-mats-in-park.jpg?s=612x612&w=0&k=20&c=oJhWy2TBo4gxDfyIPkHqcH31tL2Y-Gj62eCYwY3hEmY=",
-        alt: "Student practicing Hatha yoga pose",
+      rating: 4.9,
+      totalReviews: 380,
+      price: {
+        original: 2500,
+        discounted: 1799,
       },
-      highlights: [
-        "Gentle, mindful movements",
-        "Stress reduction techniques",
-        "Joint mobility exercises",
-        "Restorative poses",
-        "Mind-body connection practices"
-      ],
+      image: Foundation,
       instructor: {
-        name: "Michael Chen",
-        bio: "Specialized in therapeutic yoga with 8 years of experience",
-        image: "/api/placeholder/100/100"
-      }
+        name: "David Chen",
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "E-RYT 500",
+      },
+      features: [
+        "Advanced pose workshops",
+        "Meditation sessions",
+        "Weekly Q&A",
+        "Digital resources",
+      ],
     },
     {
       id: 3,
-      title: "Vinyasa Flow",
-      description: "Dynamic flowing sequences synchronized with breath.",
-      fullDescription: "Join us for an energizing Vinyasa Flow practice that synchronizes breath with movement. This course will teach you how to create seamless transitions between poses.",
-      originalPrice: 3000,
-      discountedPrice: 2299,
-      level: "intermediate",
-      duration: "12 weeks",
-      studentsEnrolled: 800,
-      image: {
-        src: "https://media.istockphoto.com/id/589554884/photo/woman-in-yoga-asana-vrikshasana-tree-pose-in-mountains-outdoors.jpg?s=612x612&w=0&k=20&c=ohUiTrrVA6A1G2WvxThRoahAO2EfcIGWTlr1F9FGYBE=",
-        alt: "Instructor demonstrating Vinyasa flow sequence",
+      title: "Hatha Yoga for Flexibility",
+      description: "Increase flexibility through gentle and steady poses.",
+      fullDescription:
+        "Perfect for those looking to improve flexibility and mindfulness.",
+      level: "beginner",
+      duration: "6 weeks",
+      nextBatch: "Starts April 10, 2024",
+      studentsEnrolled: 900,
+      rating: 4.7,
+      totalReviews: 320,
+      price: {
+        original: 1800,
+        discounted: 1299,
       },
-      highlights: [
-        "Dynamic flow sequences",
-        "Advanced breathing techniques",
-        "Core strength development",
-        "Balance poses",
-        "Arm balances introduction"
-      ],
+      image: Foundation,
       instructor: {
-        name: "David Rodriguez",
-        bio: "Former dancer turned yoga instructor with 12 years of experience",
-        image: "/api/placeholder/100/100"
-      }
+        name: "Emily Brooks",
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "RYT-200",
+      },
+      features: [
+        "Gentle asana sequences",
+        "Breathing techniques",
+        "Mindfulness exercises",
+        "Weekly group discussions",
+      ],
     },
     {
       id: 4,
-      title: "Power Yoga",
-      description: "Intense and energetic practice for strength and flexibility.",
-      fullDescription: "Challenge yourself with this intense Power Yoga course designed to build strength, increase flexibility, and enhance mental focus through dynamic, flowing sequences.",
-      originalPrice: 3500,
-      discountedPrice: 2799,
+      title: "Power Yoga for Strength",
+      description:
+        "Build muscle strength through energetic and challenging poses.",
+      fullDescription:
+        "A high-energy class designed for those who want to build strength and endurance.",
       level: "intermediate",
-      duration: "10 weeks",
-      studentsEnrolled: 600,
-      image: {
-        src: "https://media.istockphoto.com/id/1952501679/photo/old-man-meditating-on-yoga-mat-in-yard.jpg?s=612x612&w=0&k=20&c=-531TKjfAX_ukDNEUOaFaF5XizitTAs7sY-HEd979ME=",
-        alt: "Student in advanced Power yoga pose",
+      duration: "12 weeks",
+      nextBatch: "Starts March 20, 2024",
+      studentsEnrolled: 1100,
+      rating: 4.6,
+      totalReviews: 290,
+      price: {
+        original: 2200,
+        discounted: 1699,
       },
-      highlights: [
-        "Strength-building sequences",
-        "Advanced asana practice",
-        "Power flow techniques",
-        "Core power development",
-        "Endurance training"
-      ],
+      image: Foundation,
       instructor: {
-        name: "Lisa Thompson",
-        bio: "Power yoga specialist and fitness trainer with 15 years of experience",
-        image: "/api/placeholder/100/100"
-      }
+        name: "John Carter",
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "E-RYT 200",
+      },
+      features: [
+        "High-intensity workouts",
+        "Core strengthening routines",
+        "Breath control exercises",
+        "Motivational coaching",
+      ],
     },
     {
       id: 5,
-      title: "Ashtanga Yoga",
-      description: "Traditional and rigorous practice following specific sequence.",
-      fullDescription: "Immerse yourself in the traditional practice of Ashtanga Yoga. Learn the primary series and develop a strong, disciplined practice following the authentic methodology.",
-      originalPrice: 4000,
-      discountedPrice: 3299,
-      level: "advanced",
-      duration: "16 weeks",
-      studentsEnrolled: 400,
-      image: {
-        src: "https://media.istockphoto.com/id/1767112357/photo/authentic-shot-of-an-indian-senior-monk-practicing-yoga-in-a-temple-setting-serene-and.jpg?s=612x612&w=0&k=20&c=cDKGiHCzAAnNM_o-niWaCRYyGRKmi8VQnAwNbWFWvxs=",
-        alt: "Advanced practitioner in Ashtanga pose",
+      title: "Restorative Yoga & Deep Relaxation",
+      description: "Slow-paced class focused on healing and relaxation.",
+      fullDescription:
+        "Perfect for stress relief, improving sleep, and relaxing the body and mind.",
+      level: "beginner",
+      duration: "4 weeks",
+      nextBatch: "Starts February 5, 2024",
+      studentsEnrolled: 800,
+      rating: 5.0,
+      totalReviews: 215,
+      price: {
+        original: 1500,
+        discounted: 1199,
       },
-      highlights: [
-        "Traditional Ashtanga sequence",
-        "Sanskrit counting",
-        "Advanced transitions",
-        "Mysore-style practice",
-        "Philosophy and history"
-      ],
+      image: Foundation,
       instructor: {
-        name: "Amit Patel",
-        bio: "Certified Ashtanga instructor trained in Mysore, India",
-        image: "/api/placeholder/100/100"
-      }
+        name: "Laura Evans",
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "Restorative Yoga Teacher",
+      },
+      features: [
+        "Slow-paced poses",
+        "Gentle stretches",
+        "Guided meditation",
+        "Breathing exercises",
+      ],
+    },
+    {
+      id: 6,
+      title: "Yoga for Mental Clarity",
+      description: "Calming practices to enhance focus and mental well-being.",
+      fullDescription:
+        "A meditative and mindful approach to yoga, focused on boosting clarity and mental focus.",
+      level: "beginner",
+      duration: "5 weeks",
+      nextBatch: "Starts February 20, 2024",
+      studentsEnrolled: 700,
+      rating: 4.9,
+      totalReviews: 190,
+      price: {
+        original: 1700,
+        discounted: 1399,
+      },
+      image: Foundation,
+      instructor: {
+        name: "Sophie Lee",
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "Meditative Yoga Teacher",
+      },
+      features: [
+        "Mindfulness meditation",
+        "Guided relaxation",
+        "Breathing techniques",
+        "Focus-enhancing practices",
+      ],
+    },
+    {
+      id: 7,
+      title: "Ashtanga Yoga Fundamentals",
+      description: "Learn the foundational sequence of Ashtanga yoga.",
+      fullDescription:
+        "A structured and challenging practice designed for those who want to deepen their yoga practice.",
+      level: "intermediate",
+      duration: "8 weeks",
+      nextBatch: "Starts March 10, 2024",
+      studentsEnrolled: 1300,
+      rating: 4.8,
+      totalReviews: 420,
+      price: {
+        original: 2100,
+        discounted: 1599,
+      },
+      image: Foundation,
+      instructor: {
+        name: "Michael Reese",
+        image:
+          "https://hips.hearstapps.com/hmg-prod/images/cute-photos-of-cats-in-box-1593184776.jpg?crop=0.6666666666666666xw:1xh;center,top&resize=980:*",
+        certification: "Ashtanga Certified",
+      },
+      features: [
+        "Ashtanga sequence breakdown",
+        "Breath and movement synchronization",
+        "Pranayama (breathwork)",
+        "Weekly progress assessments",
+      ],
     },
   ];
 
-  const filterClasses = (level) => {
-    if (level === "all") return classes;
-    return classes.filter((yogaClass) => yogaClass.level === level);
+  const handleEnrollNow = (classId) => {
+    navigate("/login", { state: { redirectTo: `/class/${classId}` } });
   };
 
-  const handleExplore = (id) => {
-    navigate(`/course/${id}`);
+  const handleExplore = (classId) => {
+    navigate(`/class/${classId}`);
   };
 
-  const handleBuyNow = (id) => {
-    if (onBuyNow) {
-      onBuyNow(id);
+  const toggleFavorite = (id) => {
+    setFavorites((prev) => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(id)) {
+        newFavorites.delete(id);
+      } else {
+        newFavorites.add(id);
+      }
+      return newFavorites;
+    });
+  };
+
+  const filterClasses = () => {
+    let filtered = classes;
+
+    // Filter by level
+    if (selectedLevel !== "all") {
+      filtered = filtered.filter((c) => c.level === selectedLevel);
     }
-  };
 
-  const filteredClasses = filterClasses(selectedLevel);
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (c) =>
+          c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Sort classes
+    switch (sortBy) {
+      case "price":
+        filtered = [...filtered].sort(
+          (a, b) => a.price.discounted - b.price.discounted
+        );
+        break;
+      case "rating":
+        filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+        break;
+      case "popularity":
+        filtered = [...filtered].sort(
+          (a, b) => b.studentsEnrolled - a.studentsEnrolled
+        );
+        break;
+      default:
+        break;
+    }
+
+    return filtered;
+  };
 
   return (
-    <div className="min-h-screen py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Our Yoga Classes</h1>
-          <p className="text-lg text-gray-600 mb-8">Find the perfect class for your yoga journey</p>
-          
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {["all", "beginner", "intermediate", "advanced"].map((level) => (
-              <button
-                key={level}
-                onClick={() => setSelectedLevel(level)}
-                className={`px-6 py-2 rounded-lg transition-all duration-300 ${
-                  selectedLevel === level
-                    ? "bg-blue-500 text-white shadow-lg"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                }`}
-              >
-                {level.charAt(0).toUpperCase() + level.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
+    <motion.main
+      initial="hidden"
+      animate="show"
+      className={`w-full ${DarkModeClasses.container} overflow-x-hidden`}
+    >
+      <div className="min-h-screen dark:bg-gray-900">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-6 pt-16">
+          <YogaHeader
+            selectedLevel={selectedLevel}
+            setSelectedLevel={setSelectedLevel}
+          />
 
-        {/* Classes Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredClasses.map((yogaClass) => (
-            <div
-              key={yogaClass.id}
-              className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
-            >
-              <div className="relative">
-                <img
-                  src={yogaClass.image.src}
-                  alt={yogaClass.image.alt}
-                  className="w-full h-48 object-cover rounded-t-xl"
-                />
-                
-              </div>
-              
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-1">
-                  {yogaClass.title}
-                </h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">
-                  {yogaClass.description}
-                </p>
-                
-                {/* Course Info */}
-                <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {yogaClass.duration}
-                  </span>
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    {yogaClass.studentsEnrolled.toLocaleString()} students
-                  </span>
-                </div>
-                
-                {/* Price Section */}
-                <div className="flex items-center mb-4">
-                  <span className="text-2xl font-bold text-gray-800">
-                    ₹{yogaClass.discountedPrice}
-                  </span>
-                  <span className="ml-2 text-lg text-gray-500 line-through">
-                    ₹{yogaClass.originalPrice}
-                  </span>
-                  <span className="ml-2 text-green-500 text-sm">
-                    {Math.round((1 - yogaClass.discountedPrice / yogaClass.originalPrice) * 100)}% off
-                  </span>
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => handleExplore(yogaClass.id)}
-                    className="flex-1 button-hover btn-all text-white py-2 rounded-lg transition-colors duration-300" style={{fontWeight:"600"}}
-                  >
-                    Explore
-                  </button>
-                  <button 
-                    onClick={() => handleBuyNow(yogaClass.id)}
-                    className="flex-1 button-hover text-white py-2 rounded-lg transition-colors duration-300"style={{border:"1px solid #e97963",color:"#e97963",fontWeight:"600"}}
-                  >
-                    Buy Now
-                  </button>
-                </div>
-              </div>
+          {/* Search and Filter Section */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto mb-8 flex flex-wrap gap-4 items-center"
+          >
+            <div className="relative flex-1 min-w-[300px]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search classes..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-xl border dark:border-gray-700 
+                          dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 
+                          focus:ring-blue-500"
+              />
             </div>
-          ))}
+
+            <motion.select
+              whileTap={{ scale: 0.98 }}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2 rounded-xl border dark:border-gray-700 dark:bg-gray-800 
+                        dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="popularity">Most Popular</option>
+              <option value="rating">Highest Rated</option>
+              <option value="price">Lowest Price</option>
+            </motion.select>
+          </motion.div>
+
+          {/* Classes Grid */}
+          <motion.div
+            variants={containerVariants}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20 max-w-7xl mx-auto"
+          >
+            <AnimatePresence mode="wait">
+              {filterClasses().map((yogaClass) => (
+                <motion.div
+                  key={yogaClass.id}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  layout
+                  className="rounded-2xl overflow-hidden bg-white dark:bg-gray-800 
+                            shadow-xl shadow-blue-200 dark:shadow-none"
+                >
+                  <div className="relative">
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                      src={yogaClass.image}
+                      alt={yogaClass.title}
+                      className="w-full h-64 object-cover"
+                    />
+
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => toggleFavorite(yogaClass.id)}
+                      className="absolute top-4 right-4"
+                    >
+                      <Heart
+                        className={`w-6 h-6 ${
+                          favorites.has(yogaClass.id)
+                            ? "fill-red-500 text-red-500"
+                            : "text-gray-600 dark:text-gray-300"
+                        }`}
+                      />
+                    </motion.button>
+
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="absolute bottom-4 left-4 bg-gradient-to-r from-blue-600 
+                                to-purple-600 text-white px-4 py-1 rounded-full text-sm font-medium"
+                    >
+                      {yogaClass.level.charAt(0).toUpperCase() +
+                        yogaClass.level.slice(1)}
+                    </motion.div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <motion.img
+                        whileHover={{ scale: 1.1 }}
+                        src={yogaClass.instructor.image}
+                        alt={yogaClass.instructor.name}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {yogaClass.instructor.name}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {yogaClass.instructor.certification}
+                        </p>
+                      </div>
+                    </div>
+
+                    <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
+                      {yogaClass.title}
+                    </h3>
+
+                    <p className="mb-4 text-gray-600 dark:text-gray-300 text-md">
+                      {yogaClass.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {yogaClass.duration}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        {yogaClass.studentsEnrolled.toLocaleString()} students
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-400" />
+                        {yogaClass.rating} ({yogaClass.totalReviews} reviews)
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Next batch
+                        </p>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {yogaClass.nextBatch}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <motion.p
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.1 }}
+                          className="text-2xl font-bold text-gray-900 dark:text-white"
+                        >
+                          ₹{yogaClass.price.discounted}
+                        </motion.p>
+                        <p className="text-sm line-through text-gray-500 dark:text-gray-400">
+                          ₹{yogaClass.price.original}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <motion.button
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                        onClick={() => handleExplore(yogaClass.id)}
+                        className="flex-1 py-3 px-4 rounded-xl font-semibold
+                                bg-gray-100 text-gray-900 hover:bg-gray-200 
+                                dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                      >
+                        Explore
+                      </motion.button>
+                      <motion.button
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                        onClick={() => handleEnrollNow(yogaClass.id)}
+                        className="flex-1 py-3 px-4 rounded-xl font-semibold 
+                                bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                      >
+                        Enroll Now
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.main>
   );
 };
 
-export default ClassesPage;
+export default YogaClasses;

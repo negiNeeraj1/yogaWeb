@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import DarkModeClasses from "./DarkMode";
+import { motion } from "framer-motion";
 
 const poses = [
   {
@@ -42,78 +42,144 @@ const poses = [
     description:
       "Balasana, or Child's Pose, is a gentle resting pose that helps to stretch the back, hips, and thighs. It's often used to relax and center the mind during a yoga practice.",
     image:
-      "https://t4.ftcdn.net/jpg/00/99/66/59/360_F_99665987_hAxRHpLXxxlDIvAZ7U7OItxoUgEsUPv2.jpg",
+      "https://media.gettyimages.com/id/960941650/photo/mature-woman-practicing-yoga-in-childs-pose-at-home.jpg?s=612x612&w=0&k=20&c=Azxy8ao7mSzr8MeMXirj193QEP68-Cx8JS-w6lAgnFE=",
   },
 ];
+
+
+
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+};
 
 const YogaPoses = () => {
   const [showMore, setShowMore] = useState(false);
 
   return (
-    <section
-      className={`py-20 bg-gray-50 ${DarkModeClasses.background.secondary}`}
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="py-20 bg-gray-50 dark:bg-gray-900"
       id="blog"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-indigo-600 font-semibold">Some Yoga Poses</span>
-          <h2
-            className={`mt-2 text-3xl  text-gray-900 font-bold leading-tight ${DarkModeClasses.text.primary}`}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-indigo-600 dark:text-indigo-400 font-semibold"
+          >
+            Some Yoga Poses
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-2 text-3xl text-gray-900 dark:text-white font-bold leading-tight"
           >
             Your daily dose of health in 3 simple steps
-          </h2>
-        </div>
+          </motion.h2>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-16"
+        >
           {poses.slice(0, showMore ? poses.length : 4).map((pose, index) => (
-            <Link
+            <motion.div
               key={index}
-              to="/pose-detail"
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
-              <div
-                className="flex flex-col md:flex-row gap-8 items-center"
-                data-aos="fade-up"
-              >
-                <div className="flex-1 space-y-4">
-                  <p
-                    className={`text-2xl font-bold text-indigo-600 ${DarkModeClasses.text.secondary}`}
+              <Link to="/pose-detail" className="group">
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                  <motion.div
+                    className="flex-1 space-y-4"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
                   >
-                    {pose.number}
-                  </p>
-                  <h3
-                    className={`mt-2 text-xl  text-gray-900 font-bold leading-tight ${DarkModeClasses.text.primary}`}
+                    <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                      {pose.number}
+                    </p>
+                    <h3 className="mt-2 text-xl text-gray-900 dark:text-white font-bold leading-tight">
+                      {pose.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {pose.description}
+                    </p>
+                  </motion.div>
+                  <motion.div
+                    className="flex-1"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 300 }}
                   >
-                    {pose.title}
-                  </h3>
-                  <p
-                    className={`text-sm text-gray-600 ${DarkModeClasses.text.secondary}`}
-                  >
-                    {pose.description}
-                  </p>
+                    <img
+                      src={pose.image}
+                      alt={pose.title}
+                      className="w-full h-64 object-cover rounded-lg shadow-md 
+                      dark:shadow-gray-800"
+                    />
+                  </motion.div>
                 </div>
-                <div className="flex-1">
-                  <img
-                    src={pose.image}
-                    alt={pose.title}
-                    className={`w-full h-64 object-cover rounded-lg shadow-md image-hover ${DarkModeClasses.hover.card}`}
-                  />
-                </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="text-center mt-12">
-          <button
+        <motion.div
+          className="text-center mt-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <motion.button
             onClick={() => setShowMore(!showMore)}
-            className={`inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center text-indigo-600 dark:text-indigo-400 
+            font-semibold hover:text-indigo-700 dark:hover:text-indigo-300"
           >
             {showMore ? "Show Less" : "See More"}
-            <ArrowRight className="ml-2" size={20} />
-          </button>
-        </div>
+            <motion.div
+              whileHover={{ x: 5 }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              <ArrowRight className="ml-2" size={20} />
+            </motion.div>
+          </motion.button>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

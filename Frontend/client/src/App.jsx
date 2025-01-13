@@ -25,13 +25,14 @@ import YogaClassPage from "./page/Dashboard/YogaClassPage";
 import SupportPage from "./page/Dashboard/Support";
 import SubscriptionPage from "./page/Dashboard/Subscription";
 import OurCenter from "./page/Dashboard/OurCenter";
+import Class from "./page/Classes";
 
 const App = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen bg-white">
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 dark:bg-gray-900">
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
@@ -60,7 +61,7 @@ const App = () => {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/authPage" element={<AuthPage />} />
               <Route path="/eventsPage" element={<EventsPage />} />
-              <Route path="/classesPage" element={<ClassesPage />} />
+              <Route path="/classesPage" element={<Class />} />
               <Route path="/course/:id" element={<CoursePage />} />
               <Route path="/blogPage" element={<BlogPage />} />
               <Route path="/contactUs" element={<ContactUs />} />
