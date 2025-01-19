@@ -34,51 +34,91 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import DarkModeClasses from "../../Components/DarkMode";
 import { BlurText } from "../../Components/Themes/BlurText";
+import { EnrolledClasses } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 const MainDashboard = () => {
   const { user } = useAuth();
   const [selectedClass, setSelectedClass] = useState(null);
+  const [enrolledClasses, setEnrolledClasses] = useState([]);
+  const [parsedUser, setParsedUser] = useState(null);
   const [selectedAchievement, setSelectedAchievement] = useState(null);
   const [dailyStreak, setDailyStreak] = useState(12);
   const [animatedQuote, setAnimatedQuote] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const [userLevel, setUserLevel] = useState(3);
-  const [totalXP, setTotalXP] = useState(1250);
 
-  const learningPaths = [
-    {
-      id: 1,
-      title: "Mindfulness Mastery",
-      icon: <Book className="text-blue-500" />,
-      progress: 65,
-      modules: [
-        { name: "Meditation Basics", completed: true },
-        { name: "Advanced Breathing Techniques", completed: true },
-        { name: "Stress Management", completed: false },
-        { name: "Emotional Intelligence", completed: false },
-      ],
-      xpReward: 500,
-      difficulty: "Intermediate",
-      status: "In Progress",
-    },
-    {
-      id: 2,
-      title: "Yoga Transformation",
-      icon: <UserCheck className="text-green-500" />,
-      progress: 40,
-      modules: [
-        { name: "Yoga Foundations", completed: true },
-        { name: "Flexibility Workshop", completed: true },
-        { name: "Power Yoga", completed: false },
-        { name: "Yoga Philosophy", completed: false },
-      ],
-      xpReward: 750,
-      difficulty: "Advanced",
-      status: "Locked",
-    },
-  ];
+  const navigate = useNavigate();
 
-  // Enhanced progress data with more detailed tracking
+  const retrieveEnrolledClasses = async () => {
+    try {
+      const user = localStorage.getItem("user");
+      const parsedUserData = user ? JSON.parse(user) : null;
+      if (parsedUserData) {
+        setParsedUser(parsedUserData);
+        const response = await EnrolledClasses(parsedUserData.id);
+        if (response.success) {
+          setEnrolledClasses(response.data || []);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching enrolled classes:", error);
+    }
+  };
+  useEffect(() => {
+    retrieveEnrolledClasses();
+  }, []);
+
+  const handleClassClick = (classId) => {
+    navigate(`/yogadashboard/yoga-class/${classId}`);
+  };
+
+  const ClassCard = ({ enrolledClass }) => {
+    const { yogaClass } = enrolledClass;
+
+    const handleClassClick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (yogaClass?._id) {
+        onClassClick(yogaClass._id);
+      }
+    };
+
+    return (
+      <div
+        className={`${DarkModeClasses.card.glassBlue} p-6 rounded-3xl transform transition-all hover:scale-105 ${DarkModeClasses.hover.card}`}
+      >
+        <div className="absolute inset-0 opacity-10">
+          <div
+            className={`${DarkModeClasses.gradients.glass} w-full h-full rounded-3xl`}
+          />
+        </div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className={`text-xl font-bold ${DarkModeClasses.text.primary}`}>
+            {yogaClass.title}
+          </h3>
+          <span
+            className={`${DarkModeClasses.gradients.primary.text} px-3 py-1 rounded-full text-sm`}
+          >
+            {yogaClass.difficulty}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
+          <div>
+            <p className={DarkModeClasses.text.secondary}>
+              {yogaClass.instructor.firstName} {yogaClass.instructor.lastName}
+            </p>
+            <p className={DarkModeClasses.text.accent}>
+              {yogaClass.startTime} | {yogaClass.endTime}
+            </p>
+            <p className={`mt-2 ${DarkModeClasses.text.secondary}`}>
+              Status: {enrolledClass.status}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const progressData = [
     { month: "Jan", progress: 60, xp: 250, color: "#FF6B6B" },
     { month: "Feb", progress: 75, xp: 350, color: "#4ECDC4" },
@@ -87,61 +127,6 @@ const MainDashboard = () => {
     { month: "May", progress: 95, xp: 550, color: "#6C5CE7" },
   ];
 
-  const handleLearningPathInteraction = (path) => {
-    if (path.status === "Locked") {
-      // Show a modal or notification about unlocking the path
-      alert("Complete previous paths to unlock this learning journey!");
-      return;
-    }
-
-    // Open detailed view of learning path
-    setSelectedClass(path);
-  };
-
-  // Expanded and more exciting upcoming classes
-  const upcomingClasses = [
-    {
-      id: 1,
-      name: "Morning Zen Flow",
-      instructor: "Sarah Johnson",
-      time: "7:00 AM",
-      date: "Tomorrow",
-      difficulty: "Beginner",
-      description: "Awaken your inner peace with a gentle morning practice",
-      duration: "60 mins",
-      intensity: "Low",
-      xpReward: 50,
-      bgColor: "bg-gradient-to-r from-green-400 to-blue-500",
-    },
-    {
-      id: 2,
-      name: "Power Yoga Fusion",
-      instructor: "Mike Rodriguez",
-      time: "6:00 PM",
-      date: "Wednesday",
-      difficulty: "Advanced",
-      description: "Transform your body and mind with intense yoga warriors",
-      duration: "75 mins",
-      intensity: "High",
-      xpReward: 100,
-      bgColor: "bg-gradient-to-r from-red-500 to-orange-500",
-    },
-    {
-      id: 3,
-      name: "Mindfulness Meditation",
-      instructor: "Emma Lee",
-      time: "8:00 PM",
-      date: "Friday",
-      difficulty: "All Levels",
-      description: "Dive deep into your inner world of calm and clarity",
-      duration: "45 mins",
-      intensity: "Medium",
-      xpReward: 75,
-      bgColor: "bg-gradient-to-r from-purple-500 to-indigo-600",
-    },
-  ];
-
-  // More engaging achievements system
   const achievements = [
     {
       id: 1,
@@ -181,7 +166,6 @@ const MainDashboard = () => {
     },
   ];
 
-  // Motivational quotes with more energy
   const motivationalQuotes = [
     "Your journey transforms you, one breath at a time!",
     "Unlock your potential with every mindful moment.",
@@ -189,7 +173,6 @@ const MainDashboard = () => {
     "Your wellness is a superpower waiting to be unleashed!",
   ];
 
-  // Playful quote generation with typing effect
   const generateMotivationalQuote = () => {
     const quote =
       motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
@@ -208,27 +191,24 @@ const MainDashboard = () => {
     typeWriter();
   };
 
-  // Trigger confetti animation
   const triggerConfetti = () => {
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
   };
 
-  // Lifecycle effects
   useEffect(() => {
     generateMotivationalQuote();
   }, []);
 
-  useEffect(() => {
-    // Level calculation logic
-    const calculateLevel = (xp) => {
-      // Simple XP to level calculation
-      return Math.floor(Math.sqrt(xp / 100)) + 1;
-    };
+  // useEffect(() => {
+  //   const calculateLevel = (xp) => {
+  //     // Simple XP to level calculation
+  //     return Math.floor(Math.sqrt(xp / 100)) + 1;
+  //   };
 
-    const currentLevel = calculateLevel(totalXP);
-    setUserLevel(currentLevel);
-  }, [totalXP]);
+  //   const currentLevel = calculateLevel(totalXP);
+  //   setUserLevel(currentLevel);
+  // }, [totalXP]);
 
   return (
     <div
@@ -250,16 +230,13 @@ const MainDashboard = () => {
             Welcome, {user?.name || "Wellness Warrior"}
             <Rocket className="ml-3 w-8 h-8 text-yellow-300 animate-bounce" />
           </h2>
-          <p
+
+          <div
             className={`italic font-light h-12 ${DarkModeClasses.text.secondary}`}
           >
-            <BlurText
-              text={animatedQuote}
-              className="text-gray-600 dark:text-gray-300"
-              delay={100}
-            />
-            
-          </p>
+            <h1>{animatedQuote}</h1>
+          </div>
+
           <div className="mt-4 flex items-center space-x-4">
             <div
               className={`flex items-center space-x-2 ${DarkModeClasses.glass.panel} px-4 py-2 rounded-full`}
@@ -280,64 +257,26 @@ const MainDashboard = () => {
       </div>
 
       {/* Interactive Class Preview Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {upcomingClasses.map((cls, index) => (
-          <div
-            key={cls.id}
-            className={`${
-              index % 3 === 0
-                ? DarkModeClasses.card.glassBlue
-                : index % 3 === 1
-                ? DarkModeClasses.card.glassPurple
-                : DarkModeClasses.card.glassBlue
-            } p-6 rounded-3xl transform transition-all hover:scale-105 ${
-              DarkModeClasses.hover.card
-            }`}
-          >
-            <div className="absolute inset-0 opacity-10">
-              <div
-                className={`${DarkModeClasses.gradients.glass} w-full h-full rounded-3xl`}
+      <div className="space-y-4">
+        <h2 className={`text-2xl font-bold ${DarkModeClasses.text.primary}`}>
+          Your Active Classes
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {enrolledClasses.length > 0 ? (
+            enrolledClasses.map((enrolledClass) => (
+              <ClassCard
+                key={enrolledClass._id}
+                enrolledClass={enrolledClass}
+                onClassClick={handleClassClick}
               />
-            </div>
-            <div className="flex justify-between items-center mb-4">
-              <h3
-                className={`text-xl font-bold ${DarkModeClasses.text.primary}`}
-              >
-                {cls.name}
-              </h3>
-              <span
-                className={`${DarkModeClasses.gradients.primary.text} px-3 py-1 rounded-full text-sm`}
-              >
-                {cls.difficulty}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className={DarkModeClasses.text.secondary}>
-                  {cls.instructor}
-                </p>
-                <p className={DarkModeClasses.text.accent}>
-                  {cls.time} | {cls.date}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedClass(cls)}
-                className={`${DarkModeClasses.button.primary} p-2 rounded-full ${DarkModeClasses.hover.button}`}
-              >
-                <ArrowRight className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <Zap className="w-5 h-5 mr-2 text-yellow-300" />
-                <span className={DarkModeClasses.text.secondary}>
-                  XP: {cls.xpReward}
-                </span>
-              </div>
-              <div className={DarkModeClasses.text.muted}>{cls.duration}</div>
-            </div>
-          </div>
-        ))}
+            ))
+          ) : (
+            <p className={`${DarkModeClasses.text.secondary} col-span-3`}>
+              No enrolled classes found. Start your yoga journey by enrolling in
+              a class!
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Achievements Section */}
@@ -410,44 +349,39 @@ const MainDashboard = () => {
       </div>
 
       {/* Progress Chart Section */}
-      <div className={`${DarkModeClasses.card.gradient} p-6 rounded-xl`}>
-        <div className="absolute inset-0 opacity-10">
-          <div
-            className={`${DarkModeClasses.gradients.subtle} w-full h-full rounded-xl`}
-          />
-        </div>
-        <h3
-          className={`text-lg font-semibold mb-4 ${DarkModeClasses.text.primary}`}
-        >
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-xl opacity-10" />
+
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
           Progress Tracking
         </h3>
+
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={progressData}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                className={`${DarkModeClasses.divider.default} opacity-20`}
+                className="stroke-gray-200 dark:stroke-gray-700"
               />
               <XAxis
                 dataKey="month"
-                tick={{
-                  fill: `white`,
-                }}
-                stroke={`${DarkModeClasses.text.primary}`}
+                tick={{ fill: "currentColor" }}
+                stroke="currentColor"
+                className="text-gray-600 dark:text-gray-300"
               />
               <YAxis
-                tick={{
-                  fill: "white",
-                }}
-                stroke={`${DarkModeClasses.text.primary}`}
+                tick={{ fill: "currentColor" }}
+                stroke="currentColor"
+                className="text-gray-600 dark:text-gray-300"
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "var(--tooltip-bg)",
-                  border: "none",
+                  backgroundColor: "white",
                   borderRadius: "8px",
+                  border: "1px solid var(--border)",
                   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                 }}
+                className="text-gray-900 dark:text-white"
               />
               <Line
                 type="monotone"

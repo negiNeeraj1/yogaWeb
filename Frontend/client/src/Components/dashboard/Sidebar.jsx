@@ -69,8 +69,8 @@ const Sidebar = () => {
               w-full flex items-center p-3 rounded-lg mb-2 transition-all
               ${
                 location.pathname === item.path
-                  ? `bg-rose-100 text-rose-700 ${DarkModeClasses.text.primary} ${DarkModeClasses.background.tertiary}`
-                  : `hover:bg-rose-100  ${DarkModeClasses.text.muted}`
+                  ? `bg-rose-100 dark:text-rose-700 dark:font-bold text-rose-700 ${DarkModeClasses.text.primary} ${DarkModeClasses.background.tertiary}`
+                  : `hover:bg-rose-100/30  dark:text-gray-100 transition-all`
               }
             `}
           >

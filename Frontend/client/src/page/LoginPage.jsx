@@ -46,21 +46,18 @@ const LoginPage = () => {
         login(response.user);
 
         const origin = location.state?.from?.pathname || "/yogadashboard";
-        navigate(origin);
+        window.location.href = origin;
         
       } else {
-        // Handle login failure
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (err) {
-      // Handle network or server errors
       const errorMessage =
         err.response?.data?.message ||
         "An error occurred during login. Please try again.";
 
       setError(errorMessage);
     } finally {
-      // Ensure loading state is always turned off
       setIsLoading(false);
     }
   };

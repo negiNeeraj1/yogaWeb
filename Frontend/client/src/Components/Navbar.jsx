@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Moon, Sun } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
 import DarkModeClasses from "./DarkMode";
@@ -9,12 +9,14 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Check if the user is logged in
-  const isLoggedIn = localStorage.getItem("loggedIn");
+
+  const location = useLocation();
 
   // Links to display before login
   const beforeLoginLinks = [
     { to: "/classesPage", text: "Classes" },
-    { to: "/blogPage", text: "Blog" },
+    // { to: "/blogPage", text: "Blog" },
+    { to: "/about", text: "About" },
     { to: "/teachers", text: "Teachers" },
     { to: "/contactUs", text: "Contact Us" },
     {
@@ -24,12 +26,10 @@ const Navbar = () => {
     },
   ];
 
-  // If logged in, render nothing
-  if (isLoggedIn) {
+  if (location.pathname.includes("/yogadashboard")) {
     return null;
   }
 
-  // Render the navbar for non-logged-in users
   return (
     <nav
       className={`bg-white shadow-md fixed w-full z-50 ${DarkModeClasses.background.primary}`}

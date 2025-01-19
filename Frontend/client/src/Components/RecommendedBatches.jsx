@@ -115,7 +115,7 @@ const RecommendedBatches = ({ onExplore, onBuyNow }) => {
               initial="hidden"
               animate="visible"
               whileHover="hover"
-              className={`${DarkModeClasses.card} rounded-xl overflow-hidden w-full max-w-sm shadow-lg backdrop-blur-sm bg-opacity-80 dark:bg-opacity-30`}
+              className={`${DarkModeClasses.card.gradient}  rounded-xl overflow-hidden w-full max-w-sm shadow-lg backdrop-blur-sm bg-opacity-80 dark:bg-opacity-30`}
               style={{ transformStyle: "preserve-3d" }}
             >
               <div className="relative group overflow-hidden">
@@ -153,7 +153,7 @@ const RecommendedBatches = ({ onExplore, onBuyNow }) => {
                   {batch.features.map((feature, idx) => (
                     <span
                       key={idx}
-                      className={`text-xs px-2 py-1 rounded-full bg-rose-200/20 text-rose-500 dark:bg-yellow-100 dark:text-white bg-opacity-20`}
+                      className={`text-xs px-2 py-1 rounded-full bg-rose-200/20 text-rose-500 dark:bg-yellow-100/40 dark:text-white bg-opacity-20`}
                     >
                       {feature}
                     </span>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CreatePayment, VerifyPayment , EnrolledClasses } from "../../api/api";
+import { CreatePayment, VerifyPayment, EnrolledClasses } from "../../api/api";
 import { CreditCard, ChevronRight, Lock } from "lucide-react";
 import DarkModeClasses from "../DarkMode";
 
@@ -25,7 +25,6 @@ const PaymentButton = ({
   userId,
   classId,
   className,
-  updateEnrolledClasses, 
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,7 +61,6 @@ const PaymentButton = ({
         order_id: result.orderId,
         handler: async function (response) {
           try {
-           
             const verifyData = {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
@@ -72,10 +70,11 @@ const PaymentButton = ({
             const verificationResult = await VerifyPayment(verifyData);
 
             if (verificationResult.success) {
-             
+              // Fetch updated enrolled classes
               const enrolledClassesResult = await EnrolledClasses(userId);
-              updateEnrolledClasses(enrolledClassesResult.data);
-              onSuccess(verificationResult.data);
+              console.log(enrolledClassesResult);
+              // Pass the updated data to parent component
+              onSuccess(enrolledClassesResult.data);
             } else {
               throw new Error(
                 verificationResult.message || "Payment verification failed"
@@ -107,7 +106,6 @@ const PaymentButton = ({
         },
       };
 
-     
       const paymentObject = new window.Razorpay(options);
       paymentObject.on("payment.failed", function (response) {
         onFailure({

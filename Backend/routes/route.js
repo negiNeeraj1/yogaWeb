@@ -56,6 +56,7 @@ import {
 
 import { subscriptionController } from '../controllers/Subscription.controller.js';
 import { getContactForm, submitForm } from '../controllers/contact.modal.js';
+import uploadImage from '../config/multerCloudinary.js';
 
 const router = express.Router();
 
@@ -74,10 +75,10 @@ router.get('/admin/profile/:id', getAdminProfile);
 router.get('/admin/dashboard-analytics', getAdminDashboardAnalytics);
 
 // Yoga Class Routes
-router.post('/classes/create', createClass);
+router.post('/classes/create', uploadImage.single('image'), createClass);
 router.get('/classes/get', getAllClasses);
 router.get('/classes/get/:id', getClassById);
-router.put('/classes/update/:id', updateClass);
+router.put('/classes/update/:id', uploadImage.single('image'), updateClass);
 router.delete('/classes/:id', deleteClass);
 router.post('/classes/:classId/videos', upload.single('video'), uploadClassVideo);
 
@@ -102,11 +103,11 @@ router.delete('/subscriptions/delete/:id', deleteSubscription);
 router.post('/instructors/create',createInstructor);
 router.get('/instructors/get', getAllInstructors);
 router.get('/instructors/get/:id', getInstructorById);
-router.put('/instructors/update/:id', upload.fields([
-    { name: 'main_photo', maxCount: 1 },
-    { name: 'cover_photo', maxCount: 1 }
-]),
-    updateInstructor, updateInstructor);
+// router.put('/instructors/update/:id', upload.fields([
+//     { name: 'main_photo', maxCount: 1 },
+//     { name: 'cover_photo', maxCount: 1 }
+// ]),
+//     updateInstructor, updateInstructor);
 router.delete('/instructors/delete/:id', deleteInstructor);
 router.post('/instructors/create', createInstructor);
 

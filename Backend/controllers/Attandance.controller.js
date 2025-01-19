@@ -123,6 +123,7 @@ export const getUserEnrolledClasses = async (req, res) => {
 
         const classesWithDetails = enrolledClasses.map(record => {
             const yogaClass = record.yogaClass;
+            console.log(yogaClass);
 
             
             if (!yogaClass) {
@@ -134,15 +135,15 @@ export const getUserEnrolledClasses = async (req, res) => {
                 _id: record._id,
                 yogaClass: {
                     _id: yogaClass._id,
-                    title: yogaClass.title,
+                    title: yogaClass.className,
                     style: yogaClass.style,
                     description: yogaClass.description,
                     duration: yogaClass.duration,
                     difficulty: yogaClass.difficulty,
                     maxParticipants: yogaClass.maxParticipants,
                     currentParticipants: yogaClass.currentParticipants,
-                    startTime: yogaClass.startTime,
-                    endTime: yogaClass.endTime,
+                    startTime: yogaClass.schedule.startTime,
+                    endTime: yogaClass.schedule.endTime,
                     timeSlot: yogaClass.timeSlot,
                     classType: yogaClass.classType,
                     location: yogaClass.location,
@@ -159,7 +160,6 @@ export const getUserEnrolledClasses = async (req, res) => {
                     }
                 },
                 user: record.user,
-                attendancePercentage: record.attendancePercentage,
                 status: record.status,
                 createdAt: record.createdAt,
                 updatedAt: record.updatedAt

@@ -18,6 +18,15 @@ const yogaClassSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Instructor',
         required: true
+    }, image: {
+        public_id: {
+            type: String,
+            required: true
+        },
+        url: {
+            type: String,
+            required: true
+        }
     },
     assistant: {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,7 +41,7 @@ const yogaClassSchema = new mongoose.Schema({
         endTime: String,
         timeZone: String
     },
-    totalClasses: {
+    totalClasses: { 
         type: Number,
         required: true,
         min: 1

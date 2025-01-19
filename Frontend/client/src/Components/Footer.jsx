@@ -23,6 +23,7 @@ const Footer = () => {
     { name: "Contact Us", href: "/contact" },
   ];
 
+
   const yogaClasses = [
     { name: "Hatha Yoga", href: "/classes/hatha" },
     { name: "Vinyasa Flow", href: "/classes/vinyasa" },
@@ -60,6 +61,13 @@ const Footer = () => {
     },
   };
 
+  const socialLinks = [
+    { Icon: Facebook, link: "https://facebook.com" },
+    { Icon: Instagram, link: "https://www.instagram.com/bhajansingh.n/" },
+    { Icon: Twitter, link: "https://twitter.com" },
+    { Icon: Youtube, link: "https://www.youtube.com/@BSNegi12/featured" },
+  ];
+
   return (
     <motion.footer
       initial={{ opacity: 0 }}
@@ -84,10 +92,12 @@ const Footer = () => {
               today.
             </p>
             <motion.div variants={containerVariants} className="flex gap-4">
-              {[Facebook, Instagram, Twitter, Youtube].map((Icon, index) => (
+              {socialLinks.map(({ Icon, link }, index) => (
                 <motion.a
                   key={index}
-                  href="#"
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.2, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   className="text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400"
@@ -152,9 +162,9 @@ const Footer = () => {
               {[
                 {
                   Icon: MapPin,
-                  text: "123 Serenity Lane, Mindful City, MC 12345",
+                  text: "Sv1 -19, Ground Floor Eldeco Utopia Sector 93 A Noida, Uttar Pradesh 201304 India",
                 },
-                { Icon: Phone, text: "+1 (555) 123-4567" },
+                { Icon: Phone, text: "+91 8826283328" },
                 { Icon: Mail, text: "info@yogalife.com" },
               ].map((item, index) => (
                 <motion.div
@@ -164,9 +174,9 @@ const Footer = () => {
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <item.Icon className="h-6 w-6 text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-300">
                     {item.text}
-                  </p>
+                  </span>
                 </motion.div>
               ))}
 
@@ -222,8 +232,8 @@ const Footer = () => {
                 whileHover={{ scale: 1.05 }}
                 className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1"
               >
-                Made with{" "}
-                <motion.div
+                Made with
+                <motion.span
                   animate={{
                     scale: [1, 1.2, 1],
                   }}
@@ -233,7 +243,7 @@ const Footer = () => {
                   }}
                 >
                   <Heart className="h-4 w-4 text-red-500" />
-                </motion.div>{" "}
+                </motion.span>
                 by Yoga Life
               </motion.p>
             </div>

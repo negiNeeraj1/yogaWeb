@@ -8,21 +8,31 @@ cloudinary.config({
     api_secret: "RihEwpmXvaH6CM9uACo17Q6fOo4",
 });
 
-const storage = new CloudinaryStorage({
+const imageStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'yoga-videos',
-        resource_type: 'video',
-        allowed_formats: ['mp4', 'mov', 'avi'], 
-        transformation: [{ quality: 'auto' }], 
-        public_id: (req, file) => `${Date.now()}-${file.originalname.split('.')[0]}`
+        folder: 'yoga-class-images',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        transformation: [
+            { width: 1000, height: 750, crop: 'fill' },
+            { quality: 'auto' }
+        ],
+        public_id: (req, file) => `class-${Date.now()}`
     }
 });
 
-const upload = multer({
-    storage,
+const uploadImage = multer({
+    storage: imageStorage,
     limits: {
-        fileSize: 100 * 1024 * 1024 
+        fileSize: 5 * 1024 * 1024
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload only images.'), false);
+        }
     }
 });
-export default upload;
+
+export default uploadImage;

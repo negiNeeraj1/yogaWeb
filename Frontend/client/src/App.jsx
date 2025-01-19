@@ -26,8 +26,10 @@ import SupportPage from "./page/Dashboard/Support";
 import SubscriptionPage from "./page/Dashboard/Subscription";
 import OurCenter from "./page/Dashboard/OurCenter";
 import Class from "./page/Classes";
+import AboutPage from "./page/About";
 
 const App = () => {
+
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -58,12 +60,12 @@ const App = () => {
 
               {/* Other Routes */}
               <Route path="/teachers" element={<Teachers />} />
-              <Route path="/pricing" element={<Pricing />} />
               <Route path="/authPage" element={<AuthPage />} />
               <Route path="/eventsPage" element={<EventsPage />} />
               <Route path="/classesPage" element={<Class />} />
               <Route path="/course/:id" element={<CoursePage />} />
               <Route path="/blogPage" element={<BlogPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/contactUs" element={<ContactUs />} />
               <Route path="/testimonialPage" element={<TestimonialPage />} />
             </Routes>

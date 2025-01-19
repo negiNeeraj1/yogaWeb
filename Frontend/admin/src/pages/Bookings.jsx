@@ -19,16 +19,17 @@ import {
   Info,
   Star,
   Video,
+  UploadCloud,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createClass, getClass } from "../api/api";
 
 const TableSection = ({
   title,
-  children,
   Icon,
   searchTerm,
   onSearchChange,
+  children,
 }) => (
   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
     <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -53,89 +54,126 @@ const TableSection = ({
   </div>
 );
 
-
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-[50rem] p-6 m-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {title}
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X size={20} />
-          </button>
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative w-full max-w-5xl rounded-xl bg-white dark:bg-gray-800 shadow-xl">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {title}
+            </h3>
+            <button
+              onClick={onClose}
+              className="rounded-full p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <div className="px-6 py-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
+            {children}
+          </div>
         </div>
-        {children}
       </div>
     </div>
   );
 };
 
 const ClassManagement = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [openDropdownId, setOpenDropdownId] = useState(null);
-  const dropdownRef = useRef(null);
-  const [mainSearchTerm, setMainSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [classes, setClasses] = useState([]);
 
-  const [equipment, setEquipment] = useState("");
-  const [selectedDays, setSelectedDays] = useState([]);
+   const fileInputRef = useRef(null);
+   const dropdownRef = useRef(null);
+   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+   const [selectedClass, setSelectedClass] = useState(null);
+   const [openDropdownId, setOpenDropdownId] = useState(null);
+   const [mainSearchTerm, setMainSearchTerm] = useState("");
+   const [statusFilter, setStatusFilter] = useState("All");
+   const [classes, setClasses] = useState([]);
+   const [equipment, setEquipment] = useState("");
+   const [selectedDays, setSelectedDays] = useState([]);
+   const [selectedImage, setSelectedImage] = useState(null);
+   const [imagePreview, setImagePreview] = useState(null);
 
-  const [newClass, setNewClass] = useState({
-    className: "",
-    category: "",
-    instructor: "676fe9ff5e7aadf22aced5fe",
-    description: "",
-    schedule: {
-      startDate: "",
-      endDate: "",
-      daysOfWeek: [],
-      startTime: "",
-      endTime: "",
-      timeZone: "UTC+5:30",
-    },
-    type: "Online",
-    totalClasses: 12,
-    capacity: 30,
-    difficulty: "beginner",
-    
-    status: "Upcoming",
-    equipmentNeeded: [],
-    remainingClasses: 12,
-    price: 0,
-    renewal: false,
-    feedback: "",
-  });
+   const [newClass, setNewClass] = useState({
+     className: "",
+     category: "",
+     instructor: "676fe9ff5e7aadf22aced5fe",
+     description: "",
+     schedule: {
+       startDate: "",
+       endDate: "",
+       daysOfWeek: [],
+       startTime: "",
+       endTime: "",
+       timeZone: "UTC+5:30",
+     },
+     type: "Online",
+     totalClasses: 12,
+     capacity: 30,
+     difficulty: "Beginner",
+     status: "Upcoming",
+     equipmentNeeded: [],
+     remainingClasses: 12,
+     price: 0,
+     renewal: false,
+     feedback: "",
+     image: null,
+     students: 0, // Added default value for students
+   });
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenDropdownId(null);
-      }
-    };
+   const handleImageChange = (e) => {
+     const file = e.target.files[0];
+     if (file) {
+       if (file.size > 5 * 1024 * 1024) {
+         // 5MB limit
+         alert("File size should not exceed 5MB");
+         return;
+       }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+       setSelectedImage(file);
+       setNewClass((prev) => ({ ...prev, image: file }));
 
-  const fetchClasses = async () => {
-    try {
-      const response = await getClass();
-      if (response.success) {
-        setClasses(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching classes:", error);
-    }
-  };
+       const reader = new FileReader();
+       reader.onloadend = () => {
+         setImagePreview(reader.result);
+       };
+       reader.readAsDataURL(file);
+     }
+   };
+
+   useEffect(() => {
+     const handleClickOutside = (event) => {
+       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+         setOpenDropdownId(null);
+       }
+     };
+
+     document.addEventListener("mousedown", handleClickOutside);
+     return () => document.removeEventListener("mousedown", handleClickOutside);
+   }, []);
+
+   const fetchClasses = async () => {
+     try {
+       const response = await getClass();
+       if (response.success) {
+         // Ensure all required properties exist
+         const processedClasses = response.data.map((cls) => ({
+           ...cls,
+           students: cls.students || 0,
+           attendance: cls.attendance || "N/A",
+           room: cls.room || "N/A",
+           resources: cls.equipmentNeeded || [],
+         }));
+         setClasses(processedClasses);
+       }
+     } catch (error) {
+       console.error("Error fetching classes:", error);
+     }
+   };
 
   const formatInstructorName = (instructor) => {
     if (!instructor) return "N/A";
@@ -162,7 +200,7 @@ const ClassManagement = () => {
       ...prev,
       schedule: {
         ...prev.schedule,
-        daysOfWeek: updatedDays,
+        daysOfWeek: updatedDays, 
       },
     }));
   };
@@ -191,47 +229,96 @@ const ClassManagement = () => {
     e.preventDefault();
 
     try {
-      let response;
-      if (selectedClass) {
-        
-        
-      } else {
-        response = await createClass(newClass);
+      const formData = new FormData();
 
-        if (response.success) {
-          await fetchClasses();
-          setClasses([...classes, response.data]);
-          setIsAddModalOpen(false);
-          setNewClass({
-            className: "",
-            category: "",
-            instructor: "676fe9ff5e7aadf22aced5fe",
-            description: "",
-            schedule: {
-              startDate: "",
-              endDate: "",
-              daysOfWeek: [],
-              startTime: "",
-              endTime: "",
-              timeZone: "UTC+5:30",
-            },
-            totalClasses: 12,
-            Difficulty: "",
-            capacity: 30,
-            
-            status: "Upcoming",
-            equipmentNeeded: [],
-            remainingClasses: 12,
-            price: 0,
-            renewal: false,
-            feedback: "",
+      // Create a clean copy of the class data
+      const classData = {
+        ...newClass,
+        schedule: {
+          ...newClass.schedule,
+          startDate: new Date(newClass.schedule.startDate).toISOString(),
+          endDate: new Date(newClass.schedule.endDate).toISOString(),
+        },
+      };
+
+      // Append all class data to FormData
+      Object.keys(classData).forEach((key) => {
+        if (key === "schedule") {
+          // Handle schedule object
+          Object.keys(classData.schedule).forEach((scheduleKey) => {
+            if (scheduleKey === "daysOfWeek") {
+              // Send daysOfWeek as individual form fields
+              classData.schedule.daysOfWeek.forEach((day, index) => {
+                formData.append(`schedule[daysOfWeek][${index}]`, day);
+              });
+            } else {
+              formData.append(
+                `schedule[${scheduleKey}]`,
+                classData.schedule[scheduleKey]
+              );
+            }
           });
-          setSelectedDays([]);
+        } else if (key === "equipmentNeeded") {
+          classData.equipmentNeeded.forEach((item, index) => {
+            formData.append(`equipmentNeeded[${index}]`, item);
+          });
+        } else if (key === "image" && classData.image) {
+          formData.append("image", classData.image);
+        } else {
+          formData.append(key, classData[key]);
         }
+      });
+
+      // Log the FormData contents for debugging
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const response = await createClass(formData);
+
+      if (response.success) {
+        await fetchClasses();
+        setIsAddModalOpen(false);
+        resetForm();
+      } else {
+        console.error("Error creating class:", response.message);
+        alert(response.message);
       }
     } catch (error) {
       console.error("Error creating class:", error);
+      alert("Failed to create class. Please try again.");
     }
+  };
+
+
+  const resetForm = () => {
+    setNewClass({
+      className: "",
+      category: "",
+      instructor: "676fe9ff5e7aadf22aced5fe",
+      description: "",
+      schedule: {
+        startDate: "",
+        endDate: "",
+        daysOfWeek: [],
+        startTime: "",
+        endTime: "",
+        timeZone: "UTC+5:30",
+      },
+      totalClasses: 12,
+      capacity: 30,
+      difficulty: "",
+      status: "Upcoming",
+      equipmentNeeded: [],
+      remainingClasses: 12,
+      price: 0,
+      renewal: false,
+      feedback: "",
+      image: null,
+    });
+    setSelectedDays([]);
+    setSelectedImage(null);
+    setImagePreview(null);
   };
 
   const formatClassData = (classData) => {
@@ -401,38 +488,19 @@ const ClassManagement = () => {
           onClose={() => {
             setIsAddModalOpen(false);
             setSelectedClass(null);
-            setNewClass({
-              className: "",
-              category: "",
-              instructor: "",
-              description: "",
-              schedule: {
-                startDate: "",
-                endDate: "",
-                daysOfWeek: [],
-                startTime: "",
-                endTime: "",
-                timeZone: "UTC+5:30",
-              },
-              totalClasses: 12,
-              capacity: 30,
-              difficulty: "",
-              room: "",
-              status: "Upcoming",
-              equipmentNeeded: [],
-              remainingClasses: 12,
-              price: 0,
-              renewal: false,
-              feedback: "",
-            });
-            setSelectedDays([]);
+            resetForm();
           }}
           title={selectedClass ? "Edit Class" : "Add New Class"}
         >
+          {/* Modal Content */}
           <form onSubmit={handleAddClass} className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              {/* Left Column */}
+            <div className="grid grid-cols-3 gap-6">
+              {/* Left Column - Basic Information */}
               <div className="space-y-4">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-4">
+                  Basic Information
+                </h3>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Class Name
@@ -480,91 +548,47 @@ const ClassManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Equipment Needed
+                    Type
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={equipment}
-                      onChange={(e) => setEquipment(e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      placeholder="Add equipment..."
-                    />
-                    <button
-                      type="button"
-                      onClick={handleEquipmentAdd}
-                      className="mt-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                    >
-                      Add
-                    </button>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {newClass.equipmentNeeded.map((item, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-md text-sm"
-                      >
-                        {item}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setNewClass((prev) => ({
-                              ...prev,
-                              equipmentNeeded: prev.equipmentNeeded.filter(
-                                (_, i) => i !== index
-                              ),
-                            }))
-                          }
-                          className="ml-2 text-red-600"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
+                  <select
+                    value={newClass.type}
+                    onChange={(e) =>
+                      setNewClass({ ...newClass, type: e.target.value })
+                    }
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    required
+                  >
+                    <option value="Online">Online</option>
+                    <option value="Offline">Offline</option>
+                  </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Capacity
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      value={newClass.capacity}
-                      onChange={(e) =>
-                        setNewClass({
-                          ...newClass,
-                          capacity: parseInt(e.target.value),
-                        })
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Price
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      value={newClass.price}
-                      onChange={(e) =>
-                        setNewClass({
-                          ...newClass,
-                          price: parseFloat(e.target.value),
-                        })
-                      }
-                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Difficulty Level
+                  </label>
+                  <select
+                    value={newClass.difficulty}
+                    onChange={(e) =>
+                      setNewClass({ ...newClass, difficulty: e.target.value })
+                    }
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    required
+                  >
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="All Levels">All Levels</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Right Column */}
+              {/* Middle Column - Schedule & Capacity */}
               <div className="space-y-4">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-4">
+                  Schedule & Capacity
+                </h3>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -677,39 +701,145 @@ const ClassManagement = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Difficulty Level
-                  </label>
-                  <select
-                    value={newClass.difficulty}
-                    onChange={(e) =>
-                      setNewClass({ ...newClass, difficulty: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    required
-                  >
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="All Levels">All Levels</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Capacity
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={newClass.capacity}
+                      onChange={(e) =>
+                        setNewClass({
+                          ...newClass,
+                          capacity: parseInt(e.target.value),
+                        })
+                      }
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={newClass.price}
+                      onChange={(e) =>
+                        setNewClass({
+                          ...newClass,
+                          price: parseFloat(e.target.value),
+                        })
+                      }
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
                 </div>
+              </div>
+
+              {/* Right Column - Equipment & Image */}
+              <div className="space-y-4">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-4">
+                  Equipment & Image
+                </h3>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Type
+                    Equipment Needed
                   </label>
-                  <select
-                    value={newClass.type}
-                    onChange={(e) =>
-                      setNewClass({ ...newClass, type: e.target.value })
-                    }
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    required
-                  >
-                    <option value="Beginner">Online</option>
-                    <option value="Intermediate">Offline</option>
-                  </select>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={equipment}
+                      onChange={(e) => setEquipment(e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Add equipment..."
+                    />
+                    <button
+                      type="button"
+                      onClick={handleEquipmentAdd}
+                      className="mt-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {newClass.equipmentNeeded.map((item, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-md text-sm"
+                      >
+                        {item}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setNewClass((prev) => ({
+                              ...prev,
+                              equipmentNeeded: prev.equipmentNeeded.filter(
+                                (_, i) => i !== index
+                              ),
+                            }))
+                          }
+                          className="ml-2 text-red-600"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Class Image
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="h-32 w-32 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="h-32 w-32 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                          <UploadCloud className="h-8 w-8 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
+                      >
+                        Upload Image
+                      </button>
+                      {selectedImage && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedImage(null);
+                            setImagePreview(null);
+                            setNewClass((prev) => ({ ...prev, image: null }));
+                          }}
+                          className="px-4 py-2 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-200 rounded-md text-sm hover:bg-red-100 dark:hover:bg-red-900/70"
+                        >
+                          Remove Image
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -933,7 +1063,7 @@ const ClassManagement = () => {
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredClasses.map((cls) => (
                     <tr
-                      key={cls._id }
+                      key={cls._id}
                       className={`hover:bg-gray-50 dark:hover:bg-gray-600 ${
                         cls.id % 2 === 0
                           ? "dark:bg-gray-700"

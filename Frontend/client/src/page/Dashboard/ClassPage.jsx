@@ -16,6 +16,7 @@ import {
   Heart,
   BookOpen,
   Info,
+  ArrowRight,
 } from "lucide-react";
 import DarkModeClasses from "../../Components/DarkMode";
 import PaymentButton from "../../Components/PaymentGateway/PaymentButton";
@@ -54,120 +55,116 @@ const ClassCard = ({
   const daysArray = getFormattedDays(class_.schedule.daysOfWeek).split(", ");
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border-black">
-      <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl hover:translate-x-1 transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700">
-        <div className="p-6 space-y-6">
-          {/* Header section */}
-          <div className="flex justify-between items-start">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-200 to-pink-300 dark:from-purple-100 dark:to-pink-200 bg-clip-text text-transparent">
-                  {class_.className}
-                </h3>
-              </div>
-              <span
-                className="inline-flex px-3 py-1 rounded-full text-sm font-medium 
-                bg-purple-50 text-purple-700 border border-purple-100
-                dark:bg-purple-900/20 dark:text-purple-200 dark:border-purple-800/50"
-              >
-                {class_.category}
-              </span>
-            </div>
-            <div
-              className="p-3 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100
-              dark:from-purple-900/20 dark:to-pink-900/20 dark:border-purple-800/50"
-            >
-              <Layout className="w-6 h-6 text-purple-600 dark:text-purple-300" />
-            </div>
-          </div>
+    <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+      {/* Decorative elements */}
+      <div className="absolute -top-6 -right-6 w-12 h-12 bg-purple-200/50 rounded-full blur-xl group-hover:bg-purple-300/50 transition-all duration-300" />
+      <div className="absolute -bottom-6 -left-6 w-12 h-12 bg-pink-200/50 rounded-full blur-xl group-hover:bg-pink-300/50 transition-all duration-300" />
 
-          {/* Info cards grid with enhanced days display */}
-          <div className="grid grid-cols-2 gap-3">
-            <div
-              className="col-span-2 flex items-start p-3 
-              bg-white dark:bg-gray-800/50 rounded-xl 
-              group-hover:shadow-sm transition-all 
-              border border-gray-100 dark:border-gray-700"
-            >
-              <Calendar className="w-5 h-5 text-purple-500 dark:text-purple-300 mt-1" />
-              <div className="ml-3">
-                <FormattedDays days={daysArray} />
-              </div>
-            </div>
+      {/* Class Image Container */}
+      <div className="relative h-56 overflow-hidden">
+        <img
+          src={class_.image?.url}
+          alt={class_.className}
+          className="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-            <div
-              className="flex items-center p-3 
-              bg-white dark:bg-gray-800/50 rounded-xl 
-              group-hover:shadow-sm transition-all 
-              border border-gray-100 dark:border-gray-700"
-            >
-              <Clock className="w-5 h-5 text-purple-500 dark:text-purple-300" />
-              <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
-                {class_.schedule.startTime} - {class_.schedule.endTime}
-              </span>
-            </div>
+        {/* Category Badge */}
+        <div className="absolute top-4 left-4">
+          <span className="inline-flex items-center rounded-full bg-white/90 dark:bg-gray-900/90 px-3 py-1 text-sm font-medium text-purple-700 dark:text-purple-300 backdrop-blur-sm">
+            {class_.category}
+          </span>
+        </div>
 
-            <div
-              className="flex items-center p-3 
-              bg-white dark:bg-gray-800/50 rounded-xl 
-              group-hover:shadow-sm transition-all 
-              border border-gray-100 dark:border-gray-700"
-            >
-              <Users className="w-5 h-5 text-purple-500 dark:text-purple-300" />
-              <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
-                {class_.capacity - class_.remainingClasses} / {class_.capacity}
-              </span>
-            </div>
-
-            <div
-              className="flex items-center p-3 
-              bg-white dark:bg-gray-800/50 rounded-xl 
-              group-hover:shadow-sm transition-all 
-              border border-gray-100 dark:border-gray-700"
-            >
-              <Star className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
-              <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
-                {class_.difficulty}
-              </span>
-            </div>
-          </div>
-
-          {/* Total classes info */}
-          <div
-            className="flex items-center p-3 
-            bg-white dark:bg-gray-800/50 rounded-xl 
-            border border-gray-100 dark:border-gray-700"
-          >
-            <Info className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            <span className="ml-3 text-gray-600 dark:text-gray-300">
-              {class_.totalClasses} total classes
+        {/* Class Title on Image */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <h3 className="text-xl font-bold text-white mb-1">
+            {class_.className}
+          </h3>
+          <div className="flex items-center space-x-2">
+            <Star className="h-4 w-4 text-yellow-400" fill="currentColor" />
+            <span className="text-sm text-gray-200">
+              {class_.difficulty} Level
             </span>
           </div>
+        </div>
+      </div>
 
-          {/* Price and CTA section */}
-          <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <span className="text-md text-gray-500 dark:text-gray-400">
-                Course Price
-              </span>
-              <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 dark:from-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
-                ₹{class_.price}
+      {/* Content Section */}
+      <div className="p-6">
+        {/* Price Badge */}
+        <div className="mb-4 flex justify-between items-center">
+          <span className="text-lg font-semibold text-purple-600 dark:text-purple-400">
+            ₹{class_.price}
+          </span>
+        </div>
+
+        {/* Class Schedule */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+            Schedule
+          </h4>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
+              <Clock className="h-5 w-5 text-purple-500" />
+              <span className="text-sm font-medium">
+                {class_.schedule.startTime}
               </span>
             </div>
-
-            {parsedUser && (
-              <PaymentButton
-                amount={class_.price}
-                onSuccess={handlePaymentSuccess}
-                onFailure={handlePaymentFailure}
-                text="Enroll Now"
-                userId={parsedUser.id}
-                classId={class_._id}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white px-6 py-3 rounded-xl font-medium transform transition-all hover:scale-[1.02] focus:scale-[0.98] shadow-lg hover:shadow-xl"
-              />
-            )}
+            <div className="flex items-start space-x-3">
+              <Calendar className="h-5 w-5 text-purple-500 flex-shrink-0" />
+              <div className="flex flex-wrap gap-1">
+                {daysArray.map((day, index) => (
+                  <span
+                    key={index}
+                    className="inline-block px-2 py-1 text-xs font-medium rounded-md
+                  bg-purple-50 text-purple-700 border border-purple-100
+                  dark:bg-purple-900/20 dark:text-purple-200 dark:border-purple-800/50"
+                  >
+                    {day}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Capacity and Enrollment */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Class Capacity
+            </span>
+            <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+              {class_.capacity - class_.remainingClasses}/{class_.capacity}
+            </span>
+          </div>
+          <div className="w-full h-2 bg-purple-100 dark:bg-purple-900/30 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-purple-500 rounded-full transition-all duration-300"
+              style={{
+                width: `${
+                  ((class_.capacity - class_.remainingClasses) /
+                    class_.capacity) *
+                  100
+                }%`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Enrollment Button */}
+        {parsedUser && (
+          <PaymentButton
+            amount={class_.price}
+            onSuccess={handlePaymentSuccess}
+            onFailure={handlePaymentFailure}
+            text="Enroll Now"
+            userId={parsedUser.id}
+            classId={class_._id}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white px-6 py-3 rounded-xl font-medium transform transition-all hover:scale-[1.02] focus:scale-[0.98] shadow-lg hover:shadow-xl"
+          />
+        )}
       </div>
     </div>
   );
@@ -184,10 +181,10 @@ const ClassesPage = () => {
 
   const navigate = useNavigate();
 
-  const handlePaymentSuccess = (response) => {
-    console.log("Payment Successful:", response);
+  const handlePaymentSuccess = (updatedEnrolledClasses) => {
+    console.log("Payment Successful");
+    setEnrolledClasses(updatedEnrolledClasses);
     alert("Payment successful! You are now enrolled in the class.");
-    retrieveEnrolledClasses();
   };
 
   const handlePaymentFailure = (response) => {
@@ -198,6 +195,7 @@ const ClassesPage = () => {
   const retrieveClasses = async () => {
     try {
       const response = await GetClasses();
+      // console.log(response);
       setAvailableClasses(response.data);
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -213,6 +211,7 @@ const ClassesPage = () => {
       if (parsedUserData) {
         setParsedUser(parsedUserData);
         const response = await EnrolledClasses(parsedUserData.id);
+        console.log(response)
         setEnrolledClasses(response.data || []);
       }
     } catch (error) {
@@ -297,7 +296,7 @@ const ClassesPage = () => {
                               fill="currentColor"
                             />
                             <h3 className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-                              {enrollment.yogaClass.description}
+                              {enrollment.yogaClass.title}
                             </h3>
                           </div>
                           <div className="flex items-center gap-2">
@@ -353,12 +352,6 @@ const ClassesPage = () => {
                             ).toLocaleDateString()}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Star className="w-4 h-4 text-purple-400" />
-                          <span className="text-sm text-gray-600 dark:text-gray-300">
-                            Attendance: {enrollment.attendancePercentage}%
-                          </span>
-                        </div>
                       </div>
 
                       {/* Expanded Content */}
@@ -405,7 +398,7 @@ const ClassesPage = () => {
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 font-extrabold border-t-2 border-b-2 border-blue-500"></div>
             </div>
-          ) : (
+          ) : availableClasses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {availableClasses.map((class_) => (
                 <ClassCard
@@ -419,8 +412,14 @@ const ClassesPage = () => {
                 />
               ))}
             </div>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-400">
+              You don't have any active classes. Please enroll in a course to
+              begin your yoga journey.
+            </p>
           )}
         </div>
+        
       </div>
     </div>
   );

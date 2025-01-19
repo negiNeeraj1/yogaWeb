@@ -16,6 +16,8 @@ import {
 import Foundation from "../assets/Pose1.png";
 import DarkModeClasses from "../Components/DarkMode";
 import YogaHeader from "../Components/YogaHeader";
+import yoga00 from "../assets/yoga00.png";
+
 
 const YogaClasses = () => {
   const navigate = useNavigate();
@@ -322,7 +324,6 @@ const YogaClasses = () => {
       );
     }
 
-    // Sort classes
     switch (sortBy) {
       case "price":
         filtered = [...filtered].sort(
@@ -361,7 +362,7 @@ const YogaClasses = () => {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-7xl mx-auto mb-8 flex flex-wrap gap-4 items-center"
+            className="max-w-6xl mx-auto mb-8 flex flex-wrap gap-4 items-center"
           >
             <div className="relative flex-1 min-w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -392,7 +393,7 @@ const YogaClasses = () => {
           {/* Classes Grid */}
           <motion.div
             variants={containerVariants}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20 max-w-7xl mx-auto"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20 max-w-6xl mx-auto"
           >
             <AnimatePresence mode="wait">
               {filterClasses().map((yogaClass) => (
@@ -408,9 +409,9 @@ const YogaClasses = () => {
                     <motion.img
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
-                      src={yogaClass.image}
+                      src={yoga00}
                       alt={yogaClass.title}
-                      className="w-full h-64 object-cover"
+                      className="w-full h-52 object-cover"
                     />
 
                     <motion.button
@@ -457,15 +458,15 @@ const YogaClasses = () => {
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
+                    <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
                       {yogaClass.title}
                     </h3>
 
-                    <p className="mb-4 text-gray-600 dark:text-gray-300 text-md">
+                    <p className="mb-4 text-gray-500 dark:text-gray-300 text-sm">
                       {yogaClass.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600 dark:text-gray-300">
+                    <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-800 dark:text-gray-300">
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
                         {yogaClass.duration}
@@ -509,9 +510,7 @@ const YogaClasses = () => {
                         whileHover="hover"
                         whileTap="tap"
                         onClick={() => handleExplore(yogaClass.id)}
-                        className="flex-1 py-3 px-4 rounded-xl font-semibold
-                                bg-gray-100 text-gray-900 hover:bg-gray-200 
-                                dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                        className={`flex-1 py-2 rounded-lg font-semibold ${DarkModeClasses.button.primary}`}
                       >
                         Explore
                       </motion.button>
@@ -520,8 +519,7 @@ const YogaClasses = () => {
                         whileHover="hover"
                         whileTap="tap"
                         onClick={() => handleEnrollNow(yogaClass.id)}
-                        className="flex-1 py-3 px-4 rounded-xl font-semibold 
-                                bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        className={`flex-1 py-2 rounded-lg font-semibold ${DarkModeClasses.button.outline}`}
                       >
                         Enroll Now
                       </motion.button>

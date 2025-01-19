@@ -9,10 +9,12 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
-import { SignUpUser  } from "../api/api";
-import { Link } from "react-router-dom";
+import { SignUpUser } from "../api/api";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../hooks/useAuth";
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Basic Information
@@ -94,7 +96,7 @@ const AuthPage = () => {
             { value: "prefer-not-say", label: "Prefer not to say" },
           ],
         },
-        { name: "phone", label: "Phone", type: "text" },
+        { name: "phone", label: "Phone", type: "text", required: true },
       ],
     },
     {
@@ -132,7 +134,7 @@ const AuthPage = () => {
         { name: "injuries", label: "Current Injuries", type: "textarea" },
       ],
     },
-    
+
     {
       icon: <Leaf className="w-6 h-6" />,
       title: "Yoga Experience",
@@ -360,38 +362,51 @@ const AuthPage = () => {
 
     setIsLoading(true);
     setError(null);
-    console.log("Final Form Data:", formData);
+
     try {
-      // Prepare the data for submission
+      // Include ALL form fields in userData
       const userData = {
+        // Basic Information
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
         dateOfBirth: formData.dateOfBirth,
         gender: formData.gender,
+        phone: formData.phone,
+
+        // Health Information
         height: formData.height,
         weight: formData.weight,
         medicalConditions: formData.medicalConditions,
+        medications: formData.medications,
         injuries: formData.injuries,
+
+        // Yoga Experience
         experienceLevel: formData.experienceLevel,
         preferredStyle: formData.preferredStyle,
+        flexibility: formData.flexibility,
+        strengthLevel: formData.strengthLevel,
+
+        // Goals and Preferences
         fitnessGoals: formData.fitnessGoals,
         focusAreas: formData.focusAreas,
+        preferredTime: formData.preferredTime,
+        sessionDuration: formData.sessionDuration,
+
+        // Lifestyle
         occupation: formData.occupation,
         stressLevel: formData.stressLevel,
         sleepQuality: formData.sleepQuality,
         dietaryPreferences: formData.dietaryPreferences,
+        activityLevel: formData.activityLevel,
+        role: formData.role,
       };
 
       const response = await SignUpUser(userData);
-      console.log("Registration successful:", response);
+      useAuthStore.getState().setIsLoggedIn(true);
       navigate("/yogadashboard");
-      // or
-      // setSuccessMessage('Account created successfully!');
-
     } catch (error) {
-      // Handle registration error
       console.error("Registration error:", error);
       setError(error.message || "Registration failed. Please try again.");
     } finally {

@@ -3,13 +3,37 @@ import { YogaClass, ClassAttendance, Subscription, Room } from '../models/Yoga.m
 
 export const createClass = async (req, res) => {
     try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please upload a class image'
+            });
+        }
+
+        req.body.image = {
+            public_id: req.file.filename,
+            url: req.file.path
+        };
+
         const newClass = new YogaClass(req.body);
         const savedClass = await newClass.save();
-        res.status(201).json({ success: true, data: savedClass });
+
+        res.status(201).json({
+            success: true,
+            data: savedClass
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        if (req.file) {
+            await cloudinary.uploader.destroy(req.file.filename);
+        }
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
+
 
 export const getAllClasses = async (req, res) => {
     try {
@@ -44,15 +68,48 @@ export const getClassById = async (req, res) => {
 export const updateClass = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedClass = await YogaClass.findByIdAndUpdate(id, req.body, { new: true });
-        if (!updatedClass) {
-            return res
-                .status(404)
-                .json({ success: false, message: 'Class not found' });
+        const yogaClass = await YogaClass.findById(id);
+
+        if (!yogaClass) {
+            return res.status(404).json({
+                success: false,
+                message: 'Class not found'
+            });
         }
-        res.status(200).json({ success: true, data: updatedClass });
+
+        // If new image is uploaded, delete the old one
+        if (req.file) {
+            // Delete old image from cloudinary
+            if (yogaClass.image && yogaClass.image.public_id) {
+                await cloudinary.uploader.destroy(yogaClass.image.public_id);
+            }
+
+            // Add new image details to req.body
+            req.body.image = {
+                public_id: req.file.filename,
+                url: req.file.path
+            };
+        }
+
+        const updatedClass = await YogaClass.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            data: updatedClass
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        if (req.file) {
+            await cloudinary.uploader.destroy(req.file.filename);
+        }
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 
