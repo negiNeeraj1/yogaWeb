@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { createInstructor } from "../api/api";
 import axios from "axios";
+import ComingSoonPage from "../components/ComingSoonPage";
 
 const InstructorManagementModals = ({
   showAddModal,
@@ -361,6 +362,7 @@ const InstructorManagement = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -556,7 +558,11 @@ const InstructorManagement = () => {
       )
   );
 
-  return (
+  const [show] = useState(true);
+
+  return show ? (
+    <ComingSoonPage />
+  ) : (
     <div
       className={`min-h-screen transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100 bg-slate-100 text-gray-900 px-2 py-3 `}
     >

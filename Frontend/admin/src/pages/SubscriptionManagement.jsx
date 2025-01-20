@@ -1,5 +1,6 @@
 import { Edit, RefreshCw, X } from "lucide-react";
 import React, { useState } from "react";
+import ComingSoonPage from "../components/ComingSoonPage";
 
 const SubscriptionManagement = () => {
   const [selectedTab, setSelectedTab] = useState("active");
@@ -89,7 +90,11 @@ const SubscriptionManagement = () => {
     });
   };
 
-  return (
+  const [show] = useState(true);
+
+  return show ? (
+    <ComingSoonPage />
+  ) : (
     <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
@@ -297,7 +302,7 @@ const SubscriptionManagement = () => {
                         Next Billing: {sub.nextBilling}
                       </div>
                     </td>
-                    
+
                     <td className="p-2">
                       <div className="flex gap-2 justify-center">
                         <button className="flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-md transition-colors duration-200 border border-blue-200 dark:border-blue-800">
@@ -314,7 +319,6 @@ const SubscriptionManagement = () => {
                         </button>
                       </div>
                     </td>
-
                   </tr>
                 ))}
               </tbody>

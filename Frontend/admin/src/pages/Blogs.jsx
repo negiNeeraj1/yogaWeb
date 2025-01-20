@@ -18,6 +18,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import ComingSoonPage from "../components/ComingSoonPage";
 
 const Blogs = () => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -77,12 +78,16 @@ const Blogs = () => {
     // More blog data...
   ];
 
+  const [show] = useState(true);
+
   const filteredBlogs =
     activeCategory === "All"
       ? blogs
       : blogs.filter((blog) => blog.category === activeCategory);
 
-  return (
+  return show ? (
+    <ComingSoonPage />
+  ) : (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 px-3 py-3">
       <div className="max-w-7xl mx-auto ">
         <button className="fixed bottom-8 right-8 p-4 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors">

@@ -8,7 +8,8 @@ const milestones = [
     subtitle: "Where Every Journey Begins",
     description:
       "Our beginner classes focus on creating a welcoming environment where students build confidence and master fundamental poses. We emphasize proper alignment and breathing techniques.",
-    image: "/api/placeholder/400/320",
+    image:
+      "https://www.greenretreats.co.uk/wp-content/uploads/Pinn-7.5m-x-4m-3-1.jpg",
     color: "#6366F1", // Adjusted for dark mode
   },
   {
@@ -17,7 +18,8 @@ const milestones = [
     subtitle: "Nurturing Individual Progress",
     description:
       "Through small group sessions and personalized attention, we help students deepen their practice. Our instructors provide detailed guidance and modifications suited to each student's needs.",
-    image: "/api/placeholder/400/320",
+    image:
+      "https://th.bing.com/th/id/OIP.OblXLNX_vauZ-Cgfw24G1QHaE8?rs=1&pid=ImgDetMain",
     color: "#8B5CF6", // Adjusted for dark mode
   },
   {
@@ -26,7 +28,8 @@ const milestones = [
     subtitle: "Growing Together",
     description:
       "Our studio fosters a supportive community where students inspire each other. Regular workshops and events create opportunities for connection and shared learning experiences.",
-    image: "/api/placeholder/400/320",
+    image:
+      "https://i.pinimg.com/originals/5f/09/8a/5f098ae9c6b52657b04c2dc58baec193.jpg",
     color: "#EC4899", // Adjusted for dark mode
   },
   {
@@ -35,7 +38,8 @@ const milestones = [
     subtitle: "Elevating Your Journey",
     description:
       "For dedicated practitioners, we offer advanced workshops and teacher training programs. These sessions focus on deepening understanding of yoga philosophy and advanced techniques.",
-    image: "/api/placeholder/400/320",
+    image:
+      "https://th.bing.com/th/id/OIP.pkydblCOFCCrr24hhFjZOgHaEp?rs=1&pid=ImgDetMain",
     color: "#A78BFA", // Adjusted for dark mode
   },
 ];
@@ -62,7 +66,7 @@ const TeachingJourney = () => {
   return (
     <motion.section
       variants={fadeInUp}
-      className="py-12 md:py-20 bg-gray-900 relative min-h-screen overflow-hidden"
+      className="py-12 md:py-20 bg-gradient-to-b from-white to-purple-50 dark:from-gray-900 dark:to-gray-800 relative min-h-screen overflow-hidden"
     >
       <div className="absolute inset-0">
         <div className="absolute w-72 md:w-96 h-72 md:h-96 bg-purple-500/20 rounded-full blur-3xl top-0 left-0" />
@@ -75,10 +79,10 @@ const TeachingJourney = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12 md:mb-20"
         >
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 md:mb-6">
+          <h2 className="text-3xl md:text-5xl font-bold dark:text-white mb-4 md:mb-6">
             Our Teaching Journey
           </h2>
-          <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
+          <p className="text-base md:text-xl dark:text-gray-300 max-w-2xl mx-auto px-4">
             Discover how we guide and support our students through every step of
             their yoga practice
           </p>
@@ -135,12 +139,12 @@ const TeachingJourney = () => {
                           className={`absolute -top-6 ${
                             isLeft ? "-left-6" : "right-6 md:-right-6"
                           } w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center 
-                              text-xl md:text-2xl font-bold text-white z-10`}
+                              text-xl md:text-2xl font-bold dark:text-white z-10`}
                           style={{ backgroundColor: milestone.color }}
                         >
                           {milestone.number}
                         </div>
-                        <div className="bg-gray-800 rounded-2xl p-4 md:p-6 shadow-xl">
+                        <div className="dark:bg-gray-800 rounded-2xl p-2 md:p-4 shadow-xl">
                           <div className="h-48 md:h-64 mb-4 overflow-hidden rounded-xl">
                             <img
                               src={milestone.image}
@@ -164,7 +168,7 @@ const TeachingJourney = () => {
                     } px-4`}
                   >
                     <motion.h3
-                      className="text-2xl md:text-3xl font-bold text-white mb-2 md:mb-4"
+                      className="text-2xl md:text-3xl font-bold dark:text-white mb-2 md:mb-4"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.3 }}
@@ -172,7 +176,7 @@ const TeachingJourney = () => {
                       {milestone.title}
                     </motion.h3>
                     <motion.p
-                      className="text-lg md:text-xl text-purple-400 mb-3 md:mb-4"
+                      className="text-lg md:text-xl text-purple-600 dark:text-purple-400 mb-3 md:mb-4"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.4 }}
@@ -180,7 +184,7 @@ const TeachingJourney = () => {
                       {milestone.subtitle}
                     </motion.p>
                     <motion.p
-                      className="text-base md:text-lg text-gray-300"
+                      className="text-base md:text-lg dark:text-gray-300 text-gray-700"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.5 }}

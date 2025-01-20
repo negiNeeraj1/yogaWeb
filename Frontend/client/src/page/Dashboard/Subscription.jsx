@@ -14,6 +14,7 @@ import {
 import { motion } from "framer-motion";
 import { BlurText } from "../../Components/Themes/BlurText";
 import { getPlans } from "../../api/api";
+import ComingSoonPage from "../../Components/CommingSoonPage";
 
 const SubscriptionPage = () => {
   const [isYearly, setIsYearly] = useState(false);
@@ -43,8 +44,13 @@ const SubscriptionPage = () => {
     transition: { duration: 0.5 },
   };
 
+  const [show] = useState(true);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 transition-colors duration-300">
+    show ?
+    <ComingSoonPage/>
+     :
+     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

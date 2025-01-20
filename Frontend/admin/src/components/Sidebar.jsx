@@ -44,21 +44,21 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
     //   text: "Instructor Management",
     //   path: "/instructor-management",
     // },
-    {
-      icon: FileText,
-      text: "Blog Management",
-      path: "/blog-management",
-    },
-    {
-      icon: ChartBarIcon,
-      text: "Analytics",
-      path: "/analytics",
-    },
-    {
-      icon: DollarSign,
-      text: "Subscription Management",
-      path: "/subscription-management",
-    },
+    // {
+    //   icon: FileText,
+    //   text: "Blog Management",
+    //   path: "/blog-management",
+    // },
+    // {
+    //   icon: ChartBarIcon,
+    //   text: "Analytics",
+    //   path: "/analytics",
+    // },
+    // {
+    //   icon: DollarSign,
+    //   text: "Subscription Management",
+    //   path: "/subscription-management",
+    // },
     {
       icon: DollarSign,
       text: "Payment Management",

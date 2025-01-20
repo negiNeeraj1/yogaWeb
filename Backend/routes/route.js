@@ -1,5 +1,5 @@
 import express from 'express';
-import upload from '../config/multerCloudinary.js';
+
 import {
     getProfile,
     getUserAnalytics,
@@ -39,8 +39,8 @@ import {
     getUserEnrolledClasses,
     markAttendance,
     registerForClass
-} from '../controllers/attandance.controller.js';
-import {
+} from '../controllers/Attandance.controller.js';
+    import {
     createAssistant,
     createInstructor,
     deleteInstructor,
@@ -55,8 +55,8 @@ import {
 } from '../controllers/payment.controller.js';
 
 import { subscriptionController } from '../controllers/Subscription.controller.js';
-import { getContactForm, submitForm } from '../controllers/contact.modal.js';
-import uploadImage from '../config/multerCloudinary.js';
+import { getContactForm, submitForm } from '../controllers/contact.controller.js';
+import uploadImage, { uploadVideo , handleUploadError } from '../config/multerCloudinary.js';
 
 const router = express.Router();
 
@@ -80,7 +80,11 @@ router.get('/classes/get', getAllClasses);
 router.get('/classes/get/:id', getClassById);
 router.put('/classes/update/:id', uploadImage.single('image'), updateClass);
 router.delete('/classes/:id', deleteClass);
-router.post('/classes/:classId/videos', upload.single('video'), uploadClassVideo);
+router.post('/classes/:classId/videos',
+    uploadVideo.single('video'),
+    handleUploadError,
+    uploadClassVideo
+);
 
 // Class Attendance Routes
 router.get('/classes/:classId/attendance', getClassAttendance);

@@ -9,7 +9,8 @@ const testimonials = [
     name: "Sarah Mitchell",
     role: "Regular Practitioner",
     image: "/api/placeholder/100/100",
-    yogaImage: "/api/placeholder/600/400",
+    yogaImage:
+      "https://th.bing.com/th/id/OIP.jGqjQd5bNeQHgiMv4Gcx8AHaE7?w=249&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
   },
   {
     id: 2,
@@ -17,7 +18,8 @@ const testimonials = [
     name: "David Kumar",
     role: "Advanced Student",
     image: "/api/placeholder/100/100",
-    yogaImage: "/api/placeholder/600/400",
+    yogaImage:
+      "https://th.bing.com/th/id/OIP.Hoq88ux92YatelTMbfHz_wHaE8?w=612&h=408&rs=1&pid=ImgDetMain",
   },
   {
     id: 3,
@@ -25,7 +27,8 @@ const testimonials = [
     name: "Emily Chen",
     role: "Intermediate Student",
     image: "/api/placeholder/100/100",
-    yogaImage: "/api/placeholder/600/400",
+    yogaImage:
+      "https://th.bing.com/th/id/OIP.XP2vDKT1TUk0mZ3mXUbn4QHaE7?w=1216&h=810&rs=1&pid=ImgDetMain",
   },
 ];
 

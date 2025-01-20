@@ -128,7 +128,7 @@ const Home = () => {
                   <motion.img
                     src={Yoga}
                     alt="Yoga Practice"
-                    className="rounded-2xl shadow-lg h-48 md:h-64 w-full object-cover transform hover:scale-105 transition-transform duration-300"
+                    className="rounded-2xl shadow-lg h-52 md:h-64 w-full object-cover transform hover:scale-105 transition-transform duration-300"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
@@ -136,7 +136,7 @@ const Home = () => {
                   <motion.img
                     src={Yoga3}
                     alt="Teaching Session"
-                    className="rounded-2xl shadow-lg h-48 md:h-64 w-full object-cover transform hover:scale-105 transition-transform duration-300 mt-0 sm:mt-12"
+                    className="rounded-2xl shadow-lg h-52 md:h-64 w-full object-cover transform hover:scale-105 transition-transform duration-300 mt-0 sm:mt-12"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}

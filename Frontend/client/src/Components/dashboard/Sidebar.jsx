@@ -29,7 +29,7 @@ const Sidebar = () => {
     },
     {
       icon: <HeartHandshake className="w-5 h-5" />,
-      name: "Support",
+      name: "Help and Support",
       path: "/yogadashboard/contact",
     },
     {

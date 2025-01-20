@@ -123,9 +123,7 @@ export const getUserEnrolledClasses = async (req, res) => {
 
         const classesWithDetails = enrolledClasses.map(record => {
             const yogaClass = record.yogaClass;
-            console.log(yogaClass);
-
-            
+                        
             if (!yogaClass) {
                 console.log('No yoga class found for record:', record);
                 return null; 

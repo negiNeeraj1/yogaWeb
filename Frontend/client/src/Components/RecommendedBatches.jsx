@@ -153,7 +153,7 @@ const RecommendedBatches = ({ onExplore, onBuyNow }) => {
                   {batch.features.map((feature, idx) => (
                     <span
                       key={idx}
-                      className={`text-xs px-2 py-1 rounded-full bg-rose-200/20 text-rose-500 dark:bg-yellow-100/40 dark:text-white bg-opacity-20`}
+                      className={`text-xs px-2 py-1 rounded-full bg-rose-200/20 text-rose-500 dark:bg-yellow-500/40 dark:text-white bg-opacity-20`}
                     >
                       {feature}
                     </span>
