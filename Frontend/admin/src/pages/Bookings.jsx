@@ -22,7 +22,14 @@ import {
   UploadCloud,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { createClass, getClass } from "../api/api";
+import {
+  createClass,
+  getClass,
+  enrollmentStat,
+  updateClass,
+  deleteClass,
+  getInstructor,
+} from "../api/api";
 
 const TableSection = ({
   title,
@@ -83,97 +90,144 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 };
 
 const ClassManagement = () => {
+  const fileInputRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [mainSearchTerm, setMainSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [classes, setClasses] = useState([]);
+  const [equipment, setEquipment] = useState("");
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [originalImage, setOriginalImage] = useState(null);
+  const [enrollmentStats, setEnrollmentStats] = useState({
+    totalClasses: 0,
+    totalStudents: 0,
+    activeClasses: 0,
+    averageAttendance: "0%",
+    yogaCategories: 0,
+  });
+  const [instructors, setInstructors] = useState([]);
 
-   const fileInputRef = useRef(null);
-   const dropdownRef = useRef(null);
-   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-   const [selectedClass, setSelectedClass] = useState(null);
-   const [openDropdownId, setOpenDropdownId] = useState(null);
-   const [mainSearchTerm, setMainSearchTerm] = useState("");
-   const [statusFilter, setStatusFilter] = useState("All");
-   const [classes, setClasses] = useState([]);
-   const [equipment, setEquipment] = useState("");
-   const [selectedDays, setSelectedDays] = useState([]);
-   const [selectedImage, setSelectedImage] = useState(null);
-   const [imagePreview, setImagePreview] = useState(null);
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      try {
+        const response = await getInstructor();
+        setInstructors(response);
+      } catch (error) {
+        console.error("Error fetching instructors:", error);
+      }
+    };
+  
+    fetchInstructors();
+  }, []);
 
-   const [newClass, setNewClass] = useState({
-     className: "",
-     category: "",
-     instructor: "676fe9ff5e7aadf22aced5fe",
-     description: "",
-     schedule: {
-       startDate: "",
-       endDate: "",
-       daysOfWeek: [],
-       startTime: "",
-       endTime: "",
-       timeZone: "UTC+5:30",
-     },
-     type: "Online",
-     totalClasses: 12,
-     capacity: 30,
-     difficulty: "Beginner",
-     status: "Upcoming",
-     equipmentNeeded: [],
-     remainingClasses: 12,
-     price: 0,
-     renewal: false,
-     feedback: "",
-     image: null,
-     students: 0, // Added default value for students
-   });
+  useEffect(() => {
+    const fetchEnrollmentStats = async () => {
+      try {
+        const user = localStorage.getItem("user");
+        const parsedUserData = user ? JSON.parse(user) : null;
 
-   const handleImageChange = (e) => {
-     const file = e.target.files[0];
-     if (file) {
-       if (file.size > 5 * 1024 * 1024) {
-         // 5MB limit
-         alert("File size should not exceed 5MB");
-         return;
-       }
+        const stats = await enrollmentStat(parsedUserData.id);
+        const overallStats = stats.data.overallStats;
+        const classes = stats.data.enrollmentByClass;
 
-       setSelectedImage(file);
-       setNewClass((prev) => ({ ...prev, image: file }));
+        const totalStudents = classes.reduce(
+          (acc, cls) => acc + cls.registeredUsers,
+          0
+        ); // Summing registered users for all classes
+        const activeClasses = classes.filter(
+          (cls) => cls.classDetails.status === "In Progress"
+        ).length;
 
-       const reader = new FileReader();
-       reader.onloadend = () => {
-         setImagePreview(reader.result);
-       };
-       reader.readAsDataURL(file);
-     }
-   };
+        const averageAttendance =
+          classes.length > 0
+            ? `${(
+                (classes.reduce((acc, cls) => acc + cls.presentUsers, 0) /
+                  totalStudents) *
+                100
+              ).toFixed(0)}%`
+            : "0%";
 
-   useEffect(() => {
-     const handleClickOutside = (event) => {
-       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-         setOpenDropdownId(null);
-       }
-     };
+        const yogaCategories = new Set(
+          classes.map((cls) => cls.classDetails.category)
+        ).size;
 
-     document.addEventListener("mousedown", handleClickOutside);
-     return () => document.removeEventListener("mousedown", handleClickOutside);
-   }, []);
+        setEnrollmentStats({
+          totalClasses: classes.length,
+          totalStudents,
+          activeClasses,
+          averageAttendance,
+          yogaCategories,
+        });
+      } catch (error) {
+        console.error("Failed to fetch enrollment stats", error);
+      }
+    };
 
-   const fetchClasses = async () => {
-     try {
-       const response = await getClass();
-       if (response.success) {
-         // Ensure all required properties exist
-         const processedClasses = response.data.map((cls) => ({
-           ...cls,
-           students: cls.students || 0,
-           attendance: cls.attendance || "N/A",
-           room: cls.room || "N/A",
-           resources: cls.equipmentNeeded || [],
-         }));
-         setClasses(processedClasses);
-       }
-     } catch (error) {
-       console.error("Error fetching classes:", error);
-     }
-   };
+    fetchEnrollmentStats();
+  }, []);
+
+  const [newClass, setNewClass] = useState({
+    className: "",
+    category: "",
+    instructor: "",
+    description: "",
+    schedule: {
+      startDate: "",
+      endDate: "",
+      daysOfWeek: [],
+      startTime: "",
+      endTime: "",
+      timeZone: "UTC+5:30",
+    },
+    type: "Online",
+    totalClasses: 12,
+    capacity: 30,
+    difficulty: "Beginner",
+    status: "Upcoming",
+    equipmentNeeded: [],
+    remainingClasses: 12,
+    price: 0,
+    renewal: false,
+    feedback: "",
+    image: null,
+    students: 0,
+  });
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const fetchClasses = async () => {
+    try {
+      const response = await getClass();
+      if (response.success) {
+        // Ensure all required properties exist
+        const processedClasses = response.data.map((cls) => ({
+          ...cls,
+          students: cls.students || 0,
+          attendance: cls.attendance || "N/A",
+          room: cls.room || "N/A",
+          resources: cls.equipmentNeeded || [],
+        }));
+        setClasses(processedClasses);
+      }
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+    }
+  };
 
   const formatInstructorName = (instructor) => {
     if (!instructor) return "N/A";
@@ -200,30 +254,165 @@ const ClassManagement = () => {
       ...prev,
       schedule: {
         ...prev.schedule,
-        daysOfWeek: updatedDays, 
+        daysOfWeek: updatedDays,
       },
     }));
   };
 
-  const handleDeleteClass = (id) => {
-    setClasses(classes.filter((cls) => cls.id !== id));
-    setIsDeleteModalOpen(false);
-    setSelectedClass(null);
-  };
-
   const handleEditClick = (classData) => {
+    console.log("Original Class Data:", classData);
+
+    const preparedClassData = {
+      _id: classData._id,
+      className: classData.className,
+      category: classData.category,
+      description: classData.description,
+      type: classData.type,
+      difficulty: classData.difficulty,
+      instructor: classData.instructor,
+      schedule: {
+        startDate: classData.scheduleDetails?.startDate
+          ? new Date(classData.scheduleDetails.startDate)
+              .toISOString()
+              .split("T")[0]
+          : "",
+        endDate: classData.scheduleDetails?.endDate
+          ? new Date(classData.scheduleDetails.endDate)
+              .toISOString()
+              .split("T")[0]
+          : "",
+        startTime: classData.scheduleDetails?.startTime || "",
+        endTime: classData.scheduleDetails?.endTime || "",
+        daysOfWeek: classData.scheduleDetails?.days
+          ? classData.scheduleDetails.days
+              .split(", ")
+              .map(
+                (day) =>
+                  ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(
+                    day
+                  ) + 1
+              )
+          : [],
+        timeZone: classData.scheduleDetails?.timeZone || "UTC+5:30",
+      },
+      totalClasses: classData.totalClasses || 12,
+      capacity: classData.capacity || 30,
+      status: classData.status,
+      equipmentNeeded: classData.equipmentNeeded || [],
+      remainingClasses: classData.remainingClasses || 12,
+      price: classData.price || 0,
+      renewal: classData.renewal || false,
+      students: String(classData.students || 0),
+      image: classData.image || null,
+    };
+
+    // Set the new class state
+    setNewClass(preparedClassData);
+
+    // Set selected days
+    const scheduleWeekDays = classData.scheduleDetails?.days
+      ? classData.scheduleDetails.days
+          .split(", ")
+          .map(
+            (day) =>
+              ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(day) + 1
+          )
+      : [];
+    setSelectedDays(scheduleWeekDays);
+
+    // Handle image preview
+    if (classData.image) {
+      if (classData.image.url) {
+        setImagePreview(classData.image.url);
+        setSelectedImage(classData.image);
+      } else if (classData.image instanceof File) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(classData.image);
+      } else if (typeof classData.image === "string") {
+        setImagePreview(classData.image);
+        setSelectedImage(classData.image);
+      }
+    } else {
+      setImagePreview(null);
+      setSelectedImage(null);
+    }
+
+    // Reset equipment input
+    setEquipment("");
+
+    // Open the modal
     setSelectedClass(classData);
-    setNewClass({
-      ...classData,
-      students: String(classData.students),
-    });
     setIsAddModalOpen(true);
     setOpenDropdownId(null);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        alert("File size should not exceed 5MB");
+        return;
+      }
+
+      // Remove previous image if it exists
+      if (selectedImage) {
+        if (selectedImage.public_id) {
+          cloudinary.uploader.destroy(selectedImage.public_id);
+        }
+
+        setSelectedImage(null);
+        setImagePreview(null);
+      }
+
+      setSelectedImage(file);
+      setNewClass((prev) => ({ ...prev, image: file }));
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   useEffect(() => {
     fetchClasses();
   }, []);
+
+  const handleDeleteClass = async () => {
+    if (!selectedClass || !selectedClass._id) {
+      console.error("No class selected for deletion");
+      return;
+    }
+  
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this class?"
+      );
+      
+      if (confirmDelete) {
+        const response = await deleteClass(selectedClass._id);
+        
+        if (response.success) {
+          await fetchClasses();
+          
+          setIsDeleteModalOpen(false);
+          setSelectedClass(null);
+          alert("Class deleted successfully");
+        } else {
+          console.error("Error deleting class:", response.message);
+          alert(response.message);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting class:", error);
+      alert("Failed to delete class. Please try again.");
+    }
+  };
 
   const handleAddClass = async (e) => {
     e.preventDefault();
@@ -231,7 +420,6 @@ const ClassManagement = () => {
     try {
       const formData = new FormData();
 
-      // Create a clean copy of the class data
       const classData = {
         ...newClass,
         schedule: {
@@ -241,13 +429,10 @@ const ClassManagement = () => {
         },
       };
 
-      // Append all class data to FormData
       Object.keys(classData).forEach((key) => {
         if (key === "schedule") {
-          // Handle schedule object
           Object.keys(classData.schedule).forEach((scheduleKey) => {
             if (scheduleKey === "daysOfWeek") {
-              // Send daysOfWeek as individual form fields
               classData.schedule.daysOfWeek.forEach((day, index) => {
                 formData.append(`schedule[daysOfWeek][${index}]`, day);
               });
@@ -262,19 +447,25 @@ const ClassManagement = () => {
           classData.equipmentNeeded.forEach((item, index) => {
             formData.append(`equipmentNeeded[${index}]`, item);
           });
-        } else if (key === "image" && classData.image) {
-          formData.append("image", classData.image);
+        } else if (key === "image") {
+          if (classData.image && classData.image instanceof File) {
+            formData.append("image", classData.image);
+          }
         } else {
           formData.append(key, classData[key]);
         }
       });
 
-      // Log the FormData contents for debugging
       for (let pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
 
-      const response = await createClass(formData);
+      let response;
+      if (selectedClass) {
+        response = await updateClass(selectedClass._id, formData);
+      } else {
+        response = await createClass(formData);
+      }
 
       if (response.success) {
         await fetchClasses();
@@ -290,12 +481,11 @@ const ClassManagement = () => {
     }
   };
 
-
   const resetForm = () => {
     setNewClass({
       className: "",
       category: "",
-      instructor: "676fe9ff5e7aadf22aced5fe",
+      instructor: "",
       description: "",
       schedule: {
         startDate: "",
@@ -427,13 +617,28 @@ const ClassManagement = () => {
           </div>
 
           {/* Stats Section */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-6">
             {[
-              { label: "Total Classes", value: "12", icon: BookOpen },
-              { label: "Total Students", value: "345", icon: Users },
-              { label: "Active Classes", value: "8", icon: Clock },
-              { label: "Average Attendance", value: "91%", icon: CheckCircle },
-              { label: "Yoga Categories", value: "12", icon: List },
+              {
+                label: "Total Classes",
+                value: enrollmentStats.totalClasses,
+                icon: BookOpen,
+              },
+              {
+                label: "Total Students",
+                value: enrollmentStats.totalStudents,
+                icon: Users,
+              },
+              {
+                label: "Active Classes",
+                value: enrollmentStats.activeClasses,
+                icon: Clock,
+              },
+              {
+                label: "Yoga Categories",
+                value: enrollmentStats.yogaCategories,
+                icon: List,
+              },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -738,6 +943,29 @@ const ClassManagement = () => {
                     />
                   </div>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Instructor
+                  </label>
+                  <select
+                    value={newClass.instructor}
+                    onChange={(e) =>
+                      setNewClass({ ...newClass, instructor: e.target.value })
+                    }
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    required
+                  >
+                    <option value="">Select an Instructor</option>
+                    {instructors.map((instructor) => (
+                      <option key={instructor._id} value={instructor._id}>
+                        {`${instructor.firstName} ${instructor.lastName} (${instructor.email})`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+
               </div>
 
               {/* Right Column - Equipment & Image */}
@@ -797,13 +1025,26 @@ const ClassManagement = () => {
                     Class Image
                   </label>
                   <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 relative">
                       {imagePreview ? (
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="h-32 w-32 object-cover rounded-lg"
-                        />
+                        <>
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="h-32 w-32 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedImage(null);
+                              setImagePreview(null);
+                              setNewClass((prev) => ({ ...prev, image: null }));
+                            }}
+                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 m-1 hover:bg-red-600"
+                          >
+                            <X size={16} />
+                          </button>
+                        </>
                       ) : (
                         <div className="h-32 w-32 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                           <UploadCloud className="h-8 w-8 text-gray-400" />
@@ -823,21 +1064,8 @@ const ClassManagement = () => {
                         onClick={() => fileInputRef.current?.click()}
                         className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
                       >
-                        Upload Image
+                        {imagePreview ? "Replace Image" : "Upload Image"}
                       </button>
-                      {selectedImage && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedImage(null);
-                            setImagePreview(null);
-                            setNewClass((prev) => ({ ...prev, image: null }));
-                          }}
-                          className="px-4 py-2 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-200 rounded-md text-sm hover:bg-red-100 dark:hover:bg-red-900/70"
-                        >
-                          Remove Image
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

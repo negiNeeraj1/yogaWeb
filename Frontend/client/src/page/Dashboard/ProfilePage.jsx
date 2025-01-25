@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "../../context/ThemeProvider";
 import {
   User,
@@ -18,6 +18,9 @@ import {
   AtSign,
   ChevronDown,
 } from "lucide-react";
+import { useToast } from "../../Components/ToastProvider";
+import { ChangePassword, UpdateUser } from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
 
 const InputField = ({
   label,
@@ -113,16 +116,10 @@ const StyledSelect = ({ value, onChange, options }) => (
   </div>
 );
 
-// Usage in your ProfilePage component:
 const LanguageSelect = () => {
   const [language, setLanguage] = useState("english");
 
-  const languageOptions = [
-    { value: "english", label: "English" },
-    { value: "spanish", label: "Spanish" },
-    { value: "french", label: "French" },
-    { value: "german", label: "German" },
-  ];
+  const languageOptions = [{ value: "english", label: "English" }];
 
   return (
     <div className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
@@ -141,7 +138,10 @@ const LanguageSelect = () => {
 
 const ProfilePage = () => {
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const { addToast } = useToast();
+  const { updateUser , logout } = useAuth();
   const [activeSection, setActiveSection] = useState("profile");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
@@ -152,14 +152,17 @@ const ProfilePage = () => {
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
-    birthDate: "",
-    address: "",
   });
   const [security, setSecurity] = useState({
     twoFactorAuth: false,
     loginAlerts: false,
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
 
   const settingsSections = [
     {
@@ -168,24 +171,24 @@ const ProfilePage = () => {
       title: "Profile Settings",
       description: "Manage personal information",
     },
-    {
-      id: "security",
-      icon: <Lock className="w-6 h-6" />,
-      title: "Privacy & Security",
-      description: "Control account protection",
-    },
-    {
-      id: "notifications",
-      icon: <Bell className="w-6 h-6" />,
-      title: "Notifications",
-      description: "Customize alert preferences",
-    },
-    {
-      id: "payment",
-      icon: <CreditCard className="w-6 h-6" />,
-      title: "Payment & Billing",
-      description: "Manage payment methods",
-    },
+    // {
+    //   id: "security",
+    //   icon: <Lock className="w-6 h-6" />,
+    //   title: "Privacy & Security",
+    //   description: "Control account protection",
+    // },
+    // {
+    //   id: "notifications",
+    //   icon: <Bell className="w-6 h-6" />,
+    //   title: "Notifications",
+    //   description: "Customize alert preferences",
+    // },
+    // {
+    //   id: "payment",
+    //   icon: <CreditCard className="w-6 h-6" />,
+    //   title: "Payment & Billing",
+    //   description: "Manage payment methods",
+    // },
   ];
 
   const handleProfileUpdate = (e) => {
@@ -196,6 +199,95 @@ const ProfilePage = () => {
     }));
   };
 
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const userData = getUserFromLocalStorage();
+
+      if (!userData?.id) throw new Error("User ID not found");
+
+      const updateData = {
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+      };
+
+      const response = await UpdateUser(userData.id, updateData);
+
+      addToast("Profile updated successfully", "success");
+      updateUser({
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+      });
+
+      // if (notifications.email) {
+      //   await sendEmailNotification({
+      //     type: "PROFILE_UPDATE",
+      //     email: profileData.email,
+      //     data: {
+      //       name: `${profileData.firstName} ${profileData.lastName}`,
+      //       timestamp: new Date().toISOString(),
+      //     },
+      //   });
+      // }
+    } catch (error) {
+      console.error("Profile update error:", error);
+      addToast("Failed to update profile", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      addToast("New passwords do not match", "error");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      addToast("Password must be at least 6 characters long", "error");
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      const userId = userData?.id;
+
+      if (!userId) {
+        addToast("User ID not found", "error");
+        return;
+      }
+      console.log("Sending password change request:", {
+        userId,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      const response = await ChangePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+        userId: userId,
+      });
+
+      console.log("Password change response:", response);
+
+      addToast("Password changed successfully", "success");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      addToast(
+        error.response?.data?.message || "Failed to change password",
+        "error"
+      );
+    }
+  };
+
   const handleThemeToggle = () => {
     toggleDarkMode();
   };
@@ -204,7 +296,7 @@ const ProfilePage = () => {
     switch (activeSection) {
       case "profile":
         return (
-          <div className="p-6 space-y-6">
+          <form onSubmit={handleProfileSubmit} className="p-6 space-y-6">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
               Profile Information
             </h2>
@@ -215,6 +307,7 @@ const ProfilePage = () => {
                 value={profileData.firstName}
                 onChange={handleProfileUpdate}
                 icon={UserCircle}
+                required
               />
               <InputField
                 label="Last Name"
@@ -222,6 +315,7 @@ const ProfilePage = () => {
                 value={profileData.lastName}
                 onChange={handleProfileUpdate}
                 icon={UserCircle}
+                required
               />
               <InputField
                 label="Email Address"
@@ -230,46 +324,28 @@ const ProfilePage = () => {
                 value={profileData.email}
                 onChange={handleProfileUpdate}
                 icon={AtSign}
-              />
-              <InputField
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                value={profileData.phone}
-                onChange={handleProfileUpdate}
-                icon={Phone}
-              />
-              <InputField
-                label="Birth Date"
-                name="birthDate"
-                type="date"
-                value={profileData.birthDate}
-                onChange={handleProfileUpdate}
-                icon={Calendar}
-              />
-              <InputField
-                label="Address"
-                name="address"
-                value={profileData.address}
-                onChange={handleProfileUpdate}
-                icon={MapPin}
+                required
               />
             </div>
             <div className="flex justify-end space-x-4 mt-6">
               <button
+                type="button"
+                onClick={() => setActiveSection("profile")}
                 className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
                 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
               >
                 Cancel
               </button>
               <button
+                type="submit"
+                disabled={isSubmitting}
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 
                 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-200"
               >
-                Save Changes
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
             </div>
-          </div>
+          </form>
         );
 
       case "security":
@@ -279,52 +355,53 @@ const ProfilePage = () => {
               Security Settings
             </h2>
             <div className="space-y-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6">
-              <Toggle
-                checked={security.twoFactorAuth}
-                onChange={() =>
-                  setSecurity((prev) => ({
-                    ...prev,
-                    twoFactorAuth: !prev.twoFactorAuth,
-                  }))
-                }
-                label="Two-Factor Authentication"
-                icon={Shield}
-              />
-              <Toggle
-                checked={security.loginAlerts}
-                onChange={() =>
-                  setSecurity((prev) => ({
-                    ...prev,
-                    loginAlerts: !prev.loginAlerts,
-                  }))
-                }
-                label="Login Alerts"
-                icon={Bell}
-              />
-              <InputField
-                label="Current Password"
-                name="currentPassword"
-                type="password"
-                value=""
-                onChange={() => {}}
-                icon={Lock}
-              />
-              <InputField
-                label="New Password"
-                name="newPassword"
-                type="password"
-                value=""
-                onChange={() => {}}
-                icon={Lock}
-              />
-              <InputField
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                value=""
-                onChange={() => {}}
-                icon={Lock}
-              />
+              <form onSubmit={handlePasswordChange}>
+                <InputField
+                  label="Current Password"
+                  name="currentPassword"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      currentPassword: e.target.value,
+                    }))
+                  }
+                  icon={Lock}
+                />
+                <InputField
+                  label="New Password"
+                  name="newPassword"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      newPassword: e.target.value,
+                    }))
+                  }
+                  icon={Lock}
+                />
+                <InputField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
+                  icon={Lock}
+                />
+                <button
+                  type="submit"
+                  className="mt-4 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg"
+                >
+                  Change Password
+                </button>
+              </form>
             </div>
           </div>
         );
@@ -397,6 +474,45 @@ const ProfilePage = () => {
     }
   };
 
+  const getUserFromLocalStorage = () => {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userData = JSON.parse(userStr);
+        return userData;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error parsing user data from localStorage:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        let userData = null;
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          userData = JSON.parse(userStr);
+        }
+
+        if (userData) {
+          setProfileData({
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            phone: userData.phone || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row transition-colors duration-200">
       {/* Sidebar */}
@@ -438,7 +554,7 @@ const ProfilePage = () => {
         </div>
 
         <div className="mt-6 space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <LanguageSelect/>
+          <LanguageSelect />
 
           <div className="flex justify-between items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
             <div className="flex items-center space-x-3">
@@ -462,6 +578,7 @@ const ProfilePage = () => {
         <button
           className="w-full flex items-center justify-center space-x-2 p-4 rounded-lg bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 
           text-red-600 dark:text-red-400 hover:from-red-100 hover:to-rose-100 dark:hover:from-red-900/30 dark:hover:to-rose-900/30 transition-all duration-200"
+          onClick={logout}
         >
           <LogOut className="w-5 h-5" />
           <span>Logout</span>

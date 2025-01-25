@@ -37,10 +37,10 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { getAllClasses , getInstructor } from "../api/api";
+
 
 import DashboardComp from "../components/DashboardCom";
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const MetricCard = ({
   title,
@@ -142,260 +142,6 @@ const MetricCard = ({
   );
 };
 
-const DifficultyBadge = ({ level }) => {
-  const badges = {
-    Beginner:
-      "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-400 dark:border-green-800",
-    Intermediate:
-      "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-400 dark:border-yellow-800",
-    Advanced:
-      "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-400 dark:border-red-800",
-  };
-
-  return (
-    <span
-      className={`px-2 py-1 rounded-full text-xs font-medium ${badges[level]}`}
-    >
-      {level}
-    </span>
-  );
-};
-
-const ClassCard = ({ cls, onClick }) => (
-  <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl p-4 hover:shadow-lg transition-all duration-300 space-y-4">
-    <div className="flex justify-between items-start">
-      <div>
-        <h3 className="font-semibold text-lg text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-          {cls.name}
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-1">
-          <Users className="h-4 w-4" />
-          {cls.instructor}
-        </p>
-      </div>
-      <DifficultyBadge level={cls.difficulty} />
-    </div>
-
-    <div className="flex items-center justify-between text-sm">
-      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-        <Clock className="h-4 w-4" />
-        {cls.time}
-        <span className="text-gray-300 dark:text-gray-600">|</span>
-        <Timer className="h-4 w-4" />
-        {cls.duration}
-      </div>
-      <div className="flex items-center gap-2">
-        <span
-          className={`text-sm ${
-            cls.spotsAvailable < 6
-              ? "text-orange-500 dark:text-orange-400"
-              : "text-gray-600 dark:text-gray-300"
-          }`}
-        >
-          {cls.spotsAvailable} spots left
-        </span>
-        <button
-          onClick={onClick}
-          className="text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 p-2 rounded-full transition-colors"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-const ClassBookingModal = ({ isOpen, onClose, classDetails }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 z-50 flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 w-96 max-w-[90vw] max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            {classDetails.name}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <DifficultyBadge level={classDetails.difficulty} />
-            <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-              {classDetails.spotsAvailable} spots available
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-              <Users className="h-5 w-5" />
-              <div>
-                <p className="font-medium">Instructor</p>
-                <p className="text-sm">{classDetails.instructor}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-              <Clock className="h-5 w-5" />
-              <div>
-                <p className="font-medium">Time</p>
-                <p className="text-sm">
-                  {classDetails.time} ({classDetails.duration})
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
-              <Activity className="h-5 w-5" />
-              <div>
-                <p className="font-medium">Class Type</p>
-                <p className="text-sm">{classDetails.type} Yoga</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <button className="w-full bg-blue-600 dark:bg-blue-500 text-white py-3 rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-medium">
-              Book Class
-            </button>
-            <button className="w-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium">
-              Add to Waitlist
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const EnhancedUpcomingClasses = () => {
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [filter, setFilter] = useState("All");
-  const [view, setView] = useState("today");
-
-  const upcomingClasses = [
-    {
-      id: 1,
-      name: "Vinyasa Flow",
-      instructor: "Sarah Lee",
-      time: "7:00 AM",
-      duration: "60 min",
-      difficulty: "Intermediate",
-      spotsAvailable: 8,
-      type: "Vinyasa",
-      date: "2024-12-31",
-    },
-    {
-      id: 2,
-      name: "Power Yoga",
-      instructor: "Mike Chen",
-      time: "6:00 PM",
-      duration: "75 min",
-      difficulty: "Advanced",
-      spotsAvailable: 5,
-      type: "Power",
-      date: "2024-12-31",
-    },
-    {
-      id: 3,
-      name: "Restorative Yoga",
-      instructor: "Anna Roberts",
-      time: "8:00 PM",
-      duration: "45 min",
-      difficulty: "Beginner",
-      spotsAvailable: 12,
-      type: "Restorative",
-      date: "2024-12-31",
-    },
-    {
-      id: 4,
-      name: "Morning Flow",
-      instructor: "Sarah Lee",
-      time: "8:00 AM",
-      duration: "60 min",
-      difficulty: "Beginner",
-      spotsAvailable: 3,
-      type: "Vinyasa",
-      date: "2024-12-31",
-    },
-  ];
-
-  const filteredClasses = upcomingClasses.filter(
-    (cls) => filter === "All" || cls.type === filter
-  );
-
-  return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
-              Upcoming Classes
-            </h3>
-            <p className="text-gray-500 dark:text-gray-400">
-              Book your next yoga session
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="border dark:border-gray-700 rounded-xl px-4 py-2 text-sm bg-white dark:bg-gray-800 dark:text-white hover:border-blue-500 dark:hover:border-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-            >
-              <option value="All">All Types</option>
-              <option value="Vinyasa">Vinyasa</option>
-              <option value="Power">Power</option>
-              <option value="Restorative">Restorative</option>
-            </select>
-            <button className="bg-blue-600 dark:bg-blue-500 text-white p-2 rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
-              <Plus className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* View Toggle */}
-        <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
-          {["today", "week", "month"].map((v) => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
-                view === v
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              }`}
-            >
-              {v}
-            </button>
-          ))}
-        </div>
-
-        {/* Classes Grid */}
-        <div className="grid sm:grid-cols-2 gap-4">
-          {filteredClasses.map((cls) => (
-            <ClassCard
-              key={cls.id}
-              cls={cls}
-              onClick={() => setSelectedClass(cls)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <ClassBookingModal
-        isOpen={!!selectedClass}
-        onClose={() => setSelectedClass(null)}
-        classDetails={selectedClass || {}}
-      />
-    </div>
-  );
-};
 
 const user = localStorage.getItem("user");
 const parsedUserData = user ? JSON.parse(user) : null;
@@ -404,89 +150,21 @@ const userName = parsedUserData ? parsedUserData.firstName : "Guest";
 
 
 const EnhancedInstructors = () => {
+  const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
 
-  // Enhanced instructors data with certification types and colors
-  const instructors = [
-    {
-      id: 1,
-      name: "Sarah Lee",
-      specialty: "Vinyasa Flow",
-      rating: 4.8,
-      classesTeaching: 12,
-      image:
-        "https://plus.unsplash.com/premium_photo-1667030474693-6d0632f97029?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      bio: "Passionate Vinyasa instructor with 10 years of experience.",
-      certifications: [
-        {
-          name: "Yoga Alliance RYT-500",
-          type: "advanced",
-          icon: "Award",
-          color: "bg-purple-100 text-purple-800 border-purple-200",
-          description: "Advanced 500-hour certification",
-        },
-        {
-          name: "Meditation Specialist",
-          type: "specialist",
-          icon: "Book",
-          color: "bg-blue-100 text-blue-800 border-blue-200",
-          description: "Specialized meditation training",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Mike Chen",
-      specialty: "Power Yoga",
-      rating: 4.6,
-      classesTeaching: 8,
-      image:
-        "https://img.freepik.com/free-photo/portrait-adorable-domestic-cat_23-2149167145.jpg?semt=ais_hybrid",
-      bio: "Former athlete turned yoga instructor, focusing on strength and flexibility.",
-      certifications: [
-        {
-          name: "Yoga Alliance RYT-200",
-          type: "standard",
-          icon: "Shield",
-          color: "bg-green-100 text-green-800 border-green-200",
-          description: "Foundation 200-hour certification",
-        },
-        {
-          name: "Personal Training",
-          type: "specialist",
-          icon: "Award",
-          color: "bg-orange-100 text-orange-800 border-orange-200",
-          description: "Certified personal trainer",
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "Anna Roberts",
-      specialty: "Restorative Yoga",
-      rating: 4.9,
-      classesTeaching: 6,
-      image:
-        "https://img.freepik.com/free-photo/adorable-cat-lifestyle_23-2151593335.jpg?semt=ais_hybrid",
-      bio: "Dedicated to healing and mindfulness through gentle yoga practices.",
-      certifications: [
-        {
-          name: "Yoga Alliance RYT-300",
-          type: "intermediate",
-          icon: "Shield",
-          color: "bg-teal-100 text-teal-800 border-teal-200",
-          description: "Intermediate 300-hour certification",
-        },
-        {
-          name: "Therapeutic Yoga",
-          type: "specialist",
-          icon: "Book",
-          color: "bg-rose-100 text-rose-800 border-rose-200",
-          description: "Specialized therapeutic training",
-        },
-      ],
-    },
-  ];
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      try {
+        const instructorsData = await getInstructor();
+        setInstructors(instructorsData);
+      } catch (error) {
+        console.error("Failed to fetch instructors:", error);
+      }
+    };
+
+    fetchInstructors();
+  }, []);
 
   const getIcon = (iconName) => {
     switch (iconName) {
@@ -503,10 +181,10 @@ const EnhancedInstructors = () => {
 
   const CertificationBadge = ({ certification }) => (
     <div
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${certification.color} transition-all duration-300 hover:scale-105`}
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border bg-blue-100 text-blue-800 border-blue-200 transition-all duration-300 hover:scale-105`}
     >
-      {getIcon(certification.icon)}
-      <span className="text-sm font-medium">{certification.name}</span>
+      <Award className="w-4 h-4" />
+      <span className="text-sm font-medium">{certification}</span>
     </div>
   );
 
@@ -515,28 +193,24 @@ const EnhancedInstructors = () => {
       <div className="space-y-4">
         {instructors.map((instructor) => (
           <div
-            key={instructor.id}
+            key={instructor._id}
             className="flex flex-col space-y-3 border-b pb-3 group"
           >
             <div className="flex items-center space-x-4">
-              <img
-                src={instructor.image}
-                alt={instructor.name}
-                className="w-12 h-12 rounded-full dark:text-white object-cover"
-              />
+              <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <Users className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+              </div>
               <div className="flex-grow">
                 <p className="font-semibold group-hover:text-rose-600 dark:text-white transition">
-                  {instructor.name}
+                  {instructor.firstName} {instructor.lastName}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-500">
-                  {instructor.specialty}
+                  {instructor.specialties?.length > 0 
+                    ? instructor.specialties.join(", ") 
+                    : "Yoga Instructor"}
                 </p>
               </div>
               <div className="flex items-center space-x-1">
-                <Star className="h-4 w-4 text-yellow-400" />
-                <span className="text-sm dark:text-gray-400">
-                  {instructor.rating}
-                </span>
                 <button
                   onClick={() => setSelectedInstructor(instructor)}
                   className="ml-2 text-purple-500 hover:bg-purple-50 p-1 rounded-full transition-all ease-in-out"
@@ -546,7 +220,7 @@ const EnhancedInstructors = () => {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 ml-16">
-              {instructor.certifications.map((cert, index) => (
+              {instructor.certifications?.map((cert, index) => (
                 <CertificationBadge key={index} certification={cert} />
               ))}
             </div>
@@ -558,7 +232,7 @@ const EnhancedInstructors = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-8 w-96 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-300">
-                {selectedInstructor.name}
+                {selectedInstructor.firstName} {selectedInstructor.lastName}
               </h2>
               <button
                 onClick={() => setSelectedInstructor(null)}
@@ -568,13 +242,13 @@ const EnhancedInstructors = () => {
               </button>
             </div>
             <div className="text-center mb-6">
-              <img
-                src={selectedInstructor.image}
-                alt={selectedInstructor.name}
-                className="w-24 h-24 rounded-full mx-auto mb-4 dark:text-gray-200 object-cover"
-              />
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <Users className="w-12 h-12 text-gray-500 dark:text-gray-400" />
+              </div>
               <p className="text-gray-600 dark:text-white">
-                {selectedInstructor.specialty}
+                {selectedInstructor.specialties?.length > 0 
+                  ? selectedInstructor.specialties.join(", ") 
+                  : "Yoga Instructor"}
               </p>
             </div>
             <div className="space-y-4">
@@ -583,24 +257,23 @@ const EnhancedInstructors = () => {
                   Bio
                 </h3>
                 <p className="text-gray-600 dark:text-slate-300">
-                  {selectedInstructor.bio}
+                  {selectedInstructor.bio || "No bio available"}
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">
-                  Certifications & Achievements
+                  Certifications
                 </h3>
                 <div className="space-y-3">
-                  {selectedInstructor.certifications.map((cert, index) => (
+                  {selectedInstructor.certifications?.map((cert, index) => (
                     <div
                       key={index}
-                      className={`p-3 rounded-lg border ${cert.color}`}
+                      className="p-3 rounded-lg border bg-blue-50 dark:bg-blue-900/30"
                     >
                       <div className="flex items-center gap-2 mb-1">
-                        {getIcon(cert.icon)}
-                        <span className="font-medium">{cert.name}</span>
+                        <Award className="w-4 h-4 text-blue-500" />
+                        <span className="font-medium text-blue-300">{cert}</span>
                       </div>
-                      <p className="text-sm ml-6">{cert.description}</p>
                     </div>
                   ))}
                 </div>
@@ -671,48 +344,33 @@ const YogaDashboard = () => {
     totalSubscribers: 350,
   });
 
-  const [classTrends, setClassTrends] = useState([
-    { month: "Jan", classes: 30 },
-    { month: "Feb", classes: 45 },
-    { month: "Mar", classes: 55 },
-    { month: "Apr", classes: 70 },
-    { month: "May", classes: 85 },
-    { month: "Jun", classes: 95 },
-  ]);
+  useEffect(() => {
+    const fetchClassMetrics = async () => {
+      try {
+        const classesData = await getAllClasses();
+        
+        const classes = Array.isArray(classesData) ? classesData : (classesData.data ? classesData.data : [classesData]);
+        
+        const totalClasses = classes.length;
+        const activeClasses = classes.filter(cls => cls.status === 'Active').length;
+        const completedClasses = classes.filter(cls => cls.status === 'Completed').length;
+        const upcomingClasses = classes.filter(cls => cls.status === 'Upcoming').length;
+        
+        setUserMetrics({
+          totalClasses,
+          activeClasses,
+          completedClasses,
+          upcomingClasses,
+          averageAttendance: 82,
+          totalSubscribers: classes.reduce((sum, cls) => sum + (cls.capacity || 0), 0)
+        });
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+      }
+    };
 
-  const [styleDistribution, setStyleDistribution] = useState([
-    { name: "Vinyasa", value: 40 },
-    { name: "Hatha", value: 25 },
-    { name: "Power Yoga", value: 20 },
-    { name: "Restorative", value: 15 },
-  ]);
-
-  const [timeDistribution, setTimeDistribution] = useState([
-    { time: "Morning", classes: 45 },
-    { time: "Afternoon", classes: 25 },
-    { time: "Evening", classes: 50 },
-  ]);
-
-  const [recentAchievements, setRecentAchievements] = useState([
-    {
-      id: 1,
-      title: "30-Day Yoga Challenge",
-      description: "Completed consecutive daily yoga practice",
-      icon: <Zap className="h-5 w-5 text-yellow-500" />,
-    },
-    {
-      id: 2,
-      title: "Mind-Body Connection",
-      description: "Achieved 50 hours of mindful practice",
-      icon: <Heart className="h-5 w-5 text-red-500" />,
-    },
-    {
-      id: 3,
-      title: "Advanced Flexibility",
-      description: "Mastered advanced pose sequence",
-      icon: <Star className="h-5 w-5 text-blue-500" />,
-    },
-  ]);
+    fetchClassMetrics();
+  }, []);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen p-3">
@@ -730,7 +388,7 @@ const YogaDashboard = () => {
           icon={HomeIcon}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
           <MetricCard
             title="Total Classes"
             value={userMetrics.totalClasses}
@@ -748,17 +406,6 @@ const YogaDashboard = () => {
             iconBackground="bg-green-100"
           />
           <MetricCard
-            title="Subscribers"
-            value={userMetrics.totalSubscribers}
-            icon={<Users className="h-6 w-6 text-purple-500" />}
-            change="-12.5% this month"
-            backgroundColor="bg-white"
-            iconBackground="bg-purple-100"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <MetricCard
             title="Completed Classes"
             value={userMetrics.completedClasses}
             icon={<Award className="h-6 w-6 text-orange-500" />}
@@ -766,6 +413,9 @@ const YogaDashboard = () => {
             backgroundColor="bg-white"
             iconBackground="bg-orange-100"
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <MetricCard
             title="Upcoming Classes"
             value={userMetrics.upcomingClasses}
@@ -774,17 +424,9 @@ const YogaDashboard = () => {
             backgroundColor="bg-white"
             iconBackground="bg-teal-100"
           />
-          <MetricCard
-            title="Avg. Attendance"
-            value={`${userMetrics.averageAttendance}%`}
-            icon={<Clock className="h-6 w-6 text-red-500" />}
-            change="+4.1% from last month"
-            backgroundColor="bg-white"
-            iconBackground="bg-red-100"
-          />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <div className="bg-white shadow-md rounded-xl dark:bg-gray-800 p-6">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mb-4">
               Class Participation Trends
@@ -875,13 +517,13 @@ const YogaDashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> */}
 
-        <div className="bg-white shadow-md rounded-xl p-2 dark:bg-gray-800 mt-8">
+        {/* <div className="bg-white shadow-md rounded-xl p-2 dark:bg-gray-800 mt-8">
           <EnhancedUpcomingClasses />
-        </div>
+        </div> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-8">
           <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
@@ -892,7 +534,6 @@ const YogaDashboard = () => {
             <EnhancedInstructors />
           </div>
 
-          {/* Member Progress Section */}
           <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
@@ -903,8 +544,7 @@ const YogaDashboard = () => {
             <EnhancedMemberProgress />
           </div>
 
-          {/* Recent Achievements Section */}
-          <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
+          {/* <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                 Recent Achievements
@@ -929,8 +569,10 @@ const YogaDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
+
         </div>
+
       </div>
     </div>
   );

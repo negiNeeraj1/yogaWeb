@@ -72,9 +72,12 @@ const PaymentButton = ({
             if (verificationResult.success) {
               // Fetch updated enrolled classes
               const enrolledClassesResult = await EnrolledClasses(userId);
-              console.log(enrolledClassesResult);
               // Pass the updated data to parent component
-              onSuccess(enrolledClassesResult.data);
+              if (enrolledClassesResult && enrolledClassesResult.data) {
+                onSuccess(enrolledClassesResult.data);
+              } else {
+                throw new Error("Failed to fetch enrolled classes after payment");
+              }
             } else {
               throw new Error(
                 verificationResult.message || "Payment verification failed"

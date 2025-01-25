@@ -75,7 +75,7 @@ const YogaHeader = ({ selectedLevel, setSelectedLevel }) => {
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative bg-gradient-to-br from-blue-100 to-blue-200 dark:from-gray-800 dark:to-gray-900 rounded-3xl mt-2 "
+        className="relative bg-gradient-to-br from-blue-100 to-blue-200 dark:from-gray-800 dark:to-gray-900 rounded-3xl mt-2 pb-16"
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -89,7 +89,7 @@ const YogaHeader = ({ selectedLevel, setSelectedLevel }) => {
           transition={{ duration: 1 }}
           className="absolute bottom-0 left-0 w-1/3 h-full bg-gradient-to-r from-purple-50 dark:from-purple-900/10 to-transparent"
         ></motion.div>
-        <div className="max-w-7xl mx-auto px-4 py-5 pb-16 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 py-5 relative z-10">
           {/* Header Content */}
           <div className="text-center max-w-3xl mx-auto">
             <motion.div
@@ -146,12 +146,8 @@ const YogaHeader = ({ selectedLevel, setSelectedLevel }) => {
           </motion.div>
         </div>
 
-        {/* Filter Buttons - Positioned at bottom edge */}
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="absolute bottom-0 left-0 right-0 flex justify-center transform translate-y-1/2"
-        >
+        {/* Filter Buttons - Centered at bottom */}
+        <div className="absolute left-0 right-0 flex justify-center mt-9">
           <div className="inline-flex p-1.5 bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-gray-900/30">
             {["all", "beginner", "intermediate", "advanced"].map((level) => (
               <motion.button
@@ -169,7 +165,7 @@ const YogaHeader = ({ selectedLevel, setSelectedLevel }) => {
               </motion.button>
             ))}
           </div>
-        </motion.div>
+        </div>
       </motion.header>
 
       {/* Decorative Elements */}

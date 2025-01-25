@@ -130,7 +130,7 @@ const ClassCard = ({
         </div>
 
         {/* Capacity and Enrollment */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Class Capacity
@@ -151,7 +151,7 @@ const ClassCard = ({
               }}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Enrollment Button */}
         {parsedUser && (
@@ -182,9 +182,15 @@ const ClassesPage = () => {
   const navigate = useNavigate();
 
   const handlePaymentSuccess = (updatedEnrolledClasses) => {
-    console.log("Payment Successful");
-    setEnrolledClasses(updatedEnrolledClasses);
-    alert("Payment successful! You are now enrolled in the class.");
+    console.log("Payment Successful", updatedEnrolledClasses);
+    
+    if (updatedEnrolledClasses && updatedEnrolledClasses.length > 0) {
+      setEnrolledClasses(updatedEnrolledClasses);
+      alert("Payment successful! You are now enrolled in the class.");
+    } else {
+      console.error("Payment success, but no classes enrolled");
+      alert("Payment processed, but class enrollment failed. Please contact support.");
+    }
   };
 
   const handlePaymentFailure = (response) => {
@@ -194,8 +200,7 @@ const ClassesPage = () => {
 
   const retrieveClasses = async () => {
     try {
-      const response = await GetClasses();
-      // console.log(response);
+      const response = await GetClasses(); 
       setAvailableClasses(response.data);
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -211,11 +216,17 @@ const ClassesPage = () => {
       if (parsedUserData) {
         setParsedUser(parsedUserData);
         const response = await EnrolledClasses(parsedUserData.id);
-        console.log(response)
-        setEnrolledClasses(response.data || []);
+        
+        if (response && response.data) {
+          setEnrolledClasses(response.data);
+        } else {
+          console.error("No enrolled classes data received", response);
+          setEnrolledClasses([]);
+        }
       }
     } catch (error) {
       console.error("Error fetching enrolled classes:", error);
+      setEnrolledClasses([]); 
     }
   };
 

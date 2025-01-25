@@ -152,10 +152,10 @@ const classAttendanceSchema = new mongoose.Schema(
             type: [String],
             default: []
         },
-        status: {
+        enrollmentStatus: {
             type: String,
-            enum: ['Present', 'Absent', 'Late', 'Excused', 'Registered'],
-            default: 'Present'
+            enum: ['Registered', 'Enrolled', 'Dropped'],
+            default: 'Registered'
         },
         totalSessions: {
             type: Number,

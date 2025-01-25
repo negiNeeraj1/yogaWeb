@@ -7,6 +7,7 @@ import helmet from "helmet";
 import connectDB from "./config/connectDB.js";
 import indexRouter from "./routes/route.js";
 import session from "express-session";
+import MongoStore from 'connect-mongo';
 
 dotenv.config();
 
@@ -42,6 +43,10 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'yourSecretKey',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions'
+    }),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,

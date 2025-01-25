@@ -36,6 +36,7 @@ export const submitForm = async (req, res) => {
 export const getContactForm = async (req, res) => {
     try {
         const submissions = await ContactForm.find().sort({ createdAt: -1 });
+        console.log(submissions);
 
         res.status(200).json(submissions);
     } catch (error) {

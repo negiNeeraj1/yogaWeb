@@ -34,7 +34,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import DarkModeClasses from "../../Components/DarkMode";
 import { BlurText } from "../../Components/Themes/BlurText";
-import { EnrolledClasses } from "../../api/api";
+import { EnrolledClasses, dailyAchievment } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 const MainDashboard = () => {
@@ -43,11 +43,75 @@ const MainDashboard = () => {
   const [enrolledClasses, setEnrolledClasses] = useState([]);
   const [parsedUser, setParsedUser] = useState(null);
   const [selectedAchievement, setSelectedAchievement] = useState(null);
-  const [dailyStreak, setDailyStreak] = useState(12);
+  const [dailyStreak, setDailyStreak] = useState(0);
+  const [achievements, setAchievements] = useState([]);
   const [animatedQuote, setAnimatedQuote] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [totalAttendedSessions, setTotalAttendedSessions] = useState(0);
 
   const navigate = useNavigate();
+
+  const getUserFromLocalStorage = () => {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userData = JSON.parse(userStr);
+        setParsedUser(userData);
+        return userData;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error parsing user data from localStorage:", error);
+      return null;
+    }
+  };
+
+  const fetchDailyAchievements = async () => {
+    try {
+      const userData = getUserFromLocalStorage();
+
+      if (!userData || !userData.id) {
+        console.error("No user ID found in localStorage");
+        return;
+      }
+
+      const response = await dailyAchievment(userData.id);
+
+      if (response.success) {
+        setDailyStreak(response.currentStreak);
+        setTotalAttendedSessions(response.totalAttendedSessions);
+
+        const formattedAchievements = response.achievements.map(
+          (achievement, index) => ({
+            id: index + 1,
+            icon: getAchievementIcon(achievement),
+            title: achievement,
+            description: `${response.totalAttendedSessions} Sessions Completed | ${response.currentStreak} Day Streak`,
+            progress: calculateConsistencyProgress(
+              response.totalAttendedSessions,
+              response.currentStreak
+            ),
+            level: calculateLevel(response.totalAttendedSessions),
+            nextMilestone: getNextConsistencyMilestone(
+              response.totalAttendedSessions
+            ),
+            xpReward: calculateXPReward(response.totalAttendedSessions),
+            secretReward: getConsistencyReward(response.totalAttendedSessions),
+            difficultyColor: "bg-orange-100 text-orange-600",
+            stats: {
+              sessions: response.totalAttendedSessions,
+              streak: response.currentStreak,
+            },
+          })
+        );
+
+        setAchievements(formattedAchievements);
+
+      }
+    } catch (error) {
+      console.error("Error fetching daily achievements:", error);
+    }
+  };
 
   const retrieveEnrolledClasses = async () => {
     try {
@@ -61,12 +125,59 @@ const MainDashboard = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching enrolled classes:", error);
+      // console.error("Error fetching enrolled classes:", error);
     }
   };
   useEffect(() => {
     retrieveEnrolledClasses();
+    fetchDailyAchievements();
   }, []);
+
+  const getAchievementIcon = (achievement) => {
+    if (achievement.includes("Consistency"))
+      return <Flame className="text-orange-500" />;
+    if (achievement.includes("Sessions"))
+      return <Trophy className="text-green-500" />;
+    return <Star className="text-yellow-500" />;
+  };
+
+  const calculateConsistencyProgress = (sessions, streak) => {
+    const sessionWeight = 0.6;
+    const streakWeight = 0.4;
+
+    const sessionProgress = Math.min((sessions / 10) * 100, 100);
+    const streakProgress = Math.min((streak / 7) * 100, 100);
+
+    return Math.round(
+      sessionProgress * sessionWeight + streakProgress * streakWeight
+    );
+  };
+
+  const getNextConsistencyMilestone = (sessions) => {
+    const nextSessionGoal = Math.ceil(sessions / 5) * 5;
+    return `Complete ${nextSessionGoal} Sessions`;
+  };
+
+  const calculateXPReward = (sessions) => {
+    return 100 + sessions * 20;
+  };
+  const calculateLevel = (sessions) => {
+    return Math.floor(sessions / 5) + 1;
+  };
+
+  const getConsistencyReward = (sessions) => {
+    const rewards = [
+      { threshold: 5, reward: "Basic Achievement Badge" },
+      { threshold: 10, reward: "Bronze Consistency Medal" },
+      { threshold: 15, reward: "Silver Dedication Trophy" },
+      { threshold: 20, reward: "Gold Master Certificate" },
+    ];
+
+    const nextReward =
+      rewards.find((r) => r.threshold > sessions) ||
+      rewards[rewards.length - 1];
+    return `Next: ${nextReward.reward}`;
+  };
 
   const handleClassClick = (classId) => {
     navigate(`/yogadashboard/yoga-class/${classId}`);
@@ -74,6 +185,7 @@ const MainDashboard = () => {
 
   const ClassCard = ({ enrolledClass }) => {
     const { yogaClass } = enrolledClass;
+    
 
     const handleClassClick = (e) => {
       e.preventDefault();
@@ -110,9 +222,9 @@ const MainDashboard = () => {
             <p className={DarkModeClasses.text.accent}>
               {yogaClass.startTime} | {yogaClass.endTime}
             </p>
-            <p className={`mt-2 ${DarkModeClasses.text.secondary}`}>
+            {/* <p className={`mt-2 ${DarkModeClasses.text.secondary}`}>
               Status: {enrolledClass.status}
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -125,45 +237,6 @@ const MainDashboard = () => {
     { month: "Mar", progress: 85, xp: 450, color: "#45B7D1" },
     { month: "Apr", progress: 90, xp: 500, color: "#FDCB6E" },
     { month: "May", progress: 95, xp: 550, color: "#6C5CE7" },
-  ];
-
-  const achievements = [
-    {
-      id: 1,
-      icon: <Flame className="text-orange-500" />,
-      title: "Consistency Champion",
-      description: "10-Day Unbreakable Streak",
-      progress: 75,
-      level: 2,
-      nextMilestone: "15-Day Master Streak",
-      xpReward: 200,
-      secretReward: "Exclusive Meditation Playlist",
-      difficultyColor: "bg-orange-100 text-orange-600",
-    },
-    {
-      id: 2,
-      icon: <Trophy className="text-green-500" />,
-      title: "Flexibility Wizard",
-      description: "Mastered Advanced Flexibility",
-      progress: 60,
-      level: 3,
-      nextMilestone: "Ultimate Flexibility Challenge",
-      xpReward: 350,
-      secretReward: "VIP Coaching Session",
-      difficultyColor: "bg-green-100 text-green-600",
-    },
-    {
-      id: 3,
-      icon: <Star className="text-yellow-500" />,
-      title: "Zen Master",
-      description: "5 Deep Meditation Sessions",
-      progress: 90,
-      level: 4,
-      nextMilestone: "Inner Peace Mastery",
-      xpReward: 500,
-      secretReward: "Wellness Retreat Access",
-      difficultyColor: "bg-yellow-100 text-yellow-600",
-    },
   ];
 
   const motivationalQuotes = [
@@ -199,16 +272,6 @@ const MainDashboard = () => {
   useEffect(() => {
     generateMotivationalQuote();
   }, []);
-
-  // useEffect(() => {
-  //   const calculateLevel = (xp) => {
-  //     // Simple XP to level calculation
-  //     return Math.floor(Math.sqrt(xp / 100)) + 1;
-  //   };
-
-  //   const currentLevel = calculateLevel(totalXP);
-  //   setUserLevel(currentLevel);
-  // }, [totalXP]);
 
   return (
     <div
@@ -287,69 +350,84 @@ const MainDashboard = () => {
           <Trophy className="mr-3 text-purple-600 dark:text-purple-400" />
           Your Achievement Journey
         </h3>
-        <div className="grid md:grid-cols-3 gap-6">
-          {achievements.map((achievement, index) => (
-            <div
-              key={achievement.id}
-              className={`${
-                DarkModeClasses.gradients.card[
-                  index % 4 === 0
-                    ? "purple"
-                    : index % 4 === 1
-                    ? "blue"
-                    : index % 4 === 2
-                    ? "green"
-                    : "orange"
-                ]
-              } p-6 rounded-3xl relative overflow-hidden`}
-            >
+        {achievements.length > 0 ? (
+          <div className="grid md:grid-cols-3 gap-6">
+            {achievements.map((achievement, index) => (
               <div
-                className={`absolute top-2 right-2 ${DarkModeClasses.gradients.primary.text} px-2 py-1 rounded-full text-xs font-bold`}
-              >
-                Level {achievement.level}
-              </div>
-              <div className="flex items-center mb-4">
-                {achievement.icon}
-                <div className="ml-4">
-                  <h4 className={`font-bold ${DarkModeClasses.text.primary}`}>
-                    {achievement.title}
-                  </h4>
-                  <p className={DarkModeClasses.text.accent}>
-                    {achievement.description}
-                  </p>
-                </div>
-              </div>
-              <div
-                className={`w-full ${DarkModeClasses.background.tertiary} rounded-full h-2.5 mt-2`}
+                key={achievement.id}
+                className={`${
+                  DarkModeClasses.gradients.card[
+                    index % 4 === 0
+                      ? "purple"
+                      : index % 4 === 1
+                      ? "blue"
+                      : index % 4 === 2
+                      ? "green"
+                      : "orange"
+                  ]
+                } p-6 rounded-3xl relative overflow-hidden`}
               >
                 <div
-                  className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${achievement.progress}%` }}
-                ></div>
-              </div>
-              <div className="mt-4 flex justify-between items-center">
-                <div className="flex items-center">
-                  <Rocket
-                    className={`w-5 h-5 mr-2 ${DarkModeClasses.accent.primary}`}
-                  />
-                  <span className={DarkModeClasses.text.secondary}>
-                    XP: {achievement.xpReward}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setSelectedAchievement(achievement)}
-                  className={`${DarkModeClasses.button.outline} p-2 rounded-full ${DarkModeClasses.hover.button}`}
+                  className={`absolute top-2 right-2 ${DarkModeClasses.gradients.primary.text} px-2 py-1 rounded-full text-xs font-bold`}
                 >
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+                  Level {achievement.level}
+                </div>
+                <div className="flex items-center mb-4">
+                  {achievement.icon}
+                  <div className="ml-4">
+                    <h4 className={`font-bold ${DarkModeClasses.text.primary}`}>
+                      {achievement.title}
+                    </h4>
+                    <p className={DarkModeClasses.text.accent}>
+                      {achievement.description}
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className={`w-full ${DarkModeClasses.background.tertiary} rounded-full h-2.5 mt-2`}
+                >
+                  <div
+                    className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${achievement.progress}%` }}
+                  ></div>
+                </div>
+                <div className="mt-4 flex justify-between items-center">
+                  <div className="flex items-center">
+                    <Rocket
+                      className={`w-5 h-5 mr-2 ${DarkModeClasses.accent.primary}`}
+                    />
+                    <span className={DarkModeClasses.text.secondary}>
+                      XP: {achievement.xpReward}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedAchievement(achievement)}
+                    className={`${DarkModeClasses.button.outline} p-2 rounded-full ${DarkModeClasses.hover.button}`}
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <div className="flex justify-center mb-4">
+              <Trophy className="w-16 h-16 text-gray-300 dark:text-gray-600" />
             </div>
-          ))}
-        </div>
+            <p className={`text-xl ${DarkModeClasses.text.secondary}`}>
+              No achievements earned yet. Keep practicing to unlock your first
+              achievement!
+            </p>
+            <p className={`mt-2 ${DarkModeClasses.text.accent}`}>
+              Attend more classes and maintain a consistent streak to progress.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Progress Chart Section */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl relative">
+      {/* <div className="bg-white dark:bg-gray-800 p-6 rounded-xl relative">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-xl opacity-10" />
 
         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
@@ -394,7 +472,7 @@ const MainDashboard = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </div> */}
 
       {/* Modal */}
       {selectedAchievement && (

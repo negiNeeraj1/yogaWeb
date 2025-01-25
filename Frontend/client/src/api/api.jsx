@@ -9,7 +9,8 @@ export const SignUpUser = async (userData) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -20,7 +21,32 @@ export const LoginUser = async (userData) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
+  }
+};
+
+export const UpdateUser = async (id , userData) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/user/update/${id}`, userData, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
+  }
+};
+
+export const ChangePassword = async ( passwordData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/user/change-password`, passwordData, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -31,7 +57,8 @@ export const GetClasses = async () => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -42,7 +69,8 @@ export const GetClassById = async (id) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -56,7 +84,25 @@ export const EnrolledClasses = async (userId) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
+  }
+};
+
+export const dailyAchievment = async (userId) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/daily-achievement/`,
+      {userId}
+      ,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -71,7 +117,8 @@ export const CreatePayment = async (paymentData) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -82,7 +129,8 @@ export const GetPaymentsByUser = async (userId) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -97,7 +145,8 @@ export const VerifyPayment = async (paymentData) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -113,7 +162,8 @@ export const markAttendance = async (data) => {
     return response.data;
   } catch (error) {
     console.error("Attendance mark error:", error);
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -124,7 +174,8 @@ export const getClassAttendanceStats = async (data) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -135,7 +186,8 @@ export const subscriptionPayment = async (data) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 export const verifySubscriptionPayment = async (data) => {
@@ -149,7 +201,8 @@ export const verifySubscriptionPayment = async (data) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -160,7 +213,8 @@ export const getPlans = async () => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 };
 
@@ -171,6 +225,7 @@ export const sendForm = async (data) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
+    // throw error.response ? error.response.data : new Error("Network Error");
+    console.log("Request Failed");
   }
 } 

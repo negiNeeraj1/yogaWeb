@@ -1,4 +1,6 @@
 import User from "../models/user.Model.js";
+import bcrypt from "bcrypt";
+
 
 export const register = async (req, res, next) => {
     try {
@@ -132,18 +134,42 @@ export const getProfile = async (req, res) => {
     }
 };
 
+export const getAllUser = async (req,res) => {
+    try {
+        const user = await User.find().select('-password')
+        
+        if(user.length === 0){
+            return res.status(404).json({
+                success : false,
+                message : "user not found"
+            })
+        }
+        
+        res.json({
+            success: true,
+            user
+        });
+        
+    } catch (error) {
+        console.log("Profile fetch error : " , error);
+        res.status(500).json({
+            success : false,
+            message:"Error fetching profile",
+            error : error.message
+        });
+    }
+};
+
 
 export const updateProfile = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userId = req.params.id;
         const updateData = req.body;
-
 
         const protectedFields = ['_id', 'email', 'password', 'role', 'joinedDate'];
         protectedFields.forEach(field => {
             delete updateData[field];
         });
-
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -176,42 +202,81 @@ export const updateProfile = async (req, res) => {
     }
 };
 
+// export const changePassword = async (req, res) => {
+//     try {
+//         const { currentPassword, newPassword, userId } = req.body;
+
+//         if (!userId) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "User ID is required"
+//             });
+//         }
+
+//         const user = await User.findById(userId);
+
+//         if (!user) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: "User not found"
+//             });
+//         }
+
+//         const isMatch = await user.comparePassword(currentPassword);
+//         if (!isMatch) {
+//             return res.status(401).json({
+//                 success: false,
+//                 message: "Current password is incorrect"
+//             });
+//         }
+
+//         if (newPassword.length < 6) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "New password must be at least 6 characters long"
+//             });
+//         }
+
+//         await User.findByIdAndUpdate(userId, { password: newPassword }, { 
+//             runValidators: false 
+//         });   
+
+//         res.json({
+//             success: true,
+//             message: "Password changed successfully"
+//         });
+//     } catch (error) {
+//         console.error('Password change error:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Error changing password",
+//             error: error.message
+//         });
+//     }
+// };
+
 export const changePassword = async (req, res) => {
     try {
-        const { currentPassword, newPassword } = req.body;
-        const user = await User.findById(req.user._id);
-
+        const { userId, currentPassword, newPassword } = req.body;
+        
+        const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
-
-        const isMatch = await user.comparePassword(currentPassword);
+        // Direct password comparison
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(401).json({
-                success: false,
-                message: "Current password is incorrect"
-            });
+            return res.status(401).json({ success: false, message: "Current password incorrect" });
         }
 
-
+        // Update password directly
         user.password = newPassword;
-        await user.save();
+        await user.save({ validateBeforeSave: false });
 
-        res.json({
-            success: true,
-            message: "Password changed successfully"
-        });
+        res.json({ success: true, message: "Password changed successfully" });
     } catch (error) {
-        console.error('Password change error:', error);
-        res.status(500).json({
-            success: false,
-            message: "Error changing password",
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -351,7 +416,7 @@ export const trackUserSession = async (req, res) => {
     try {
         const { userId, loginTime, logoutTime, ipAddress } = req.body;
 
-        const duration = Math.round((new Date(logoutTime) - new Date(loginTime)) / 60000); // Duration in minutes
+        const duration = Math.round((new Date(logoutTime) - new Date(loginTime)) / 60000); 
 
         await User.findByIdAndUpdate(userId, {
             $push: {
@@ -374,12 +439,12 @@ export const trackUserSession = async (req, res) => {
 };
 
 
-// Modify existing login controller
+
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Input validation
+        
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -387,10 +452,10 @@ export const login = async (req, res) => {
             });
         }
 
-        // Find user and select necessary fields
+        
         const existingUser = await User.findOne({ email }).select('+password');
 
-        // Check if user exists
+        
         if (!existingUser) {
             console.log("User not found:", email);
             return res.status(404).json({
@@ -399,10 +464,10 @@ export const login = async (req, res) => {
             });
         }
 
-        // Compare passwords
+        
         const isMatch = await existingUser.comparePassword(password);
 
-        // Check if password matches
+        
         if (!isMatch) {
             console.log("Password mismatch for:", email);
             return res.status(401).json({
@@ -411,13 +476,13 @@ export const login = async (req, res) => {
             });
         }
 
-        // Create login entry
+        
         const loginEntry = {
             timestamp: new Date(),
             ipAddress: req.ip || req.connection.remoteAddress
         };
 
-        // Update user login stats
+        
         const updatedUser = await User.findByIdAndUpdate(
             existingUser._id,
             {
@@ -429,7 +494,7 @@ export const login = async (req, res) => {
                 $push: {
                     loginHistory: {
                         $each: [loginEntry],
-                        $slice: -10  // Keep only last 10 login entries
+                        $slice: -10  
                     }
                 },
                 $inc: { loginCount: 1 }
@@ -440,11 +505,11 @@ export const login = async (req, res) => {
             }
         );
 
-        // Set session data
+        
         req.session.userId = existingUser._id;
         req.session.userRole = existingUser.role;
 
-        // Prepare user response (excluding sensitive data)
+        
         const userResponse = {
             id: existingUser._id,
             firstName: existingUser.firstName,
@@ -454,7 +519,7 @@ export const login = async (req, res) => {
             accountStatus: updatedUser.accountStatus
         };
 
-        // Send successful response
+        
         return res.status(200).json({
             success: true,
             message: "Login successful",
@@ -471,12 +536,12 @@ export const login = async (req, res) => {
     }
 };
 
-// New method to track session duration
+
 export const trackSessionDuration = async (req, res) => {
     try {
         const { userId, loginTime, logoutTime } = req.body;
 
-        const duration = Math.round((new Date(logoutTime) - new Date(loginTime)) / 60000); // duration in minutes
+        const duration = Math.round((new Date(logoutTime) - new Date(loginTime)) / 60000); 
 
         await User.findByIdAndUpdate(userId, {
             $push: {
@@ -493,29 +558,6 @@ export const trackSessionDuration = async (req, res) => {
         console.error('Session tracking error:', error);
         res.status(500).json({
             message: 'Error tracking session',
-            error: error.message
-        });
-    }
-};
-
-// Method to manage subscriptions
-export const manageSubscription = async (req, res) => {
-    try {
-        const { userId, subscribe } = req.body;
-
-        const user = await User.findByIdAndUpdate(userId, {
-            isSubscriber: subscribe,
-            subscriptionDate: subscribe ? new Date() : null
-        }, { new: true });
-
-        res.json({
-            message: `Subscription ${subscribe ? 'activated' : 'deactivated'}`,
-            isSubscriber: user.isSubscriber
-        });
-    } catch (error) {
-        console.error('Subscription management error:', error);
-        res.status(500).json({
-            message: 'Error managing subscription',
             error: error.message
         });
     }

@@ -165,7 +165,34 @@ export const getAdminDashboardAnalytics = async (req, res) => {
 export const getAdminProfile = async (req, res) => {
     try {
 
-        const userId = req.params.id;
+        const user = await Admin.find().select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching profile",
+            error: error.message
+        });
+    }
+};
+
+export const getAdminProfileById = async (req, res) => {
+    try {
+
+        const {userId} = req.params;
+
         const user = await Admin.findById(userId).select('-password');
 
         if (!user) {
@@ -184,6 +211,57 @@ export const getAdminProfile = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Error fetching profile",
+            error: error.message
+        });
+    }
+};
+
+export const updateAdminProfile = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const updateData = req.body;
+
+        const validFields = ['Fname', 'Lname', 'email', 'phone_Number', 'userPhoto', 'role'];
+
+       
+        for (const field in updateData) {
+            if (!validFields.includes(field)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid field: ${field}`
+                });
+            }
+        }
+       
+        const protectedFields = ['_id', 'email', 'password', 'role', 'joinedDate'];
+        protectedFields.forEach(field => {
+            delete updateData[field];
+        });
+
+       
+        const user = await Admin.findByIdAndUpdate(userId, updateData, {
+            new: true,
+            runValidators: true
+        }).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                status: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            user: user
+        });
+
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error updating profile",
             error: error.message
         });
     }

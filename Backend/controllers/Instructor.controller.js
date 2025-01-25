@@ -60,24 +60,35 @@ const uploadToCloudinary = async (file, folder) => {
 
 export const createInstructor = async (req, res) => {
     try {
-        // const instructorData = { ...req.body };
-        const instructorData = req.body;
+        const instructorData = { ...req.body };
 
-        // if (req.files && req.files.main_photo) {
-        //     const mainPhotoUrl = await uploadToCloudinary(
-        //         req.files.main_photo[0],
-        //         'main_photos'
-        //     );
-        //     instructorData.main_photo = mainPhotoUrl;
-        // }
+        if (req.files && req.files.main_photo) {
+            const mainPhoto = req.files.main_photo[0];
+            const mainPhotoResult = await cloudinary.uploader.upload(mainPhoto.path, {
+                folder: 'instructors/main_photos',
+                allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+                transformation: [
+                    { width: 1000, height: 750, crop: 'fill' },
+                    { quality: 'auto' }
+                ],
+                public_id: `instructor-main-${Date.now()}`
+            });
+            instructorData.main_photo = mainPhotoResult.secure_url;
+        }
 
-        // if (req.files && req.files.cover_photo) {
-        //     const coverPhotoUrl = await uploadToCloudinary(
-        //         req.files.cover_photo[0],
-        //         'cover_photos'
-        //     );
-        //     instructorData.cover_photo = coverPhotoUrl;
-        // }
+        if (req.files && req.files.cover_photo) {
+            const coverPhoto = req.files.cover_photo[0];
+            const coverPhotoResult = await cloudinary.uploader.upload(coverPhoto.path, {
+                folder: 'instructors/cover_photos',
+                allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+                transformation: [
+                    { width: 1000, height: 750, crop: 'fill' },
+                    { quality: 'auto' }
+                ],
+                public_id: `instructor-cover-${Date.now()}`
+            });
+            instructorData.cover_photo = coverPhotoResult.secure_url;
+        }
 
         const instructor = new Instructor(instructorData);
         const newInstructor = await instructor.save();
@@ -162,15 +173,21 @@ export const updateInstructor = async (req, res) => {
 
 export const deleteInstructor = async (req, res) => {
     try {
-        const deletedInstructor = await Instructor.findByIdAndDelete(req.params.id);
-        if (!deletedInstructor) {
-            return res.status(404).json({ message: 'Instructor not found' });
-        }
-        res.status(200).json({ message: 'Instructor deleted' });
+      const instructorId = req.params.id;
+      
+      const deletedInstructor = await Instructor.findByIdAndDelete(instructorId);
+  
+      if (!deletedInstructor) {
+        return res.status(404).json({ message: 'Instructor not found' });
+      }
+  
+      res.status(200).json({ message: 'Instructor successfully deleted' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+      console.error('Error deleting instructor:', error);  // Log the error for debugging
+      res.status(500).json({ message: 'Server error, please try again later' });
     }
-};
+  };
+  
 
 
 export const createAssistant = async (req, res) => {

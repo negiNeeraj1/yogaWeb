@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Edit,
@@ -11,7 +11,12 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import { createInstructor } from "../api/api";
+import {
+  createInstructor,
+  getInstructor,
+  getInstructorById,
+  deleteInstructor,
+} from "../api/api";
 import axios from "axios";
 import ComingSoonPage from "../components/ComingSoonPage";
 
@@ -38,12 +43,13 @@ const InstructorManagementModals = ({
       },
     });
   };
+
   const handleArrayInput = (e, field) => {
     const value = e.target.value.split(",").map((item) => item.trim());
     handleInputChange({
       target: {
         name: field,
-        value,
+        value: value,
       },
     });
   };
@@ -289,29 +295,30 @@ const InstructorManagementModals = ({
       {/* Modal Backdrop */}
       <div className="fixed inset-0 bg-black bg-opacity-50 z-40" />
 
-      {/* Add/Edit Modal */}
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {showAddModal ? "Add New Instructor" : "Edit Instructor"}
-            </h2>
-            <button
-              onClick={() => {
-                if (showAddModal) setShowAddModal(false);
-                if (showEditModal) setShowEditModal(false);
-              }}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            >
-              <X size={24} />
-            </button>
+      {(showAddModal || showEditModal) && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {showAddModal ? "Add New Instructor" : "Edit Instructor"}
+              </h2>
+              <button
+                onClick={() => {
+                  if (showAddModal) setShowAddModal(false);
+                  if (showEditModal) setShowEditModal(false);
+                }}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            {renderForm(
+              showAddModal ? handleAddInstructor : handleEditInstructor,
+              showAddModal ? "Add Instructor" : "Save Changes"
+            )}
           </div>
-          {renderForm(
-            showAddModal ? handleAddInstructor : handleEditInstructor,
-            showAddModal ? "Add Instructor" : "Save Changes"
-          )}
         </div>
-      </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
@@ -382,74 +389,141 @@ const InstructorManagement = () => {
     tips: [],
   });
 
-  const [instructors, setInstructors] = useState([
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      image:
-        "https://www.santander.co.uk/assets/s3fs-public/styles/d4/public/dimages/gettyimages-1361392268extendedpattern.jpg?itok=CfqdWipr",
-      coverImage:
-        "https://media.gettyimages.com/id/1405951139/photo/cat-wearing-summer-clothing.jpg?s=612x612&w=0&k=20&c=JcSIDE-rTXEduq-iplJjS6672w8a3Aba96hGl9erlqo=",
-      qualifications: [
-        "RYT-500",
-        "Prenatal Yoga Certified",
-        "Meditation Expert",
-      ],
-      location: "Downtown Studio",
-      experience: 8,
-      specialties: ["Hatha", "Vinyasa", "Prenatal"],
-      currentCourses: ["Morning Flow", "Prenatal Basics", "Advanced Vinyasa"],
-      rating: 4.9,
-      feedback: [
-        {
-          id: 1,
-          text: "Amazing prenatal yoga instructor! Made me feel safe and confident.",
-          rating: 5,
-        },
-        {
-          id: 2,
-          text: "Her morning flow class is the perfect way to start the day.",
-          rating: 5,
-        },
-      ],
-      tips: [
-        "Focus on breath synchronization in vinyasa flows",
-        "Practice mindfulness off the mat",
-        "Stay hydrated before and after practice",
-      ],
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      image:
-        "https://t4.ftcdn.net/jpg/00/77/51/81/360_F_77518136_F88I0v3R2mZsKEgxxXMc4iqXlOjK8OLE.jpg",
-      coverImage:
-        "https://media.gettyimages.com/id/182158909/photo/tabby-cat-riding-a-bicycle-with-sunglasses.jpg?s=612x612&w=0&k=20&c=v9iVkFCj0M9_X0FKEa5EyONPvF_Dy5y5Lt088zgte9g=",
-      qualifications: ["RYT-200", "Ashtanga Certified", "Yoga Therapy"],
-      location: "East End Studio",
-      experience: 5,
-      specialties: ["Ashtanga", "Power Yoga", "Therapeutic"],
-      currentCourses: ["Ashtanga Primary", "Yoga Basics", "Therapeutic Yoga"],
-      rating: 4.8,
-      feedback: [
-        {
-          id: 1,
-          text: "Michael's attention to alignment is exceptional.",
-          rating: 5,
-        },
-        {
-          id: 2,
-          text: "Great at adapting poses for different ability levels.",
-          rating: 4,
-        },
-      ],
-      tips: [
-        "Maintain steady ujjayi breath",
-        "Build strength through consistent practice",
-        "Listen to your body's limits",
-      ],
-    },
-  ]);
+  const handleEditModalOpen = (instructor) => {
+    setFormData({
+      firstName: instructor.name.split(" ")[0] || "",
+      lastName: instructor.name.split(" ")[1] || "",
+      email: instructor.email || "",
+      phone: instructor.phone || "",
+      bio: instructor.bio || "",
+      YOE: instructor.experience || "",
+      location: instructor.location ? [instructor.location] : [], // Ensure location is an array
+      qualifications: instructor.qualifications || [],
+      specialties: instructor.specialties || [],
+      tips: instructor.tips || [],
+      rating: instructor.rating || "",
+    });
+    setShowEditModal(true);
+  };
+
+  const handleDeleteModalOpen = (instructor) => {
+    setSelectedInstructor(instructor);
+    setShowDeleteConfirm(true);
+  };
+
+  const [instructors, setInstructors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      try {
+        setLoading(true);
+        const response = await getInstructor();
+
+        if (response && Array.isArray(response)) {
+          const formattedInstructors = response.map((instructor) => ({
+            id: instructor._id,
+            name: `${instructor.firstName} ${instructor.lastName}`,
+            image: instructor.main_photo,
+            coverImage: instructor.cover_photo,
+            qualifications: instructor.qualifications || [],
+            location: (instructor.location && instructor.location[0]) || "",
+            experience: instructor.YOE || 0,
+            specialties: instructor.specialties || [],
+            currentCourses: [],
+            rating: parseFloat(instructor.rating) || 0,
+            feedback: [],
+            tips: instructor.tips || [],
+            email: instructor.email,
+            phone: instructor.phone,
+            bio: instructor.bio,
+            certifications: instructor.certifications || [],
+          }));
+
+          setInstructors(formattedInstructors);
+        } else {
+          console.error("Unexpected response format:", response);
+        }
+      } catch (error) {
+        setError(error);
+        console.error("Error fetching instructors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstructors();
+  }, []);
+
+  const fetchInstructorDetails = async (instructorId) => {
+    try {
+      setLoading(true);
+      const response = await getInstructorById(instructorId);
+
+      if (response.success) {
+        const instructor = response.data;
+        const formattedInstructor = {
+          id: instructor._id,
+          name: `${instructor.firstName} ${instructor.lastName}`,
+          image: instructor.main_photo || "/default-profile.jpg",
+          coverImage: instructor.cover_photo || "/default-cover.jpg",
+          qualifications: instructor.qualifications || [],
+          location: instructor.location?.[0] || "",
+          experience: instructor.YOE || 0,
+          specialties: instructor.specialties || [],
+          currentCourses: [],
+          rating: parseFloat(instructor.rating) || 0,
+          feedback: [],
+          tips: instructor.tips || [],
+        };
+        setSelectedInstructor(formattedInstructor);
+      }
+    } catch (error) {
+      setError(error);
+      console.error("Error fetching instructor details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedInstructor && selectedInstructor.id) {
+      fetchInstructorDetails(selectedInstructor.id);
+    }
+  }, [selectedInstructor]);
+
+  const handleDeleteInstructor = async () => {
+    try {
+      if (!selectedInstructor || !selectedInstructor.id) {
+        alert("No instructor selected for deletion");
+        return;
+      }
+
+      // Call the deleteInstructor API method
+      await deleteInstructor(selectedInstructor.id);
+
+      // Remove the instructor from the local state
+      setInstructors((prevInstructors) =>
+        prevInstructors.filter(
+          (instructor) => instructor.id !== selectedInstructor.id
+        )
+      );
+
+      // Close the delete confirmation modal
+      setShowDeleteConfirm(false);
+
+      // Clear the selected instructor
+      setSelectedInstructor(null);
+
+      // Show success message
+      // alert("Instructor deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting instructor:", error);
+      alert(`Failed to delete instructor: ${error.message}`);
+    }
+  };
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -459,64 +533,69 @@ const InstructorManagement = () => {
 
   const handleAddInstructor = async () => {
     try {
-      const processedFormData = {
-        ...formData,
-        location: formData.location
-          ? Array.isArray(formData.location)
-            ? formData.location
-            : formData.location.split(",").map((item) => item.trim())
-          : [],
-        certifications: formData.certifications
-          ? Array.isArray(formData.certifications)
-            ? formData.certifications
-            : formData.certifications.split(",").map((item) => item.trim())
-          : [],
-        qualifications: formData.qualifications
-          ? Array.isArray(formData.qualifications)
-            ? formData.qualifications
-            : formData.qualifications.split(",").map((item) => item.trim())
-          : [],
-        specialties: formData.specialties
-          ? Array.isArray(formData.specialties)
-            ? formData.specialties
-            : formData.specialties.split(",").map((item) => item.trim())
-          : [],
-        tips: formData.tips
-          ? Array.isArray(formData.tips)
-            ? formData.tips
-            : formData.tips.split(",").map((item) => item.trim())
-          : [],
-      };
+      const response = await createInstructor(formData);
 
-      const response = await createInstructor(processedFormData);
-
-      if (response.success) {
+      if (response) {
+        // Add the new instructor to the list
         const newInstructor = {
-          id: response.data._id,
-          name: `${response.data.firstName} ${response.data.lastName}`,
-          image: response.data.main_photo || "/default-profile.jpg",
-          coverImage: response.data.cover_photo || "/default-cover.jpg",
-          qualifications: response.data.qualifications || [],
-          location: response.data.location?.[0] || "",
-          experience: response.data.YOE || 0,
-          specialties: response.data.specialties || [],
+          id: response._id,
+          name: `${response.firstName} ${response.lastName}`,
+          image: response.main_photo || "/default-profile.jpg",
+          coverImage: response.cover_photo || "/default-cover.jpg",
+          qualifications: response.qualifications || [],
+          location: response.location?.[0] || "",
+          experience: response.YOE || 0,
+          specialties: response.specialties || [],
           currentCourses: [],
-          rating: parseFloat(response.data.rating) || 0,
+          rating: parseFloat(response.rating) || 0,
           feedback: [],
-          tips: response.data.tips || [],
+          tips: response.tips || [],
+          email: response.email,
+          phone: response.phone,
+          bio: response.bio,
         };
 
-        setInstructors([...instructors, newInstructor]);
+        setInstructors((prevInstructors) => [
+          ...prevInstructors,
+          newInstructor,
+        ]);
+
+        setSelectedInstructor(newInstructor);
+
         setShowAddModal(false);
-        setFormData({}); 
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          bio: "",
+          YOE: "",
+          main_photo: null,
+          cover_photo: null,
+          certifications: [],
+          location: [],
+          qualifications: [],
+          specialties: [],
+          tips: [],
+          rating: "",
+        });
 
         alert("Instructor added successfully!");
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error creating instructor:", error);
-      alert("Error creating instructor. Please try again.");
+      alert(`Error creating instructor: ${error.message}`);
     }
   };
+
+  useEffect(() => {
+    if (instructors.length > 0) {
+      console.log("Instructors updated:", instructors);
+      // Update any dependent logic if necessary
+    }
+  }, [instructors]);
+  
 
   const handleFileChange = (e, field) => {
     const file = e.target.files[0];
@@ -540,16 +619,6 @@ const InstructorManagement = () => {
     setFormData({});
   };
 
-  const handleDeleteInstructor = () => {
-    setInstructors(
-      instructors.filter(
-        (instructor) => instructor.id !== selectedInstructor.id
-      )
-    );
-    setShowDeleteConfirm(false);
-    setSelectedInstructor(null);
-  };
-
   const filteredInstructors = instructors.filter(
     (instructor) =>
       instructor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -558,11 +627,7 @@ const InstructorManagement = () => {
       )
   );
 
-  const [show] = useState(true);
-
-  return show ? (
-    <ComingSoonPage />
-  ) : (
+  return (
     <div
       className={`min-h-screen transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100 bg-slate-100 text-gray-900 px-2 py-3 `}
     >
@@ -608,14 +673,14 @@ const InstructorManagement = () => {
                   key={instructor.id}
                   onClick={() => setSelectedInstructor(instructor)}
                   className="cursor-pointer rounded-lg border dark:border-slate-600 bg-white 
-                           dark:bg-slate-800 hover:shadow-lg dark:hover:shadow-slate-700/50 
-                           transition-all duration-200 overflow-hidden group flex "
+                             dark:bg-slate-800 hover:shadow-lg dark:hover:shadow-slate-700/50 
+                             transition-all duration-200 overflow-hidden group flex "
                 >
                   <div className="p-4 flex items-start space-x-5">
                     <img
                       src={instructor.image}
                       alt={instructor.name}
-                      className="w-20 h-20 rounded-full object-cover ring-2 ring-purple-500/20 group-hover:ring-purple-500/50 transition-all duration-200 "
+                      className="w-20 h-20 rounded-full object-cover ring-2 ring-purple-500/20 group-hover:ring-purple-500/50 transition-all duration-200"
                     />
                     <div>
                       <h3 className="font-semibold text-lg group-hover:text-purple-500 transition-colors duration-200">
@@ -623,7 +688,7 @@ const InstructorManagement = () => {
                       </h3>
                       <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-1">
                         <MapPin size={16} className="mr-1 text-purple-500" />
-                        {instructor.location}
+                        {instructor.location || "No location"}
                       </div>
                       <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-1">
                         <Award size={16} className="mr-1 text-purple-500" />
@@ -631,7 +696,7 @@ const InstructorManagement = () => {
                       </div>
                       <div className="flex items-center text-sm text-yellow-500 mt-1">
                         <Star size={16} className="mr-1" fill="currentColor" />
-                        {instructor.rating}
+                        {instructor.rating || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -644,41 +709,35 @@ const InstructorManagement = () => {
           {selectedInstructor && (
             <div
               className="md:col-span-1 rounded-lg border dark:border-slate-600 bg-white 
-                dark:bg-slate-800 transition-colors duration-200 overflow-hidden"
+            dark:bg-slate-800 transition-colors duration-200 overflow-hidden"
             >
               <div className="p-4">
                 <div className="relative mb-6">
+                  {/* Cover Image */}
                   <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
                     <img
-                      src={selectedInstructor.coverImage}
+                      src={
+                        selectedInstructor.coverImage || "/default-cover.jpg"
+                      }
                       alt={selectedInstructor.name}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      onError={(e) => {
-                        console.error(
-                          "Error loading cover image:",
-                          e.target.src
-                        );
-                        e.target.src = "fallback-image-url";
-                      }}
                     />
 
                     <div className="absolute top-4 right-4 flex space-x-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedInstructor(selectedInstructor);
-                          setFormData(selectedInstructor);
-                          setShowEditModal(true);
+                          handleEditModalOpen(selectedInstructor);
                         }}
                         className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
                       >
                         <Edit className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       </button>
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedInstructor(selectedInstructor);
-                          setShowDeleteConfirm(true);
+                          handleDeleteModalOpen(selectedInstructor);
                         }}
                         className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-white dark:hover:bg-gray-700 transition-colors shadow-lg"
                       >
@@ -687,130 +746,137 @@ const InstructorManagement = () => {
                     </div>
                   </div>
 
-                  {/* Profile image overlay */}
+                  {/* Profile Image */}
                   <div className="absolute -bottom-4 left-4">
                     <div className="relative">
                       <img
-                        src={selectedInstructor.image}
+                        src={selectedInstructor.image || "/default-profile.jpg"}
                         alt={selectedInstructor.name}
                         className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-800 
-                       object-cover shadow-lg hover:shadow-xl transition-shadow duration-300"
+             object-cover shadow-lg hover:shadow-xl transition-shadow duration-300"
                       />
-                      <div
-                        className="absolute -bottom-2 -right-2 bg-green-500 w-5 h-5 rounded-full 
-                          border-2 border-white dark:border-slate-800"
-                      ></div>
                     </div>
                   </div>
                 </div>
 
+                {/* Name */}
                 <h2
                   className="text-xl font-semibold mb-4 bg-gradient-to-r from-purple-500 to-pink-500 
-                     bg-clip-text text-transparent pl-32"
+           bg-clip-text text-transparent pl-32"
                 >
                   {selectedInstructor.name}
                 </h2>
 
-                {/* <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedInstructor(selectedInstructor);
-                      setFormData(selectedInstructor);
-                      setShowEditModal(true);
-                    }}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedInstructor(instructor);
-                      setShowDeleteConfirm(true);
-                    }}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div> */}
-
                 <div className="space-y-6">
-                  {/* Rest of the content remains the same */}
-                  <div>
-                    <h3 className="font-medium mb-2 flex items-center text-purple-500 dark:text-purple-400">
-                      <Award size={16} className="mr-2" />
-                      Qualifications
-                    </h3>
-                    <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-300">
-                      {selectedInstructor.qualifications.map((qual, idx) => (
-                        <li
-                          key={idx}
-                          className="hover:text-purple-500 transition-colors duration-200"
-                        >
-                          {qual}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {/* Bio */}
+                  {selectedInstructor.bio && (
+                    <div>
+                      <h3 className="font-medium mb-2 text-purple-500 dark:text-purple-400">
+                        Bio
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {selectedInstructor.bio}
+                      </p>
+                    </div>
+                  )}
 
-                  <div>
-                    <h3 className="font-medium mb-2 flex items-center text-purple-500 dark:text-purple-400">
-                      <Book size={16} className="mr-2" />
-                      Current Courses
-                    </h3>
-                    <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-300">
-                      {selectedInstructor.currentCourses.map((course, idx) => (
-                        <li
-                          key={idx}
-                          className="hover:text-purple-500 transition-colors duration-200"
-                        >
-                          {course}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {/* Qualifications */}
+                  {selectedInstructor.qualifications &&
+                    selectedInstructor.qualifications.length > 0 && (
+                      <div>
+                        <h3 className="font-medium mb-2 flex items-center text-purple-500 dark:text-purple-400">
+                          <Award size={16} className="mr-2" />
+                          Qualifications
+                        </h3>
+                        <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-300">
+                          {selectedInstructor.qualifications.map(
+                            (qual, idx) => (
+                              <li
+                                key={idx}
+                                className="hover:text-purple-500 transition-colors duration-200"
+                              >
+                                {qual}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    )}
 
-                  <div>
-                    <h3 className="font-medium mb-2 flex items-center text-purple-500 dark:text-purple-400">
-                      <MessageSquare size={16} className="mr-2" />
-                      Recent Feedback
-                    </h3>
-                    <div className="space-y-2">
-                      {selectedInstructor.feedback.map((fb) => (
-                        <div
-                          key={fb.id}
-                          className="text-sm p-3 rounded-lg bg-gray-50 dark:bg-slate-700/50 
-                                                  border dark:border-slate-600 hover:border-purple-500 transition-colors duration-200"
-                        >
-                          <div className="flex items-center text-yellow-500 mb-1">
-                            {[...Array(fb.rating)].map((_, i) => (
-                              <Star key={i} size={12} fill="currentColor" />
-                            ))}
-                          </div>
-                          <p className="text-gray-600 dark:text-gray-300">
-                            {fb.text}
-                          </p>
-                        </div>
-                      ))}
+                  {/* Specialties */}
+                  {selectedInstructor.specialties &&
+                    selectedInstructor.specialties.length > 0 && (
+                      <div>
+                        <h3 className="font-medium mb-2 text-purple-500 dark:text-purple-400">
+                          Specialties
+                        </h3>
+                        <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-300">
+                          {selectedInstructor.specialties.map(
+                            (specialty, idx) => (
+                              <li
+                                key={idx}
+                                className="hover:text-purple-500 transition-colors duration-200"
+                              >
+                                {specialty}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    )}
+
+                  {/* Additional Details */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="font-medium mb-2 text-purple-500 dark:text-purple-400">
+                        Experience
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {selectedInstructor.experience} years
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium mb-2 text-purple-500 dark:text-purple-400">
+                        Location
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {selectedInstructor.location || "Not specified"}
+                      </p>
                     </div>
                   </div>
 
+                  {/* Contact Information */}
                   <div>
                     <h3 className="font-medium mb-2 text-purple-500 dark:text-purple-400">
-                      Yoga Tips
+                      Contact Information
                     </h3>
-                    <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-300">
-                      {selectedInstructor.tips.map((tip, idx) => (
-                        <li
-                          key={idx}
-                          className="hover:text-purple-500 transition-colors duration-200"
-                        >
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      <strong>Email:</strong> {selectedInstructor.email}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      <strong>Phone:</strong> {selectedInstructor.phone}
+                    </p>
                   </div>
+
+                  {/* Tips */}
+                  {selectedInstructor.tips &&
+                    selectedInstructor.tips.length > 0 && (
+                      <div>
+                        <h3 className="font-medium mb-2 text-purple-500 dark:text-purple-400">
+                          Yoga Tips
+                        </h3>
+                        <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-300">
+                          {selectedInstructor.tips.map((tip, idx) => (
+                            <li
+                              key={idx}
+                              className="hover:text-purple-500 transition-colors duration-200"
+                            >
+                              {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                 </div>
               </div>
             </div>

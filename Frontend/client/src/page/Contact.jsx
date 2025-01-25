@@ -9,13 +9,19 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Footer from "../Components/Footer";
+import { sendForm } from "../api/api";
 
 const ContactUs = () => {
+  const user = localStorage.getItem("user");
+  const parsedUserData = user ? JSON.parse(user) : null;
+
+
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
-    phone: "",
+    subject: "",
     message: "",
+    id: parsedUserData?.id,
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -24,19 +30,33 @@ const ContactUs = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitted(true);
-    console.log("Form Data Submitted:", formData);
-    setTimeout(() => {
+  
+    try {
+      const response = await sendForm(formData);
+      
+      if (response.success) {
+        alert(response.message);
+      } else {
+        console.error(response.message);
+      }
+  
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          id: parsedUserData?.id,
+        });
+      }, 3000);
+    } catch (error) {
+      console.error('Submission error:', error);
       setIsSubmitted(false);
-      setFormData({
-        fullName: "",
-        email: "",
-        phone: "",
-        message: "",
-      });
-    }, 3000);
+    }
   };
 
   const contactInfo = [
@@ -155,11 +175,11 @@ const ContactUs = () => {
                     </label>
                     <input
                       type="text"
-                      name="fullName"
-                      value={formData.fullName}
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-300"
-                      placeholder="Enter your full name"
+                      placeholder="Enter your full Full name"
                       required
                     />
                   </div>
@@ -180,16 +200,16 @@ const ContactUs = () => {
                   </div>
 
                   <div>
-                    <label className="block text-gray-700 dark:text-gray-200 font-medium mb-2">
-                      Phone Number
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium mb-2">
+                      Subject
                     </label>
                     <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      placeholder="Subject"
+                      className="w-full p-4 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-all duration-300"
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-300"
-                      placeholder="Enter your phone number"
                       required
                     />
                   </div>

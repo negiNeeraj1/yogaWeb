@@ -32,11 +32,11 @@ const Sidebar = () => {
       name: "Help and Support",
       path: "/yogadashboard/contact",
     },
-    {
-      icon: <CreditCard className="w-5 h-5" />,
-      name: "Subscription",
-      path: "/yogadashboard/subscription",
-    },
+    // {
+    //   icon: <CreditCard className="w-5 h-5" />,
+    //   name: "Subscription",
+    //   path: "/yogadashboard/subscription",
+    // },
     {
       icon: <MapPin className="w-5 h-5" />,
       name: "Our Centers",

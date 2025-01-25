@@ -39,11 +39,11 @@ const Sidebar = ({ isCollapsed, onToggleCollapse }) => {
       text: "User Management",
       path: "/user-management",
     },
-    // {
-    //   icon: Users,
-    //   text: "Instructor Management",
-    //   path: "/instructor-management",
-    // },
+    {
+      icon: Users,
+      text: "Instructor Management",
+      path: "/instructor-management",
+    },
     // {
     //   icon: FileText,
     //   text: "Blog Management",

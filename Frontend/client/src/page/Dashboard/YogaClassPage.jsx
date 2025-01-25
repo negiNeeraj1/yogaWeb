@@ -276,17 +276,17 @@ const YogaClassPage = () => {
               </h1>
               <div className="flex flex-wrap gap-4 mb-4">
                 <div className="flex items-center text-gray-600 dark:text-gray-300">
-                  <Clock className="w-5 h-5 mr-2" />
+                  <Clock className="w-5 h-5 mr-2 text-purple-400" />
                   {yogaClass.totalClasses} Classes
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-gray-300">
-                  <Users className="w-5 h-5 mr-2" />
+                  <Users className="w-5 h-5 mr-2 text-purple-400" />
                   with {yogaClass.instructor.email}
                 </div>
-                <div className="flex items-center text-gray-600 dark:text-gray-300">
+                {/* <div className="flex items-center text-gray-600 dark:text-gray-300">
                   <Star className="w-5 h-5 mr-2 text-yellow-500" />
                   {yogaClass.status}
-                </div>
+                </div> */}
               </div>
             </div>
             <button
@@ -430,6 +430,13 @@ const YogaClassPage = () => {
                     {yogaClass.category} - {yogaClass.type || "In Person"}
                   </span>
                 </div>
+                {/* <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <Users className="w-5 h-5 mr-3 text-blue-500" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">
+                    {yogaClass.capacity - yogaClass.remainingClasses} of{" "}
+                    {yogaClass.capacity} spots filled
+                  </span>
+                </div> */}
                 <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                   <Users className="w-5 h-5 mr-3 text-blue-500" />
                   <span className="text-gray-700 dark:text-gray-300 font-medium">
