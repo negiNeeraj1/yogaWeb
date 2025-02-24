@@ -2,6 +2,13 @@ import React from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import Footer from "../Components/Footer"
+import Pose1 from "../assets/images/pose1.jpg"
+import Pose2 from "../assets/images/pose2.jpg"
+import Pose3 from "../assets/images/pose3.jpg"
+import Pose4 from "../assets/images/pose4.jpg"
+import Pose5 from "../assets/images/pose5.jpg"
+import Pose6 from "../assets/images/pose6.jpg"
+import Pose7 from "../assets/images/pose7.jpg"
 
 const About = () => {
   const achievements = [
@@ -59,15 +66,14 @@ const About = () => {
   const galleryItems = [
     {
       id: 1,
-      image:
-        "https://th.bing.com/th/id/OIP.a047Qj8J1Azlo6nkOHNBUgHaHa?w=157&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+      image:Pose1 ,
       title: "Morning Ashtanga Class",
       description: "Students practicing sun salutations at sunrise",
       height: "tall",
     },
     {
       id: 2,
-      image: "https://wallpaperaccess.com/full/139142.jpg",
+      image: Pose2,
       title: "Meditation Session",
       description: "Group meditation in our peaceful garden",
       height: "medium",
@@ -75,7 +81,7 @@ const About = () => {
     {
       id: 3,
       image:
-        "https://th.bing.com/th/id/OIP.Enef_Pv0oXeBGHdsIB6FcgHaEK?rs=1&pid=ImgDetMain",
+        Pose3,
       title: "Vinyasa Flow",
       description: "Dynamic flow class with advanced practitioners",
       height: "medium",
@@ -83,43 +89,28 @@ const About = () => {
     {
       id: 4,
       image:
-        "https://th.bing.com/th/id/OIP.xCQfBnF1QNqaQkbZJHo-iAHaE8?rs=1&pid=ImgDetMain",
-      title: "Aerial Yoga Workshop",
-      description: "Learning inversions with silk support",
-      height: "tall",
-    },
-    {
-      id: 5,
-      image:
-        "https://th.bing.com/th/id/OIP.VV-AgoS6nh3f8dBmFcxH3QHaEK?rs=1&pid=ImgDetMain",
+        Pose5,
       title: "Partner Yoga",
       description: "Building trust and connection through yoga",
       height: "short",
     },
     {
-      id: 6,
+      id: 5,
       image:
-        "https://th.bing.com/th/id/OIP.hJb8J46BSDNFUZAz9SJ5YgHaEw?w=700&h=450&rs=1&pid=ImgDetMain",
+        Pose6,
       title: "Kids Yoga Class",
       description: "Making yoga fun for little ones",
       height: "medium",
     },
     {
-      id: 7,
+      id: 6,
       image:
-        "https://th.bing.com/th/id/OIP.L5LpLapOrbemxlhednPdWwHaE0?w=289&h=174&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        Pose7,
       title: "Sunset Yoga",
       description: "Beachside yoga session in Goa",
       height: "tall",
     },
-    {
-      id: 8,
-      image:
-        "https://th.bing.com/th/id/OIP.0YPjqrhriIVoyAKQgaZsfwHaDt?w=349&h=174&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      title: "Teacher Training",
-      description: "Advanced posture workshops",
-      height: "medium",
-    },
+   
   ];
 
   return (
