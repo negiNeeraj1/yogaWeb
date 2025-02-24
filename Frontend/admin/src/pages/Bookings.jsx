@@ -477,7 +477,7 @@ const ClassManagement = () => {
       }
     } catch (error) {
       console.error("Error creating class:", error);
-      alert("Failed to create class. Please try again.");
+      alert(error);
     }
   };
 
