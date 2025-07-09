@@ -22,8 +22,6 @@ const Footer = () => {
     { name: "Blog & Articles", href: "/blog" },
     { name: "Contact Us", href: "/contact" },
   ];
-
-
   const yogaClasses = [
     { name: "Hatha Yoga", href: "/classes/hatha" },
     { name: "Vinyasa Flow", href: "/classes/vinyasa" },
