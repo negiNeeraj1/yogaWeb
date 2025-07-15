@@ -37,6 +37,7 @@ const Footer = () => {
     { day: "Sunday", hours: "8:00 AM - 6:00 PM" },
   ];
 
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
