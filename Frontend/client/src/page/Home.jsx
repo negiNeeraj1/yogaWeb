@@ -9,7 +9,7 @@ import Footer from "../Components/Footer";
 import RecommendedBatches from "../Components/RecommendedBatches";
 import DarkModeClasses from "../Components/DarkMode";
 import Yoga from "../assets/yoga00.png";
-import Yoga3 from "../assets/yoga3.0.png";
+import Yoga3 from "../assets/yoga3.jpg";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
